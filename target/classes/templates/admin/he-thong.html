@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quản trị hệ thống</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="top"><div>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định (Thông tư 04/2025)</div><div>−　□　⊙</div></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="user"><div class="avatar">QT</div><div><b>Người dùng</b><small>Đang tải...</small></div></div>
+      <nav class="nav">
+        <a href="/admin">▦ <span>Tổng quan</span></a>
+        <a href="/admin/ctdt">▤ <span>Quản lý CTĐT</span></a>
+        <a href="/admin/tieu-chuan">☷ <span>Quản lý bộ tiêu chuẩn</span></a>
+        <a href="/admin/nhom">♣ <span>Quản lý nhóm</span></a><a href="/admin/phan-cong">♟ <span>Phân công nhiệm vụ</span></a>
+        <a href="/admin/minh-chung">▧ <span>Quản lý minh chứng</span></a>
+        <a href="/admin/bao-cao">▱ <span>Báo cáo tự đánh giá</span></a>
+        <a href="/admin/he-thong">⚙ <span>Quản trị hệ thống</span></a>
+      </nav>
+      <div class="version">Phiên bản: HeThongKiemDinh24<br>Thông tư 04/2025/TT-BGDĐT</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-head">
+        <h1>Quản trị hệ thống</h1>
+        <p>Tạo người dùng, cấp vai trò và tài khoản đăng nhập. Email chính là tên đăng nhập; mật khẩu ban đầu do Admin đặt.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="notice"><b>Phân biệt:</b> Vai trò tại trang này là <b>vai trò hệ thống</b> dùng để phân quyền đăng nhập. Chức vụ Trưởng nhóm / Thư ký nhóm / Thành viên được gán riêng trong trang Quản lý nhóm và không làm thay đổi vai trò hệ thống.</div>
+            <div class="notice"><b>Quy tắc tài khoản:</b> Khi thêm người mới phải chọn vai trò và đặt mật khẩu tối thiểu 6 ký tự. Tài khoản không được xóa khỏi hệ thống. Khi nhân sự không còn hoạt động, Admin chỉ chuyển trạng thái sang Khóa.</div>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <input id="q" placeholder="Tìm theo mã, họ tên, email, vai trò...">
+              <select id="filterRole"><option value="">Tất cả vai trò</option></select>
+            </div>
+            <button class="btn-primary" onclick="openUser()">+ Thêm thành viên / tài khoản</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Mã</th><th>Họ tên</th><th>Tài khoản (Email)</th><th>Vai trò</th><th>SĐT</th><th>Khoa</th><th>Trình độ</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" id="mUser">
+        <div class="modal-box">
+          <div class="modal-head"><span id="modalTitle">Thêm thành viên mới</span><button onclick="closeModal('mUser')">×</button></div>
+          <div class="modal-body">
+            <div class="notice" id="accountNotice">Email sẽ được dùng làm tên đăng nhập. Admin đặt mật khẩu ban đầu cho tài khoản mới.</div>
+            <div class="form-grid">
+              <div class="field"><label>Mã người dùng</label><input id="u_id" readonly class="readonly" value="Tự động khi lưu"></div>
+              <div class="field"><label>Vai trò *</label><select id="u_role"><option value="">-- Chọn vai trò --</option></select></div>
+              <div class="field full"><label>Họ tên *</label><input id="u_ten" placeholder="Nguyễn Văn A"></div>
+              <div class="field"><label>Email / Tên đăng nhập *</label><input id="u_email" type="email" placeholder="nguyenvana@huit.edu.vn"></div>
+              <div class="field"><label>Số điện thoại</label><input id="u_sdt"></div>
+              <div class="field"><label>Khoa</label><input id="u_khoa" value="Công nghệ Thông tin"></div>
+              <div class="field"><label>Trình độ</label><select id="u_td"><option value="">-- Chọn trình độ --</option><option>Cử nhân</option><option>Kỹ sư</option><option>Thạc sĩ</option><option>Tiến sĩ</option></select></div>
+              <div class="field"><label>Trạng thái</label><select id="u_tt"><option>Hoạt động</option><option>Khóa</option></select></div>
+              <div class="field"><label id="passwordLabel">Mật khẩu ban đầu *</label><input id="u_pass" type="password" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự"></div>
+              <div class="field"><label>Xác nhận mật khẩu</label><input id="u_pass2" type="password" autocomplete="new-password" placeholder="Nhập lại mật khẩu"></div>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn-light" onclick="closeModal('mUser')">Hủy</button>
+            <button class="btn-primary" onclick="saveUser()">Lưu người dùng & tài khoản</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let data=[], roles=[], editing=null;
+    const roleName=id=>roles.find(r=>r.id===id)?.tenVaiTro||id||'';
+    const userRoleId=x=>x?.phanQuyen?.[0]?.maVaiTro||'';
+
+    async function load(){
+      [data,roles]=await Promise.all([api('/nguoi-dung'),api('/vai-tro')]);
+      fillRoles(); render();
+    }
+
+    function fillRoles(){
+      const opts=roles.map(r=>`<option value="${esc(r.id)}">${esc(r.tenVaiTro)}</option>`).join('');
+      $('#u_role').innerHTML='<option value="">-- Chọn vai trò --</option>'+opts;
+      $('#filterRole').innerHTML='<option value="">Tất cả vai trò</option>'+opts;
+    }
+
+    function render(){
+      const q=$('#q').value.toLowerCase();
+      const fr=$('#filterRole').value;
+      const a=data.filter(x=>{
+        const rn=roleName(userRoleId(x));
+        return (!q||(`${JSON.stringify(x)} ${rn}`).toLowerCase().includes(q)) && (!fr||userRoleId(x)===fr);
+      });
+      $('#rows').innerHTML=a.map(x=>{
+        const active=x.trangThai==='Hoạt động';
+        return `<tr>
+          <td>${esc(x.id)}</td>
+          <td>${esc(x.hoTen)}</td>
+          <td><b>${esc(x.email)}</b><br><small style="color:#778397">Dùng để đăng nhập</small></td>
+          <td><span class="badge b-blue">${esc(roleName(userRoleId(x))||'Chưa phân vai trò')}</span></td>
+          <td>${esc(x.soDienThoai)}</td>
+          <td>${esc(x.khoa)}</td>
+          <td>${esc(x.trinhDo)}</td>
+          <td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai)}</span></td>
+          <td><div class="actions">
+            <button class="btn-light" onclick='editUser(${JSON.stringify(x)})'>Sửa</button>
+            <button class="btn-light" onclick="toggle('${x.id}')">${active?'Khóa':'Mở khóa'}</button>
+          </div></td>
+        </tr>`;
+      }).join('')||'<tr><td colspan="9" class="empty">Chưa có người dùng</td></tr>';
+    }
+
+    $('#q').addEventListener('input',render);
+    $('#filterRole').addEventListener('change',render);
+
+    function openUser(){
+      editing=null;
+      $('#modalTitle').textContent='Thêm thành viên mới';
+      $('#accountNotice').innerHTML='Email sẽ được dùng làm <b>tên đăng nhập</b>. Admin phải chọn <b>vai trò</b> và đặt <b>mật khẩu ban đầu</b>.';
+      $('#passwordLabel').textContent='Mật khẩu ban đầu *';
+      $('#u_id').value='Tự động khi lưu';
+      ['u_ten','u_email','u_sdt','u_pass','u_pass2'].forEach(k=>$('#'+k).value=''); $('#u_td').value='';
+      $('#u_khoa').value='Công nghệ Thông tin'; $('#u_tt').value='Hoạt động'; $('#u_role').value='';
+      openModal('mUser');
+    }
+
+    function editUser(x){
+      editing=x.id;
+      $('#modalTitle').textContent='Cập nhật thành viên / tài khoản';
+      $('#accountNotice').innerHTML='Để trống mật khẩu nếu <b>không muốn đổi mật khẩu</b>. Nếu nhập mật khẩu mới, hệ thống sẽ thay mật khẩu đăng nhập hiện tại.';
+      $('#passwordLabel').textContent='Mật khẩu mới (không bắt buộc)';
+      $('#u_id').value=x.id; $('#u_ten').value=x.hoTen||''; $('#u_email').value=x.email||''; $('#u_sdt').value=x.soDienThoai||'';
+      $('#u_khoa').value=x.khoa||''; $('#u_td').value=x.trinhDo||''; $('#u_tt').value=x.trangThai||'Hoạt động';
+      $('#u_role').value=userRoleId(x); $('#u_pass').value=''; $('#u_pass2').value='';
+      openModal('mUser');
+    }
+
+    async function saveUser(){
+      const pass=$('#u_pass').value, pass2=$('#u_pass2').value;
+      const b={
+        id:editing,
+        hoTen:$('#u_ten').value.trim(),
+        email:$('#u_email').value.trim(),
+        matKhau:pass||null,
+        soDienThoai:$('#u_sdt').value.trim(),
+        khoa:$('#u_khoa').value.trim(),
+        trinhDo:$('#u_td').value.trim(),
+        trangThai:$('#u_tt').value,
+        phanQuyen:[{maVaiTro:$('#u_role').value}]
+      };
+      if(!b.hoTen)return alert('Vui lòng nhập họ tên');
+      if(!b.email)return alert('Vui lòng nhập email. Email chính là tài khoản đăng nhập.');
+      if(!$('#u_role').value)return alert('Vui lòng chọn vai trò');
+      if(!editing && pass.length<6)return alert('Admin phải đặt mật khẩu ban đầu tối thiểu 6 ký tự');
+      if(pass && pass.length<6)return alert('Mật khẩu tối thiểu 6 ký tự');
+      if(pass!==pass2)return alert('Xác nhận mật khẩu chưa khớp');
+      try{
+        await api('/nguoi-dung',{method:'POST',body:JSON.stringify(b)});
+        closeModal('mUser'); await load();
+      }catch(e){alert(e.message)}
+    }
+
+    async function toggle(id){try{await api('/nguoi-dung/'+id+'/toggle',{method:'POST'});load()}catch(e){alert(e.message)}}
+    load();
+  </script>
+</body>
+</html>

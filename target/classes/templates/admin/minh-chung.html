@@ -1,0 +1,73 @@
+<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quản lý minh chứng</title><link rel="stylesheet" href="/css/app.css"></head><body><div class="top"><div>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định (Thông tư 04/2025)</div><div>−　□　⊙</div></div><div class="shell"><aside class="sidebar"><div class="user"><div class="avatar">QT</div><div><b>Nguyễn Văn Quản Trị</b><small>Quản trị hệ thống</small></div></div><nav class="nav"><a href="/admin">▦ <span>Tổng quan</span></a><a href="/admin/ctdt">▤ <span>Quản lý CTĐT</span></a><a href="/admin/tieu-chuan">☷ <span>Quản lý bộ tiêu chuẩn</span></a><a href="/admin/nhom">♣ <span>Quản lý nhóm</span></a><a href="/admin/phan-cong">♟ <span>Phân công nhiệm vụ</span></a><a href="/admin/minh-chung">▧ <span>Quản lý minh chứng</span></a><a href="/admin/bao-cao">▱ <span>Báo cáo tự đánh giá</span></a><a href="/admin/he-thong">⚙ <span>Quản trị hệ thống</span></a></nav><div class="version">Phiên bản: HeThongKiemDinh24<br>Thông tư 04/2025/TT-BGDĐT</div></aside><main class="main"><div class="page-head"><h1>Quản lý minh chứng</h1><p>Chia thành minh chứng theo tiêu chuẩn/tiêu chí và minh chứng chung cấp trường/khoa. Quản trị viên chỉ được xem và chỉnh sửa minh chứng đã có.</p></div><div class="tabs"><button class="active" data-tab="criterion">Minh chứng tiêu chí</button><button data-tab="common">Minh chứng chung</button></div>
+<div id="criterion" class="tab active"><div class="card"><div class="card-body"><div class="toolbar"><div class="toolbar-left"><select id="fStd"><option value="">Tất cả tiêu chuẩn</option></select><select id="fCri"><option value="">Tất cả tiêu chí</option></select><select id="fSt"><option value="">Tất cả trạng thái</option><option>Chờ Trưởng nhóm duyệt</option><option>Chờ Thư ký duyệt</option><option>Đã duyệt</option><option>Từ chối</option></select><input id="q1" placeholder="Tìm minh chứng..."></div></div><div class="table-wrap"><table><thead><tr><th>Mã</th><th>Tiêu chuẩn</th><th>Tiêu chí</th><th>Tên minh chứng</th><th>File</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="rows1"></tbody></table></div></div></div></div>
+<div id="common" class="tab"><div class="card"><div class="card-body"><div class="notice">Minh chứng chung cấp trường/khoa không có trạng thái duyệt. Quản trị viên chỉ được xem và chỉnh sửa; việc thêm minh chứng do Trưởng nhóm/Thành viên thực hiện ở màn hình nghiệp vụ.</div><div class="toolbar"><input id="q2" placeholder="Tìm minh chứng chung..."></div><div class="table-wrap"><table><thead><tr><th>Mã nội bộ</th><th>Cấp</th><th>Tên minh chứng</th><th>Mô tả</th><th>File</th><th>Thao tác</th></tr></thead><tbody id="rows2"></tbody></table></div></div></div></div>
+<div class="modal" id="mEv"><div class="modal-box"><div class="modal-head"><span id="evTitle">Minh chứng</span><button onclick="closeModal('mEv')">×</button></div><div class="modal-body"><input type="hidden" id="ev_type"><div class="form-grid"><div class="field"><label>Mã nội bộ</label><input id="ev_id" readonly class="readonly"></div><div class="field commonOnly"><label>Cấp quản lý</label><select id="ev_cap"><option>Cấp Trường</option><option>Cấp Khoa</option></select></div><div class="field commonOnly"><label>Số hiệu văn bản</label><input id="ev_sohieu"></div><div class="field commonOnly"><label>Đơn vị ban hành</label><input id="ev_donvi"></div><div class="field commonOnly"><label>Ngày ban hành</label><input id="ev_ngaybanhanh" type="date"></div><div class="field criterionOnly"><label>Tiêu chí</label><select id="ev_tc"></select></div><div class="field criterionOnly"><label>Mã phân công</label><select id="ev_pc"></select></div><div class="field full"><label>Tên minh chứng</label><input id="ev_ten"></div><div class="field full"><label>Mô tả</label><textarea id="ev_mota"></textarea></div><div class="field full"><label>File minh chứng</label><div class="file-edit-box"><div id="ev_current_file" class="notice" style="margin-bottom:8px">Chưa có file</div><input id="ev_file_upload" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"><div class="actions" style="margin-top:8px"><button type="button" class="btn-danger" id="btnDeleteFile" onclick="deleteEvidenceFile()">Xóa file hiện tại</button></div><small>Chọn file mới nếu muốn thay thế file hiện tại. Không cần nhập đường dẫn thủ công.</small></div></div><div class="field criterionOnly"><label>Trạng thái</label><select id="ev_tt"><option>Chờ Trưởng nhóm duyệt</option><option>Chờ Thư ký duyệt</option><option>Đã duyệt</option><option>Từ chối</option></select></div><div class="field"><label>Người upload</label><select id="ev_user"></select></div></div></div><div class="modal-foot"><button class="btn-primary" onclick="saveEv()">Lưu</button></div></div></div>
+</main></div><script src="/js/common.js"></script><script>
+let all=[],common=[],criteria=[],users=[],pc=[],editing=null;
+function inferCriterion(x){if(x.maTieuChi)return x.maTieuChi;const c=(x.maMinhChung||'').trim();const i=c.lastIndexOf('.');return i>0?c.substring(0,i):''}
+function inferStandard(x){if(x.maTieuChuan)return x.maTieuChuan;const tc=criteria.find(t=>t.id===inferCriterion(x));return tc?.maTieuChuan||''}
+function normalizeEvidence(){all=all.map(x=>({...x,maTieuChi:inferCriterion(x),maTieuChuan:inferStandard(x)}))}$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.remove('active'));$$('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')});const nm=id=>criteria.find(x=>x.id===id)?.tenTieuChi||id;
+async function load(){[all,common,criteria,users,pc]=await Promise.all([api('/minh-chung'),api('/minh-chung-chung'),api('/tieu-chi'),api('/nguoi-dung'),api('/phan-cong')]);normalizeEvidence();fill();render()}
+function fill(){const s=[...new Set(criteria.map(x=>x.maTieuChuan))].sort();$('#fStd').innerHTML='<option value="">Tất cả tiêu chuẩn</option>'+s.map(x=>`<option>${x}</option>`).join('');$('#ev_tc').innerHTML=criteria.map(x=>`<option value="${x.id}">${x.id} - ${esc(x.tenTieuChi)}</option>`).join('');$('#ev_pc').innerHTML='<option value="">-- Không chọn --</option>'+pc.map(x=>`<option value="${x.id}">${x.id}</option>`).join('');$('#ev_user').innerHTML=users.map(x=>`<option value="${x.id}">${x.id} - ${esc(x.hoTen)}</option>`).join('');syncCri()}
+function syncCri(){$('#fCri').innerHTML='<option value="">Tất cả tiêu chí</option>'+criteria.filter(x=>!$('#fStd').value||x.maTieuChuan===$('#fStd').value).map(x=>`<option value="${x.id}">${x.id}</option>`).join('');render()}
+function render(){const q1=$('#q1').value.toLowerCase(),q2=$('#q2').value.toLowerCase(),fs=$('#fStd').value,fc=$('#fCri').value,st=$('#fSt').value;const a=all.filter(x=>(x.loaiMinhChung||'TIEU_CHI')!=='CHUNG'&&(!fs||x.maTieuChuan===fs)&&(!fc||x.maTieuChi===fc)&&(!st||x.trangThai===st)&&(!q1||JSON.stringify(x).toLowerCase().includes(q1)));$('#rows1').innerHTML=a.map(x=>`<tr><td><b>${esc(x.maMinhChung||x.id)}</b></td><td>${esc(x.maTieuChuan)}</td><td>${esc(x.maTieuChi)}<br><small>${esc(nm(x.maTieuChi))}</small></td><td>${esc(x.tenMinhChung)}</td><td>${x.duongDanFile?`<a target="_blank" href="${x.duongDanFile}">Xem</a>`:'-'}</td><td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai)}</span></td><td><div class="actions"><button class="btn-light" onclick='editEv(${JSON.stringify(x)})'>Sửa</button></div></td></tr>`).join('')||'<tr><td colspan="7" class="empty">Không có minh chứng</td></tr>';const b=common.filter(x=>(!q2||JSON.stringify(x).toLowerCase().includes(q2)));$('#rows2').innerHTML=b.map(x=>`<tr><td>${esc(x.maMinhChung||x.id)}</td><td>${esc(x.capQuanLy)}</td><td>${esc(x.tenMinhChung)}</td><td>${esc(x.moTa)}</td><td>${x.duongDanFile?`<a target="_blank" href="${x.duongDanFile}">Xem</a>`:'-'}</td><td><button class="btn-light" onclick='editCommon(${JSON.stringify(x)})'>Sửa</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Không có minh chứng chung</td></tr>'}
+$('#fStd').addEventListener('change',syncCri);['fCri','fSt'].forEach(id=>$('#'+id).addEventListener('change',render));['q1','q2'].forEach(id=>$('#'+id).addEventListener('input',render));
+function mode(type){$$('.criterionOnly').forEach(x=>x.style.display=type==='TIEU_CHI'?'block':'none');$$('.commonOnly').forEach(x=>x.style.display=type==='CHUNG'?'block':'none')}
+function fileNameFromPath(path){if(!path)return '';const p=path.split('/');return p[p.length-1]||path}
+function refreshCurrentFile(path){
+  const box=$('#ev_current_file'),btn=$('#btnDeleteFile');
+  if(path){box.innerHTML=`File hiện tại: <a target="_blank" href="${esc(path)}">${esc(fileNameFromPath(path))}</a>`;btn.style.display=$('#ev_file_upload').disabled?'none':'inline-block'}
+  else{box.textContent='Chưa có file';btn.style.display='none'}
+}
+function dateInput(v){if(!v)return '';const d=new Date(v);if(Number.isNaN(d.getTime()))return '';return d.toISOString().slice(0,10)}
+function editCommon(x){
+  editing=x.id;['ev_tc','ev_pc','ev_tt','ev_user'].forEach(id=>$('#'+id).disabled=false);$('#ev_file_upload').disabled=false;$('#ev_type').value='CHUNG';$('#ev_id').value=x.id;$('#ev_cap').value=x.capQuanLy||'Cấp Trường';
+  $('#ev_sohieu').value=x.soHieuVanBan||'';$('#ev_donvi').value=x.donViBanHanh||'';$('#ev_ngaybanhanh').value=dateInput(x.ngayBanHanh);
+  $('#ev_ten').value=x.tenMinhChung||'';$('#ev_mota').value=x.moTa||'';$('#ev_file_upload').value='';refreshCurrentFile(x.duongDanFile||'');
+  mode('CHUNG');$('#evTitle').textContent='Chỉnh sửa minh chứng chung';openModal('mEv')
+}
+function editEv(x){
+  editing=x.id;const type=x.loaiMinhChung||'TIEU_CHI';$('#ev_type').value=type;$('#ev_id').value=x.id;
+  ['ev_tc','ev_pc','ev_tt','ev_user'].forEach(id=>$('#'+id).disabled=true);
+  $('#ev_file_upload').disabled=(x.trangThai==='Đã duyệt');
+  $('#ev_cap').value='Cấp Trường';$('#ev_sohieu').value='';$('#ev_donvi').value='';$('#ev_ngaybanhanh').value='';$('#ev_tc').value=x.maTieuChi||'';$('#ev_pc').value=x.maPhanCong||'';
+  $('#ev_ten').value=x.tenMinhChung||'';$('#ev_mota').value=x.moTa||'';$('#ev_tt').value=x.trangThai||'Chờ duyệt';$('#ev_user').value=x.maNguoiUpload||'';
+  $('#ev_file_upload').value='';refreshCurrentFile(x.duongDanFile||'');mode(type);$('#evTitle').textContent=type==='CHUNG'?'Chỉnh sửa minh chứng chung':'Chỉnh sửa minh chứng tiêu chí';openModal('mEv')
+}
+async function uploadEvidenceFile(id){
+  const input=$('#ev_file_upload');
+  if(!input.files||!input.files[0])return;
+  const fd=new FormData();fd.append('file',input.files[0]);
+  const res=await fetch('/api/minh-chung/'+encodeURIComponent(id)+'/upload',{method:'POST',body:fd});
+  if(!res.ok){let msg='Không thể upload file';try{const j=await res.json();msg=j.message||msg}catch(e){}throw new Error(msg)}
+}
+async function saveEv(){
+  if(!editing)return alert('Quản trị viên chỉ được chỉnh sửa minh chứng đã có.');
+  const type=$('#ev_type').value;
+  if(type==='CHUNG'){
+    const old=common.find(x=>x.id===editing);if(!old)return alert('Không tìm thấy minh chứng chung.');
+    const body={...old,id:editing,maMinhChung:old.maMinhChung||editing,capQuanLy:$('#ev_cap').value,soHieuVanBan:$('#ev_sohieu').value.trim(),donViBanHanh:$('#ev_donvi').value.trim(),ngayBanHanh:$('#ev_ngaybanhanh').value?$('#ev_ngaybanhanh').value+'T00:00:00':null,tenMinhChung:$('#ev_ten').value.trim(),moTa:$('#ev_mota').value.trim()};
+    if(!body.tenMinhChung)return alert('Nhập tên minh chứng');
+    await api('/minh-chung-chung',{method:'POST',body:JSON.stringify(body)});
+    const input=$('#ev_file_upload');
+    if(input.files&&input.files[0]){const fd=new FormData();fd.append('file',input.files[0]);const res=await fetch('/api/minh-chung-chung/'+encodeURIComponent(editing)+'/upload',{method:'POST',body:fd});if(!res.ok){alert('Không thể upload file minh chứng chung');return}}
+  }else{
+    const old=all.find(x=>x.id===editing);if(!old)return alert('Không tìm thấy minh chứng.');
+    const body={...old,id:editing,loaiMinhChung:'TIEU_CHI',maTieuChi:old.maTieuChi,maPhanCong:old.maPhanCong,tenMinhChung:$('#ev_ten').value.trim(),moTa:$('#ev_mota').value.trim(),trangThai:old.trangThai,maNguoiUpload:old.maNguoiUpload};
+    if(!body.tenMinhChung)return alert('Nhập tên minh chứng');
+    await api('/minh-chung',{method:'POST',body:JSON.stringify(body)});
+    try{await uploadEvidenceFile(editing)}catch(e){alert(e.message);return}
+  }
+  closeModal('mEv');await load()
+}
+async function deleteEvidenceFile(){
+  if(!editing)return;
+  if(!confirm('Xóa file đính kèm hiện tại? Bản ghi minh chứng vẫn được giữ lại.'))return;
+  const type=$('#ev_type').value;
+  const url=type==='CHUNG'?'/minh-chung-chung/'+encodeURIComponent(editing)+'/file':'/minh-chung/'+encodeURIComponent(editing)+'/file';
+  await api(url,{method:'DELETE'});
+  $('#ev_file_upload').value='';refreshCurrentFile('');
+  const list=type==='CHUNG'?common:all;const x=list.find(v=>v.id===editing);if(x){x.duongDanFile=null;x.tenFile=null;x.loaiFile=null;x.kichThuoc=null}
+  alert('Đã xóa file đính kèm.');
+}
+load();</script></body></html>

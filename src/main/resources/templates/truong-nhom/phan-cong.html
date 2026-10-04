@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Phân công tiêu chí</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .criteria-picker{margin-top:12px;border:1px solid #dbe4f0;border-radius:14px;background:#fff;overflow:hidden}
+    .criteria-picker-head{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #e8eef6;background:#f8fbff}
+    .criteria-picker-head .left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .criteria-picker-head input{min-width:260px}
+    .criteria-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .criteria-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:12px;max-height:360px;overflow:auto}
+    .criterion-check{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid #e0e7f1;border-radius:12px;cursor:pointer;background:#fff;transition:.15s}
+    .criterion-check:hover{border-color:#aebfda;background:#f8fbff}
+    .criterion-check.selected{border-color:#6b76d8;background:#f2f1ff}
+    .criterion-check input{width:18px;height:18px;margin-top:2px;accent-color:#6657d9}
+    .criterion-info{min-width:0}
+    .criterion-info b{display:block;color:#0d2853;margin-bottom:3px}
+    .criterion-info span{font-size:12px;color:#65748b;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .assign-summary{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;padding:10px 12px;border-radius:10px;background:#f6f7fb}
+    .empty-criteria{grid-column:1/-1;padding:28px;text-align:center;color:#7b8799}
+
+    .criterion-check.assigned{opacity:.46;background:#f1f3f6;border-color:#e0e4ea;cursor:not-allowed}
+    .criterion-check.assigned:hover{background:#f1f3f6;border-color:#e0e4ea}
+    .assigned-badge{display:inline-block;margin-top:5px;padding:2px 7px;border-radius:999px;background:#dce2ea;color:#667085;font-size:11px;font-weight:700}
+    .multi-combo{position:relative}
+    .multi-combo-btn{width:100%;min-height:42px;text-align:left;background:#fff;border:1px solid #ccd7e6;border-radius:8px;padding:9px 36px 9px 11px;cursor:pointer;color:#23344f;position:relative}
+    .multi-combo-btn:after{content:"▾";position:absolute;right:12px;top:10px;color:#667085}
+    .multi-combo.disabled .multi-combo-btn{background:#f1f3f6;color:#98a2b3;cursor:not-allowed}
+    .multi-combo-menu{display:none;position:absolute;z-index:30;top:calc(100% + 5px);left:0;right:0;max-height:240px;overflow:auto;background:#fff;border:1px solid #ccd7e6;border-radius:10px;box-shadow:0 10px 30px rgba(16,24,40,.14);padding:6px}
+    .multi-combo.open .multi-combo-menu{display:block}
+    .support-opt{display:flex;gap:9px;align-items:center;padding:9px;border-radius:8px;cursor:pointer}
+    .support-opt:hover{background:#f4f7fb}
+    .support-opt input{width:16px;height:16px;accent-color:#6657d9}
+    @media(max-width:900px){.criteria-list{grid-template-columns:1fr}.criteria-picker-head{align-items:stretch;flex-direction:column}.criteria-picker-head input{min-width:0;width:100%}}
+  </style>
+</head>
+<body class="role-page role-leader">
+<div class="top"><span>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định</span><span>Trưởng nhóm · Phân công tiêu chí</span></div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="user"></div>
+    <nav class="nav">
+      <a href="/truong-nhom">▦ Tổng quan</a>
+      <a href="/truong-nhom/phan-cong">⇄ Phân công tiêu chí</a>
+      <a href="/truong-nhom/minh-chung">▧ Minh chứng</a>
+      <a href="/truong-nhom/tien-do">◷ Theo dõi tiến độ</a>
+    <a href="/truong-nhom/bao-cao-nhom">▱ <span>Duyệt báo cáo nhóm</span></a></nav>
+    <div class="version">Phiên bản: HeThongKiemDinh24<br>Thông tư 04/2025/TT-BGDĐT</div>
+  </aside>
+
+  <main class="main">
+    <section class="role-hero">
+      <div>
+        <span class="hero-kicker">⇄ Điều phối nhóm</span>
+        <h1>Phân công tiêu chí</h1>
+        <p>Một thành viên có thể được giao nhiều tiêu chí cùng lúc. Chọn nhóm, người thực hiện rồi đánh dấu các tiêu chí cần giao.</p>
+      </div>
+      <div class="hero-actions"><a class="btn btn-outline" href="/truong-nhom/tien-do">Theo dõi tiến độ</a></div>
+    </section>
+
+    <div class="form-card">
+      <div class="form-card-title">
+        <span>Giao nhiều tiêu chí cho một thành viên</span>
+        <span class="badge b-blue">Chỉ tiêu chí thuộc tiêu chuẩn của bạn</span>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Nhóm *</label>
+          <select id="group"></select>
+        </div>
+        <div class="field">
+          <label>Kế hoạch *</label>
+          <select id="plan"></select>
+        </div>
+        <div class="field">
+          <label>Người thực hiện chính *</label>
+          <select id="member"></select>
+        </div>
+        <div class="field">
+          <label>Có nhân sự hỗ trợ?</label>
+          <select id="hasSupport">
+            <option value="Không">Không</option>
+            <option value="Có">Có</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Nhân sự hỗ trợ</label>
+          <div class="multi-combo disabled" id="supportCombo">
+            <button type="button" class="multi-combo-btn" id="supportComboBtn" onclick="toggleSupportCombo()">-- Chưa chọn --</button>
+            <div class="multi-combo-menu" id="supportMenu"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Hạn hoàn thành</label>
+          <input id="end" type="date">
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:11px">
+        <label>Nội dung công việc</label>
+        <input id="work" value="Thu thập minh chứng và viết báo cáo tự đánh giá">
+      </div>
+
+      <div class="criteria-picker">
+        <div class="criteria-picker-head">
+          <div class="left">
+            <b>Chọn tiêu chí cần giao</b>
+            <span class="badge b-gray" id="selectedCount">0 tiêu chí đã chọn</span>
+          </div>
+          <div class="criteria-actions">
+            <input id="criterionSearch" placeholder="Tìm mã hoặc tên tiêu chí...">
+            <button class="btn-light" type="button" onclick="selectVisible()">Chọn tất cả đang hiển thị</button>
+            <button class="btn-light" type="button" onclick="clearCriteria()">Bỏ chọn</button>
+          </div>
+        </div>
+        <div class="criteria-list" id="criteriaList"></div>
+      </div>
+
+      <div class="assign-summary">
+        <span id="assignHint" class="muted">Chưa chọn tiêu chí.</span>
+        <button class="btn-primary" onclick="assignMany()">+ Giao các tiêu chí đã chọn</button>
+      </div>
+    </div>
+
+    <section class="role-card">
+      <div class="card-head">
+        <div>
+          <b>Phân công trong nhóm</b>
+          <span class="head-sub">Một thành viên có thể xuất hiện ở nhiều dòng nếu được giao nhiều tiêu chí.</span>
+        </div>
+        <span class="badge b-gray" id="countBadge">0 phân công</span>
+      </div>
+      <div class="card-body">
+        <div class="role-toolbar">
+          <input class="grow" id="search" placeholder="Tìm tiêu chí, nhóm hoặc người thực hiện...">
+          <select id="statusFilter">
+            <option value="">Tất cả trạng thái</option>
+            <option>Đã phân công</option>
+            <option>Đang thực hiện</option>
+            <option>Hoàn thành</option>
+          </select>
+        </div>
+        <div class="role-table">
+          <table>
+            <thead><tr><th>Mã</th><th>Nhóm</th><th>Tiêu chuẩn / Tiêu chí</th><th>Người thực hiện</th><th>Nhân sự hỗ trợ</th><th>Hạn</th><th>Trạng thái</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="/js/common.js"></script>
+<script>
+let groups=[],criteria=[],users=[],jobs=[],myStd=[],me;
+const selectedCriteria=new Set();
+const selectedSupport=new Set();
+
+async function load(){
+  [groups,criteria,users,jobs,me]=await Promise.all([
+    api('/truong-nhom/nhom'),
+    api('/tieu-chi'),
+    api('/nguoi-dung'),
+    api('/truong-nhom/phan-cong'),
+    api('/auth/me')
+  ]);
+
+  myStd=jobs.filter(x=>x.maNguoiDung===me.id&&!x.maTieuChi&&x.trangThai!=='Hủy phân công');
+
+  group.innerHTML='<option value="">-- Chọn nhóm --</option>'+
+    groups.map(g=>`<option value="${g.id}">${esc(g.tenNhom)} (${g.id})</option>`).join('');
+
+  group.onchange=()=>{selectedCriteria.clear();fillPlan();fill();};
+  plan.onchange=()=>{selectedCriteria.clear();fill();};
+
+  fillPlan();
+  fill();
+  render();
+}
+function fillPlan(){
+  const parents=myStd.filter(x=>!group.value||x.maNhomTieuChi===group.value);
+  const ids=[...new Set(parents.map(x=>x.maKeHoach).filter(Boolean))];
+  plan.innerHTML='<option value="">-- Chọn kế hoạch --</option>'+ids.map(id=>`<option value="${esc(id)}">${esc(id)}</option>`).join('');
+  if(ids.length===1)plan.value=ids[0];
+}
+
+function allowedCriteria(){
+  const stds=myStd
+    .filter(x=>(!group.value||x.maNhomTieuChi===group.value)&&(!plan.value||x.maKeHoach===plan.value))
+    .map(x=>x.maTieuChuan);
+
+  return criteria.filter(c=>stds.includes(c.maTieuChuan));
+}
+
+function fill(){
+  const g=groups.find(x=>x.id===group.value);
+
+  const detail=(g?.thanhVienChiTiet||[]);
+  const primaryIds=detail
+    .filter(x=>['Thư ký nhóm','Thư ký','Thành viên'].includes(x.chucVu))
+    .map(x=>x.maNguoiDung);
+  const supportIds=detail
+    .filter(x=>x.chucVu==='Nhân sự hỗ trợ')
+    .map(x=>x.maNguoiDung);
+
+  member.innerHTML='<option value="">-- Chọn Thành viên / Thư ký nhóm --</option>'+
+    users.filter(u=>primaryIds.includes(u.id))
+      .map(u=>`<option value="${u.id}">${esc(u.hoTen)} (${esc(detail.find(v=>v.maNguoiDung===u.id)?.chucVu||'Thành viên')})</option>`)
+      .join('');
+
+  selectedSupport.clear();
+  supportMenu.innerHTML=users.filter(u=>supportIds.includes(u.id))
+    .map(u=>`<label class="support-opt"><input type="checkbox" value="${u.id}" onchange="toggleSupportPerson('${u.id}',this.checked)"><span>${esc(u.hoTen)} <small class="muted">(Nhân sự hỗ trợ)</small></span></label>`)
+    .join('') || '<div class="muted" style="padding:10px">Nhóm chưa có nhân sự hỗ trợ</div>';
+
+  hasSupport.value='Không';
+  supportCombo.classList.add('disabled');
+  supportCombo.classList.remove('open');
+  updateSupportButton();
+  renderCriteria();
+}
+
+function renderCriteria(){
+  const q=criterionSearch.value.trim().toLowerCase();
+  const list=allowedCriteria().filter(c=>
+    !q ||
+    (c.id||'').toLowerCase().includes(q) ||
+    (c.tenTieuChi||'').toLowerCase().includes(q)
+  );
+
+  const assignedIds=new Set(jobs.filter(x=>x.maTieuChi&&x.maNhomTieuChi===group.value&&x.trangThai!=='Hủy phân công').map(x=>x.maTieuChi));
+  assignedIds.forEach(id=>selectedCriteria.delete(id));
+
+  criteriaList.innerHTML=list.map(c=>{
+    const assigned=assignedIds.has(c.id);
+    return `
+    <label class="criterion-check ${assigned?'assigned':(selectedCriteria.has(c.id)?'selected':'')}" data-id="${c.id}">
+      <input type="checkbox" value="${c.id}" ${selectedCriteria.has(c.id)?'checked':''} ${assigned?'disabled':''} onchange="toggleCriterion('${c.id}',this.checked)">
+      <span class="criterion-info">
+        <b>${esc(c.id)} · ${esc(c.maTieuChuan||'')}</b>
+        <span>${esc(c.tenTieuChi||'')}</span>
+        ${assigned?'<span class="assigned-badge">Đã phân công</span>':''}
+      </span>
+    </label>`;
+  }).join('') || `<div class="empty-criteria">Không có tiêu chí phù hợp với nhóm/tiêu chuẩn được giao.</div>`;
+
+  updateSelectedSummary();
+}
+
+function toggleCriterion(id,checked){
+  if(checked) selectedCriteria.add(id);
+  else selectedCriteria.delete(id);
+  const card=document.querySelector(`.criterion-check[data-id="${CSS.escape(id)}"]`);
+  if(card) card.classList.toggle('selected',checked);
+  updateSelectedSummary();
+}
+
+function selectVisible(){
+  document.querySelectorAll('#criteriaList input[type=checkbox]:not(:disabled)').forEach(cb=>{
+    cb.checked=true;
+    selectedCriteria.add(cb.value);
+    cb.closest('.criterion-check')?.classList.add('selected');
+  });
+  updateSelectedSummary();
+}
+
+function clearCriteria(){
+  selectedCriteria.clear();
+  renderCriteria();
+}
+
+function updateSelectedSummary(){
+  selectedCount.textContent=selectedCriteria.size+' tiêu chí đã chọn';
+  const who=member.options[member.selectedIndex]?.text||'';
+  const helper=(hasSupport.value==='Có'&&selectedSupport.size)?[...selectedSupport].map(id=>users.find(u=>u.id===id)?.hoTen||id).join(', '):'';
+  assignHint.textContent=selectedCriteria.size
+    ? `Sẽ giao ${selectedCriteria.size} tiêu chí${who&&member.value?' cho '+who:''}${helper?' · hỗ trợ: '+helper:''}.`
+    : 'Chưa chọn tiêu chí.';
+}
+
+member.onchange=updateSelectedSummary;
+hasSupport.onchange=()=>{
+  const enabled=hasSupport.value==='Có';
+  supportCombo.classList.toggle('disabled',!enabled);
+  if(!enabled){
+    selectedSupport.clear();
+    supportMenu.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=false);
+    supportCombo.classList.remove('open');
+  }
+  updateSupportButton();
+  updateSelectedSummary();
+};
+criterionSearch.oninput=renderCriteria;
+
+function toggleSupportCombo(){
+  if(hasSupport.value!=='Có') return;
+  supportCombo.classList.toggle('open');
+}
+function toggleSupportPerson(id,checked){
+  if(checked) selectedSupport.add(id); else selectedSupport.delete(id);
+  updateSupportButton();
+  updateSelectedSummary();
+}
+function updateSupportButton(){
+  if(hasSupport.value!=='Có'){supportComboBtn.textContent='-- Không sử dụng hỗ trợ --';return;}
+  if(selectedSupport.size===0){supportComboBtn.textContent='-- Chọn nhân sự hỗ trợ --';return;}
+  const names=[...selectedSupport].map(id=>users.find(u=>u.id===id)?.hoTen||id);
+  supportComboBtn.textContent=`Đã chọn ${selectedSupport.size}: ${names.join(', ')}`;
+}
+document.addEventListener('click',e=>{
+  if(!supportCombo.contains(e.target)) supportCombo.classList.remove('open');
+});
+
+function render(){
+  const q=search.value.trim().toLowerCase();
+  const s=statusFilter.value;
+  const map=Object.fromEntries(users.map(u=>[u.id,u.hoTen]));
+  const standards=new Set(myStd.map(x=>x.maTieuChuan));
+
+  const raw=jobs
+    .filter(x=>x.maTieuChi&&standards.has(x.maTieuChuan))
+    .filter(x=>(!s||x.trangThai===s)&&(
+      !q ||
+      JSON.stringify(x).toLowerCase().includes(q) ||
+      (map[x.maNguoiDung]||'').toLowerCase().includes(q)
+    ));
+
+  const groupsMap=new Map();
+  raw.forEach(x=>{
+    const key=x.maDotPhanCong||x.id;
+    if(!groupsMap.has(key)) groupsMap.set(key,[]);
+    groupsMap.get(key).push(x);
+  });
+  const batches=[...groupsMap.entries()].map(([batchId,items])=>({batchId,items}));
+  countBadge.textContent=batches.length+' lần phân công';
+
+  rows.innerHTML=batches.map(b=>{
+    const first=b.items[0];
+    const supportIds=[...new Set(b.items.flatMap(x=>{
+      if(Array.isArray(x.maNhanSuHoTroList)&&x.maNhanSuHoTroList.length) return x.maNhanSuHoTroList;
+      return x.maNhanSuHoTro?[x.maNhanSuHoTro]:[];
+    }))];
+    const criteriaHtml=b.items.map(x=>`<span class="role-code" style="display:inline-block;margin:2px 5px 2px 0">${esc(x.maTieuChi)}</span>`).join('');
+    const supportHtml=supportIds.length
+      ? supportIds.map(id=>`<span class="badge b-gray" style="margin:2px 4px 2px 0">${esc(map[id]||id)}</span>`).join('')
+      : '<span class="muted">Không có</span>';
+    return `
+    <tr>
+      <td><span class="role-code">${esc(first.id)}</span>${b.items.length>1?`<div class="muted">${b.items.length} tiêu chí cùng lần giao</div>`:''}</td>
+      <td><b>${esc(first.maNhomTieuChi||'-')}</b></td>
+      <td class="criteria-cell">${criteriaHtml}<small>Tiêu chuẩn ${esc(first.maTieuChuan||'-')}</small></td>
+      <td><span class="strong">${esc(map[first.maNguoiDung]||first.maNguoiDung||'')}</span><div class="muted">${esc(first.vaiTroTrongNhom||'')}</div></td>
+      <td>${supportHtml}</td>
+      <td>${fmtDate(first.ngayKetThucDuKien)||'-'}</td>
+      <td><span class="badge ${statusBadge(first.trangThai)}">${esc(first.trangThai||'')}</span></td>
+    </tr>`;
+  }).join('') || `
+    <tr><td colspan="7"><div class="empty-state">
+      <div class="empty-icon">⇄</div>
+      <b>Chưa có phân công tiêu chí</b>
+      <span>Chọn nhóm, người thực hiện và một hoặc nhiều tiêu chí phía trên để bắt đầu giao việc.</span>
+    </div></td></tr>`;
+}
+
+async function assignMany(){
+  if(!group.value) return alert('Vui lòng chọn nhóm');
+  if(!plan.value) return alert('Vui lòng chọn kế hoạch');
+  if(!member.value) return alert('Vui lòng chọn người thực hiện');
+  if(selectedCriteria.size===0) return alert('Vui lòng chọn ít nhất một tiêu chí');
+  if(hasSupport.value==='Có'&&selectedSupport.size===0) return alert('Vui lòng chọn ít nhất một nhân sự hỗ trợ');
+  if(selectedSupport.has(member.value)) return alert('Người thực hiện chính và nhân sự hỗ trợ phải khác nhau');
+
+  const btn=event?.currentTarget;
+  if(btn){btn.disabled=true;btn.textContent='Đang phân công...';}
+
+  try{
+    const result=await api('/truong-nhom/phan-cong-nhieu-tieu-chi',{
+      method:'POST',
+      body:JSON.stringify({
+        maNhomTieuChi:group.value,
+        maKeHoach:plan.value,
+        maNguoiDung:member.value,
+        maNhanSuHoTroList:hasSupport.value==='Có'?[...selectedSupport]:[],
+        maTieuChiList:[...selectedCriteria],
+        noiDungCongViec:work.value,
+        ngayBatDau:new Date().toISOString().slice(0,10),
+        ngayKetThucDuKien:end.value||null,
+        trangThai:'Đã phân công'
+      })
+    });
+
+    alert(`Đã phân công thành công ${result.length} tiêu chí cho thành viên.`);
+    selectedCriteria.clear();
+    selectedSupport.clear();
+    end.value='';
+    await load();
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='+ Giao các tiêu chí đã chọn';}
+  }
+}
+
+search.oninput=render;
+statusFilter.onchange=render;
+load();
+</script>
+</body>
+</html>

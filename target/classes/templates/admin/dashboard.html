@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bảng thông tin tổng quan tự đánh giá & kiểm định</title><link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<div class="top">
+  <div>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định (Thông tư 04/2025)</div>
+  <div>−　□　⊙</div>
+</div>
+<div class="shell">
+<aside class="sidebar">
+ <div class="user"><div class="avatar">QT</div><div><b>Nguyễn Văn Quản Trị</b><small>Quản trị hệ thống</small></div></div>
+ <nav class="nav">
+   <a href="/admin">▦ <span>Tổng quan</span></a>
+   <a href="/admin/ctdt">▤ <span>Quản lý CTĐT</span></a>
+   <a href="/admin/tieu-chuan">☷ <span>Quản lý bộ tiêu chuẩn</span></a>
+   <a href="/admin/nhom">♣ <span>Quản lý nhóm</span></a><a href="/admin/phan-cong">♟ <span>Phân công nhiệm vụ</span></a>
+   <a href="/admin/minh-chung">▧ <span>Quản lý minh chứng</span></a>
+   <a href="/admin/bao-cao">▱ <span>Báo cáo tự đánh giá</span></a>
+   <a href="/admin/he-thong">⚙ <span>Quản trị hệ thống</span></a>
+ </nav>
+ <div class="version">Phiên bản: v2.4.1 (2025)<br>Thông tư 04/2025/TT-BGDĐT</div>
+</aside>
+
+<main class="main">
+<div class="page-head"><h1>Bảng thông tin tổng quan tự đánh giá & kiểm định</h1><p>Dữ liệu đồng bộ từ MongoDB và phân tích tiến độ thực hiện theo tiêu chuẩn đánh giá</p></div>
+
+<div class="stats">
+ <div class="stat"><div class="label">Tổng số CTĐT</div><div class="num" id="ctdt">0</div><div class="note">Dữ liệu từ MongoDB</div><div class="iconbox">▣</div></div>
+ <div class="stat"><div class="label">Tổng số tiêu chí</div><div class="num" id="tieuChi">0</div><div class="note">Theo bộ tiêu chuẩn hiện hành</div><div class="iconbox">☷</div></div>
+ <div class="stat"><div class="label">Số minh chứng đã nộp</div><div class="num" id="minhChung">0</div><div class="note">Cập nhật theo dữ liệu thực tế</div><div class="iconbox">▤</div></div>
+ <div class="stat"><div class="label">Tiến độ phân công</div><div class="num" id="progress">0%</div><div class="note">Dựa trên tiêu chí đã phân công</div><div class="iconbox">↗</div></div>
+</div>
+<div class="grid2">
+ <div class="card"><div class="card-head">Tiến độ hoàn thành theo Tiêu chuẩn</div><div class="chart" id="chart"></div></div>
+ <div class="card"><div class="card-head">Hoạt động gần đây</div><div class="activity" id="activity"></div></div>
+</div>
+
+</main></div>
+<script src="/js/common.js"></script>
+<script>
+(async()=>{
+ try{
+  const d=await api("/dashboard");
+  $("#ctdt").textContent=d.ctdt; $("#tieuChi").textContent=d.tieuChi; $("#minhChung").textContent=d.minhChung;
+  $("#progress").textContent=(d.tieuChi?Math.round((d.phanCong/d.tieuChi)*100):0)+"%";
+  const st=(d.tieuChuanTienDo||[]).slice(0,8);
+  $("#chart").innerHTML=st.length?st.map(x=>`<div class="bar-wrap"><div class="pct">${x.phanTram}%</div><div class="bar ${x.phanTram<50?'orange':''}" style="height:${Math.max(8,x.phanTram*2.1)}px"></div><div class="bar-label">${esc(x.ma)}</div></div>`).join(""):'<div class="empty">Chưa có dữ liệu tiêu chuẩn</div>';
+  $("#activity").innerHTML=(d.logs||[]).length?(d.logs||[]).map(x=>`<div class="activity-item"><b>${esc(x.hanhDong||"Hoạt động hệ thống")}</b><div>${esc(x.noiDung||"")}</div><span>${esc(x.thoiGian||"")}</span></div>`).join(""):'<div class="activity-item">Chưa có hoạt động gần đây.</div>';
+ }catch(e){console.error(e)}
+})();
+</script>
+</body></html>

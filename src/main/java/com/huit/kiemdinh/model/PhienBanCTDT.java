@@ -8,6 +8,7 @@ public class PhienBanCTDT {
     private String maPhienBan;
     private String namHoc;
     private Integer soPhienBan;
+    private Integer namPhienBan;
     private String tenPhienBan;
     private String noiDungCapNhat;
     private LocalDate ngayBanHanh;
@@ -21,6 +22,7 @@ public class PhienBanCTDT {
     public String getMaPhienBan(){return maPhienBan;} public void setMaPhienBan(String v){maPhienBan=v;}
     public String getNamHoc(){return namHoc;} public void setNamHoc(String v){namHoc=v;}
     public Integer getSoPhienBan(){return soPhienBan;} public void setSoPhienBan(Integer v){soPhienBan=v;}
+    public Integer getNamPhienBan(){return namPhienBan;} public void setNamPhienBan(Integer v){namPhienBan=v;}
     public String getTenPhienBan(){return tenPhienBan;} public void setTenPhienBan(String v){tenPhienBan=v;}
     public String getNoiDungCapNhat(){return noiDungCapNhat;} public void setNoiDungCapNhat(String v){noiDungCapNhat=v;}
     public LocalDate getNgayBanHanh(){return ngayBanHanh;} public void setNgayBanHanh(LocalDate v){ngayBanHanh=v;}

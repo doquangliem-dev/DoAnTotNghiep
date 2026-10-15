@@ -7,7 +7,7 @@
 <body>
 
 <div class="top">
-  <div>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định (Thông tư 04/2025)</div>
+  <div>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định CTĐT</div>
   <div>−　□　⊙</div>
 </div>
 <div class="shell">
@@ -20,9 +20,9 @@
    <a href="/admin/nhom">♣ <span>Quản lý nhóm</span></a><a href="/admin/phan-cong">♟ <span>Phân công nhiệm vụ</span></a>
    <a href="/admin/minh-chung">▧ <span>Quản lý minh chứng</span></a>
    <a href="/admin/bao-cao">▱ <span>Báo cáo tự đánh giá</span></a>
-   <a href="/admin/he-thong">⚙ <span>Quản trị hệ thống</span></a>
+   <a href="/admin/thong-ke">▥ <span>Thống kê</span></a><a href="/admin/he-thong">⚙ <span>Quản trị hệ thống</span></a>
  </nav>
- <div class="version">Phiên bản: v2.4.1 (2025)<br>Thông tư 04/2025/TT-BGDĐT</div>
+ <div class="version">Phiên bản: v2.4.1 (2025)<br>Bộ tiêu chuẩn MOET</div>
 </aside>
 
 <main class="main">
@@ -50,7 +50,7 @@
   const st=(d.tieuChuanTienDo||[]).slice(0,8);
   $("#chart").innerHTML=st.length?st.map(x=>`<div class="bar-wrap"><div class="pct">${x.phanTram}%</div><div class="bar ${x.phanTram<50?'orange':''}" style="height:${Math.max(8,x.phanTram*2.1)}px"></div><div class="bar-label">${esc(x.ma)}</div></div>`).join(""):'<div class="empty">Chưa có dữ liệu tiêu chuẩn</div>';
   $("#activity").innerHTML=(d.logs||[]).length?(d.logs||[]).map(x=>`<div class="activity-item"><b>${esc(x.hanhDong||"Hoạt động hệ thống")}</b><div>${esc(x.noiDung||"")}</div><span>${esc(x.thoiGian||"")}</span></div>`).join(""):'<div class="activity-item">Chưa có hoạt động gần đây.</div>';
- }catch(e){console.error(e)}
+ }catch(e){console.error(e);showGlobalError(e)}
 })();
 </script>
 </body></html>

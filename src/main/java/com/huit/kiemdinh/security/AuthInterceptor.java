@@ -1,5 +1,7 @@
 package com.huit.kiemdinh.security;
 
+import com.huit.kiemdinh.config.DemoDataState;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -11,7 +13,11 @@ import java.util.List;
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
     private final AuthService auth;
-    public AuthInterceptor(AuthService auth){ this.auth = auth; }
+    private final DemoDataState dataState;
+    public AuthInterceptor(AuthService auth, DemoDataState dataState){
+        this.auth = auth;
+        this.dataState = dataState;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -25,6 +31,15 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 
+        // ApplicationRunner seed chạy sau khi Tomcat đã mở cổng. Chặn API nghiệp vụ
+        // trong vài giây seed để giao diện không đọc trúng collection đang được tạo lại.
+        if(uri.startsWith("/api/") && !uri.startsWith("/api/auth/") && !dataState.isReady()){
+            response.setStatus(503);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"message\":\"Hệ thống đang chuẩn bị dữ liệu, vui lòng chờ vài giây\"}");
+            return false;
+        }
+
         // Bảo vệ khu vực giao diện theo vai trò.
         if(uri.startsWith("/admin") && !hasAny(session,"Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/hoi-dong") && !hasAny(session,"Hội đồng","Quản trị")) return deny(request,response,auth.homeFor(session));
@@ -32,13 +47,16 @@ public class AuthInterceptor implements HandlerInterceptor {
         if(uri.startsWith("/thanh-vien") && !hasAny(session,"Thành viên","Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/thu-ky") && !hasAny(session,"Thư ký","Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/khao-thi") && !hasAny(session,"Khảo thí","Quản trị")) return deny(request,response,auth.homeFor(session));
+        if(uri.startsWith("/nhan-su-bao-cao") && !hasAny(session,"Nhân sự phụ trách báo cáo","Quản trị")) return deny(request,response,auth.homeFor(session));
 
         // API theo vai trò: kiểm tra ở backend, không dựa vào việc ẩn/hiện nút trên giao diện.
+        if(uri.startsWith("/api/admin/") && !hasAny(session,"Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/api/hoi-dong/") && !hasAny(session,"Hội đồng","Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/api/truong-nhom/") && !hasAny(session,"Trưởng nhóm","Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/api/thanh-vien/") && !hasAny(session,"Thành viên","Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/api/thu-ky/") && !hasAny(session,"Thư ký","Quản trị")) return deny(request,response,auth.homeFor(session));
         if(uri.startsWith("/api/khao-thi/") && !hasAny(session,"Khảo thí","Quản trị")) return deny(request,response,auth.homeFor(session));
+        if(uri.startsWith("/api/nhan-su-bao-cao/") && !hasAny(session,"Nhân sự phụ trách báo cáo","Quản trị")) return deny(request,response,auth.homeFor(session));
 
         // Các API dùng chung có thao tác ghi dữ liệu quản trị phải là Admin.
         // Các vai trò nghiệp vụ phải dùng API /api/<vai-tro>/... tương ứng để service kiểm tra quyền sở hữu/phân công.
@@ -54,6 +72,9 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private boolean isAdminWriteApi(String uri,String method){
         if("GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method) || "OPTIONS".equalsIgnoreCase(method)) return false;
+        // Minh chứng chung cấp Trường/Khoa là nghiệp vụ dùng chung của Quản trị và Thư ký chương trình.
+        // Loại endpoint này ra trước khi kiểm tra prefix /api/minh-chung để tránh chặn nhầm Thư ký.
+        if(uri.equals("/api/minh-chung-chung") || uri.startsWith("/api/minh-chung-chung/")) return false;
         List<String> prefixes=List.of(
                 "/api/ctdt",
                 "/api/bo-tieu-chuan",
@@ -62,7 +83,6 @@ public class AuthInterceptor implements HandlerInterceptor {
                 "/api/nguoi-dung",
                 "/api/nhom-tieu-chi",
                 "/api/phan-cong",
-                "/api/minh-chung-chung",
                 "/api/minh-chung",
                 "/api/bao-cao"
         );

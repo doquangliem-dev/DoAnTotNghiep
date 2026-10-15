@@ -25,13 +25,14 @@ public class FileStorageService {
         Files.createDirectories(root.resolve("ctdt"));
         Files.createDirectories(root.resolve("minhchung"));
         Files.createDirectories(root.resolve("minh-chung-chung"));
+        Files.createDirectories(root.resolve("bao-cao"));
         migrateLegacyUploads();
     }
 
     private void migrateLegacyUploads() {
         Path legacy = Path.of("uploads").toAbsolutePath().normalize();
         if (legacy.equals(root) || !Files.exists(legacy)) return;
-        for (String sub : new String[]{"ctdt", "minhchung", "minh-chung-chung"}) {
+        for (String sub : new String[]{"ctdt", "minhchung", "minh-chung-chung", "bao-cao"}) {
             Path from = legacy.resolve(sub);
             Path to = root.resolve(sub);
             if (!Files.exists(from)) continue;
@@ -78,6 +79,17 @@ public class FileStorageService {
         Files.createDirectories(dir);
         Files.copy(file.getInputStream(), dir.resolve(safe), StandardCopyOption.REPLACE_EXISTING);
         return "/uploads/minh-chung-chung/" + safe;
+    }
+
+
+    public String saveBaoCao(String id, MultipartFile file) throws IOException {
+        String original = Optional.ofNullable(file.getOriginalFilename()).orElse("baocao.pdf");
+        String ext = extension(original).toLowerCase(Locale.ROOT);
+        String safe = sanitize(id + "_" + System.currentTimeMillis() + ext);
+        Path dir = root.resolve("bao-cao");
+        Files.createDirectories(dir);
+        Files.copy(file.getInputStream(), dir.resolve(safe), StandardCopyOption.REPLACE_EXISTING);
+        return "/uploads/bao-cao/" + safe;
     }
 
     public void deleteByWebPath(String webPath) {

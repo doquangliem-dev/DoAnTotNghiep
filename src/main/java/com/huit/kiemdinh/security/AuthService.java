@@ -118,6 +118,7 @@ public class AuthService {
         if(hasRole(session, "Thành viên")) return "/thanh-vien";
         if(hasRole(session, "Thư ký")) return "/thu-ky";
         if(hasRole(session, "Khảo thí")) return "/khao-thi";
+        if(hasRole(session, "Nhân sự phụ trách báo cáo")) return "/nhan-su-bao-cao";
         return "/login";
     }
 
@@ -131,7 +132,7 @@ public class AuthService {
 
     private String choosePrimaryRole(List<String> names) {
         // Thứ tự ưu tiên chỉ dùng để chọn giao diện mặc định khi một tài khoản có nhiều vai trò.
-        String[] priority={"quan tri","hoi dong","truong nhom","thu ky","khao thi","thanh vien"};
+        String[] priority={"quan tri","hoi dong","truong nhom","thu ky chuong trinh","khao thi","nhan su phu trach bao cao","thanh vien"};
         for(String key:priority) for(String n:names) if(normalize(n).contains(key)) return n;
         return names.isEmpty() ? "Chưa phân vai trò" : names.get(0);
     }

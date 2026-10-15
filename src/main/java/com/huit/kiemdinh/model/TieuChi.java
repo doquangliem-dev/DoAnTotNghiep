@@ -9,8 +9,8 @@ import java.util.Map;
 
 @Document(collection="tieuChi")
 public class TieuChi {
-    @Id private String id;              // VD H1.01.01
-    private String maTieuChuan;         // VD H1
+    @Id private String id;              // VD TC1.1
+    private String maTieuChuan;         // VD TC1
     private Integer soTieuChi;          // VD 1 cho tiêu chí 1.1
     private String tenTieuChi;
     private String moTa;

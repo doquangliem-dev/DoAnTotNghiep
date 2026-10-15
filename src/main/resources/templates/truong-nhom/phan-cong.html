@@ -48,7 +48,7 @@
       <a href="/truong-nhom/minh-chung">▧ Minh chứng</a>
       <a href="/truong-nhom/tien-do">◷ Theo dõi tiến độ</a>
     <a href="/truong-nhom/bao-cao-nhom">▱ <span>Duyệt báo cáo nhóm</span></a></nav>
-    <div class="version">Phiên bản: HeThongKiemDinh24<br>Thông tư 04/2025/TT-BGDĐT</div>
+    <div class="version">Phiên bản: HeThongKiemDinh29<br>Bộ tiêu chuẩn MOET</div>
   </aside>
 
   <main class="main">
@@ -56,14 +56,14 @@
       <div>
         <span class="hero-kicker">⇄ Điều phối nhóm</span>
         <h1>Phân công tiêu chí</h1>
-        <p>Một thành viên có thể được giao nhiều tiêu chí cùng lúc. Chọn nhóm, người thực hiện rồi đánh dấu các tiêu chí cần giao.</p>
+        <p>Mỗi Thành viên/Thư ký nhóm được giao <b>tối đa 2 tiêu chí</b> trong cùng nhóm và kế hoạch. Hệ thống kiểm tra giới hạn ở cả giao diện và backend.</p>
       </div>
       <div class="hero-actions"><a class="btn btn-outline" href="/truong-nhom/tien-do">Theo dõi tiến độ</a></div>
     </section>
 
     <div class="form-card">
       <div class="form-card-title">
-        <span>Giao nhiều tiêu chí cho một thành viên</span>
+        <span>Giao tiêu chí cho Thành viên / Thư ký nhóm (tối đa 2)</span>
         <span class="badge b-blue">Chỉ tiêu chí thuộc tiêu chuẩn của bạn</span>
       </div>
 
@@ -175,8 +175,8 @@ async function load(){
   group.innerHTML='<option value="">-- Chọn nhóm --</option>'+
     groups.map(g=>`<option value="${g.id}">${esc(g.tenNhom)} (${g.id})</option>`).join('');
 
-  group.onchange=()=>{selectedCriteria.clear();fillPlan();fill();};
-  plan.onchange=()=>{selectedCriteria.clear();fill();};
+  group.onchange=()=>{selectedCriteria.clear();fillPlan();fill();renderCriteria();};
+  plan.onchange=()=>{selectedCriteria.clear();fill();renderCriteria();};
 
   fillPlan();
   fill();
@@ -233,18 +233,25 @@ function renderCriteria(){
     (c.tenTieuChi||'').toLowerCase().includes(q)
   );
 
-  const assignedIds=new Set(jobs.filter(x=>x.maTieuChi&&x.maNhomTieuChi===group.value&&x.trangThai!=='Hủy phân công').map(x=>x.maTieuChi));
-  assignedIds.forEach(id=>selectedCriteria.delete(id));
+  const activeAssignments=jobs.filter(x=>x.maTieuChi
+    && x.maNhomTieuChi===group.value
+    && (!plan.value||x.maKeHoach===plan.value)
+    && x.trangThai!=='Hủy phân công');
+  const assignedByCriterion=new Map();
+  activeAssignments.forEach(x=>{if(!assignedByCriterion.has(x.maTieuChi)) assignedByCriterion.set(x.maTieuChi,x);});
+  assignedByCriterion.forEach((_,id)=>selectedCriteria.delete(id));
 
   criteriaList.innerHTML=list.map(c=>{
-    const assigned=assignedIds.has(c.id);
+    const assignment=assignedByCriterion.get(c.id);
+    const assigned=!!assignment;
+    const assignee=assignment?(users.find(u=>u.id===assignment.maNguoiDung)?.hoTen||assignment.maNguoiDung||'thành viên'):'';
     return `
-    <label class="criterion-check ${assigned?'assigned':(selectedCriteria.has(c.id)?'selected':'')}" data-id="${c.id}">
+    <label class="criterion-check ${assigned?'assigned':(selectedCriteria.has(c.id)?'selected':'')}" data-id="${c.id}" ${assigned?'title="Tiêu chí này đã được phân công"':''}>
       <input type="checkbox" value="${c.id}" ${selectedCriteria.has(c.id)?'checked':''} ${assigned?'disabled':''} onchange="toggleCriterion('${c.id}',this.checked)">
       <span class="criterion-info">
         <b>${esc(c.id)} · ${esc(c.maTieuChuan||'')}</b>
         <span>${esc(c.tenTieuChi||'')}</span>
-        ${assigned?'<span class="assigned-badge">Đã phân công</span>':''}
+        ${assigned?`<span class="assigned-badge">Đã phân công · ${esc(assignee)}</span>`:''}
       </span>
     </label>`;
   }).join('') || `<div class="empty-criteria">Không có tiêu chí phù hợp với nhóm/tiêu chuẩn được giao.</div>`;
@@ -274,8 +281,11 @@ function clearCriteria(){
   renderCriteria();
 }
 
+function currentMemberLoad(){return jobs.filter(x=>x.maTieuChi&&x.maNhomTieuChi===group.value&&x.maKeHoach===plan.value&&x.maNguoiDung===member.value&&x.trangThai!=='Hủy phân công').length;}
 function updateSelectedSummary(){
-  selectedCount.textContent=selectedCriteria.size+' tiêu chí đã chọn';
+  const load=currentMemberLoad();
+  if(load+selectedCriteria.size>2){[...selectedCriteria].slice(Math.max(0,2-load)).forEach(id=>selectedCriteria.delete(id));renderCriteria();return;}
+  selectedCount.textContent=selectedCriteria.size+' tiêu chí đã chọn · đã giao '+load+'/2';
   const who=member.options[member.selectedIndex]?.text||'';
   const helper=(hasSupport.value==='Có'&&selectedSupport.size)?[...selectedSupport].map(id=>users.find(u=>u.id===id)?.hoTen||id).join(', '):'';
   assignHint.textContent=selectedCriteria.size

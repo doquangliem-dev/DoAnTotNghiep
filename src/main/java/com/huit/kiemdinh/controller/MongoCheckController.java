@@ -12,7 +12,7 @@ public class MongoCheckController {
     private final MongoTemplate mongoTemplate;
     public MongoCheckController(MongoTemplate mongoTemplate){ this.mongoTemplate=mongoTemplate; }
 
-    @GetMapping("/mongo-check")
+    @GetMapping("/api/admin/mongo-check")
     public Map<String,Object> check(){
         Map<String,Object> r=new LinkedHashMap<>();
         r.put("database", mongoTemplate.getDb().getName());

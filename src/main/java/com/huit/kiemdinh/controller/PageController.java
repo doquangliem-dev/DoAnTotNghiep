@@ -15,6 +15,7 @@ public class PageController {
     @GetMapping("/admin/minh-chung") public String mc(){ return "admin/minh-chung"; }
     @GetMapping("/admin/bao-cao") public String bc(){ return "admin/bao-cao"; }
     @GetMapping("/admin/he-thong") public String ht(){ return "admin/he-thong"; }
+    @GetMapping("/admin/thong-ke") public String thongKe(){ return "admin/thong-ke"; }
 
     @GetMapping("/hoi-dong") public String hd(){ return "hoi-dong/dashboard"; }
     @GetMapping("/hoi-dong/minh-chung") public String hdMc(){ return "hoi-dong/minh-chung"; }
@@ -38,8 +39,13 @@ public class PageController {
     @GetMapping("/thu-ky/ke-hoach") public String tkKh(){ return "thu-ky/ke-hoach"; }
     @GetMapping("/thu-ky/minh-chung") public String tkMc(){ return "thu-ky/minh-chung"; }
     @GetMapping("/thu-ky/tong-hop") public String tkTh(){ return "thu-ky/tong-hop"; }
+    @GetMapping("/thu-ky/bao-cao") public String tkBc(){ return "thu-ky/bao-cao"; }
 
     @GetMapping("/khao-thi") public String kt(){ return "khao-thi/dashboard"; }
     @GetMapping("/khao-thi/ke-hoach") public String ktKh(){ return "khao-thi/ke-hoach"; }
     @GetMapping("/khao-thi/tong-hop") public String ktTh(){ return "khao-thi/tong-hop"; }
+    @GetMapping("/khao-thi/bao-cao") public String ktBaoCao(){ return "khao-thi/bao-cao"; }
+
+    @GetMapping("/nhan-su-bao-cao") public String nsbc(){ return "nhan-su-bao-cao/dashboard"; }
+    @GetMapping("/nhan-su-bao-cao/noi-dung") public String nsbcNoiDung(){ return "nhan-su-bao-cao/noi-dung"; }
 }

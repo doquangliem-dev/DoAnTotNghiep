@@ -1,10 +1,5 @@
-# Kho file upload
+# Kho lưu file HeThongKiemDinh29
 
-Từ HeThongKiemDinh24, file thực tế được lưu bền vững ngoài source code tại:
-
-- Windows mặc định: `C:\Users\<user>\HeThongKiemDinhStorage`
-- CTĐT: `HeThongKiemDinhStorage\ctdt`
-- Minh chứng: `HeThongKiemDinhStorage\minhchung`
-
-Có thể đổi vị trí bằng biến môi trường `APP_STORAGE_ROOT`.
-Thư mục này không nên xóa nếu muốn giữ các file đã upload giữa các lần khởi động/build/project version.
+File upload thực tế được lưu ngoài source code để không mất khi build/restart.
+Mặc định ứng dụng sử dụng thư mục người dùng `HeThongKiemDinhStorage`.
+Có thể đổi bằng biến môi trường `APP_STORAGE_ROOT`.

@@ -23,6 +23,10 @@ public class ApiController {
     @GetMapping("/ctdt/{id}") public ChuongTrinhDaoTao getCtdt(@PathVariable String id){return s.getCtdt(id);}
     @PostMapping("/ctdt") public ChuongTrinhDaoTao saveCtdt(@RequestBody ChuongTrinhDaoTao x){return s.saveCtdt(x);}
     @PostMapping("/ctdt/{id}/phien-ban") public ChuongTrinhDaoTao addVersion(@PathVariable String id,@RequestBody PhienBanCTDT x){return s.addPhienBan(id,x);}
+    @PostMapping("/ctdt/{id}/phien-ban/{maPhienBan}/trang-thai")
+    public ChuongTrinhDaoTao updateVersionStatus(@PathVariable String id,@PathVariable String maPhienBan,@RequestBody Map<String,String> body){
+        return s.updatePhienBanTrangThai(id,maPhienBan,body.get("trangThai"));
+    }
     @PostMapping(value="/ctdt/{id}/phien-ban/{maPhienBan}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public ChuongTrinhDaoTao uploadCtdt(@PathVariable String id,@PathVariable String maPhienBan,@RequestParam("file") MultipartFile file){return s.uploadCtdt(id,maPhienBan,file);}
     @DeleteMapping("/ctdt/{id}/phien-ban/{maPhienBan}/file")
@@ -73,24 +77,40 @@ public class ApiController {
     @GetMapping("/minh-chung-chung") public List<MinhChungChung> mcc(){return s.minhChungChung();}
     @PostMapping("/minh-chung-chung")
     public MinhChungChung saveMcc(@RequestBody MinhChungChung x,HttpSession session){
-        if(!hasRole(session,"Quản trị")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Chỉ Quản trị viên được chỉnh sửa minh chứng chung ở màn hình này");
+        if(!hasRole(session,"Quản trị")&&!hasRole(session,"Thư ký"))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Chỉ Quản trị viên hoặc Thư ký chương trình được thêm/sửa minh chứng cấp Trường/Khoa");
+        if(x.getMaNguoiTao()==null||x.getMaNguoiTao().isBlank()) x.setMaNguoiTao(currentUser(session));
         return s.saveMinhChungChung(x);
     }
     @PostMapping(value="/minh-chung-chung/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public MinhChungChung uploadMcc(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){
-        if(!hasRole(session,"Quản trị")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Không có quyền chỉnh sửa minh chứng chung");
+        if(!hasRole(session,"Quản trị")&&!hasRole(session,"Thư ký")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Không có quyền chỉnh sửa minh chứng cấp Trường/Khoa");
         return s.uploadMinhChungChung(id,file);
     }
     @DeleteMapping("/minh-chung-chung/{id}/file")
     public MinhChungChung deleteMccFile(@PathVariable String id,HttpSession session){
-        if(!hasRole(session,"Quản trị")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Không có quyền chỉnh sửa minh chứng chung");
+        if(!hasRole(session,"Quản trị")&&!hasRole(session,"Thư ký")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Không có quyền chỉnh sửa minh chứng cấp Trường/Khoa");
         return s.deleteMinhChungChungFile(id);
+    }
+    @DeleteMapping("/minh-chung-chung/{id}")
+    public void deleteMcc(@PathVariable String id,HttpSession session){
+        if(!hasRole(session,"Quản trị")&&!hasRole(session,"Thư ký")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Không có quyền xóa minh chứng cấp Trường/Khoa");
+        s.deleteMinhChungChung(id);
     }
 
     @GetMapping("/bao-cao") public List<BaoCaoTieuChi> bc(){return s.baoCao();}
     @GetMapping("/ke-hoach") public List<KeHoachTuDanhGia> keHoachChung(){return s.keHoach();}
     @GetMapping("/bao-cao/{id}") public BaoCaoTieuChi getBc(@PathVariable String id){return s.getBaoCao(id);}
     @PostMapping("/bao-cao") public BaoCaoTieuChi saveBc(@RequestBody BaoCaoTieuChi x){return s.saveBaoCao(x);}
+    @PostMapping("/admin/bao-cao/{id}/xu-ly")
+    public BaoCaoTieuChi adminXuLyBaoCao(@PathVariable String id,@RequestBody Map<String,String> body,HttpSession session){
+        return s.adminXuLyBaoCao(id,body.get("ketQua"),body.get("nhanXet"),currentUser(session));
+    }
+    @GetMapping("/admin/thong-ke") public Map<String,Object> adminThongKe(@RequestParam(required=false) String maKeHoach){return s.thongKeHeThong(maKeHoach);}
+    @GetMapping("/admin/bao-cao-tong") public Map<String,Object> adminBaoCaoTong(@RequestParam(required=false) String maKeHoach){return s.cauTrucBaoCao(maKeHoach);}
+    @GetMapping("/admin/phan-cong-bao-cao") public List<PhanCongBaoCao> adminPhanCongBaoCao(){return s.phanCongBaoCao();}
+    @PostMapping("/admin/phan-cong-bao-cao") public PhanCongBaoCao adminSavePhanCongBaoCao(@RequestBody PhanCongBaoCao x,HttpSession session){return s.savePhanCongBaoCao(x,currentUser(session));}
+    @PostMapping("/admin/bao-cao-phan/{id}/xu-ly") public BaoCaoPhan adminXuLyBaoCaoPhan(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session){return s.adminXuLyBaoCaoPhan(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));}
 
     // ===== API DÀNH CHO HỘI ĐỒNG TỰ ĐÁNH GIÁ =====
     @GetMapping("/hoi-dong/dashboard") public Map<String,Object> hoiDongDashboard(){return s.hoiDongDashboard();}
@@ -108,6 +128,8 @@ public class ApiController {
     @GetMapping("/hoi-dong/tong-hop")
     public Map<String,Object> tongHopHoiDong(@RequestParam(required=false) String maKeHoach){return s.tongHopHoiDong(maKeHoach);}
     @GetMapping("/hoi-dong/bao-cao-nhom") public List<BaoCaoNhom> hoiDongBaoCaoNhom(){return s.baoCaoNhomHoiDong();}
+    @GetMapping("/hoi-dong/bao-cao-phan") public List<BaoCaoPhan> hoiDongBaoCaoPhan(){return s.baoCaoPhanChoHoiDong();}
+    @PostMapping("/hoi-dong/bao-cao-phan/{id}/duyet") public BaoCaoPhan hoiDongDuyetBaoCaoPhan(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session){return s.hoiDongXuLyBaoCaoPhan(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));}
 
 
     // ===== TRƯỞNG NHÓM TIÊU CHÍ =====
@@ -123,6 +145,10 @@ public class ApiController {
     public List<MinhChung> tnMinhChung(HttpSession session){return s.minhChungTruongNhom(currentUser(session));}
     @GetMapping("/truong-nhom/bao-cao")
     public List<BaoCaoTieuChi> tnBaoCao(HttpSession session){return s.baoCaoTruongNhom(currentUser(session));}
+    @PostMapping("/truong-nhom/bao-cao/{id}/duyet")
+    public BaoCaoTieuChi tnDuyetBaoCao(@PathVariable String id,@RequestBody Map<String,String> body,HttpSession session){
+        return s.truongNhomDuyetBaoCaoTieuChi(id,body.get("ketQua"),body.get("nhanXet"),currentUser(session));
+    }
     @PostMapping("/truong-nhom/phan-cong-tieu-chi")
     public PhanCong tnPhanCong(@RequestBody PhanCong x,HttpSession session){return s.truongNhomPhanCongTieuChi(x,currentUser(session));}
     @PostMapping("/truong-nhom/phan-cong-nhieu-tieu-chi")
@@ -159,8 +185,20 @@ public class ApiController {
     public BaoCaoTieuChi tvSaveBc(@RequestBody BaoCaoTieuChi x,HttpSession session){return s.luuBaoCaoThanhVien(x,currentUser(session));}
     @PostMapping("/thanh-vien/bao-cao/{id}/gui-duyet")
     public BaoCaoTieuChi tvGuiDuyetBc(@PathVariable String id,HttpSession session){return s.guiBaoCaoThanhVien(id,currentUser(session));}
+    @PostMapping(value="/thanh-vien/bao-cao/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+    public BaoCaoTieuChi tvUploadBaoCao(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){return s.uploadBaoCaoThanhVien(id,file,currentUser(session));}
     @GetMapping("/thanh-vien/thu-ky-nhom/bao-cao-nhom")
     public List<BaoCaoNhom> tvBaoCaoNhom(HttpSession session){return s.baoCaoNhomCuaThuKy(currentUser(session));}
+    @GetMapping("/thanh-vien/thu-ky-nhom/phan-cong")
+    public List<PhanCong> tvPhanCongNhom(HttpSession session){return s.phanCongNhomCuaThuKy(currentUser(session));}
+    @GetMapping("/thanh-vien/thu-ky-nhom/thong-tin")
+    public Map<String,Object> tvThongTinThuKyNhom(HttpSession session){return s.thongTinThuKyNhom(currentUser(session));}
+    @GetMapping("/thanh-vien/thu-ky-nhom/nguon-bao-cao")
+    public Map<String,Object> tvNguonBaoCaoNhom(@RequestParam String maNhom,@RequestParam String maKeHoach,@RequestParam String maTieuChuan,HttpSession session){
+        return s.nguonBaoCaoNhom(currentUser(session),maNhom,maKeHoach,maTieuChuan);
+    }
+    @GetMapping("/thanh-vien/danh-gia-minh-chung")
+    public List<DanhGiaMinhChung> tvDanhGiaMinhChung(HttpSession session){return s.danhGiaMinhChungCuaNguoiDung(currentUser(session));}
     @PostMapping("/thanh-vien/thu-ky-nhom/bao-cao-nhom")
     public BaoCaoNhom tvSaveBaoCaoNhom(@RequestBody BaoCaoNhom x,HttpSession session){return s.saveBaoCaoNhomThuKy(x,currentUser(session));}
     @PostMapping("/thanh-vien/thu-ky-nhom/bao-cao-nhom/{id}/gui-duyet")
@@ -168,7 +206,9 @@ public class ApiController {
 
     // ===== THƯ KÝ CHƯƠNG TRÌNH =====
     @GetMapping("/thu-ky/dashboard")
-    public Map<String,Object> tkDashboard(){Map<String,Object> m=new LinkedHashMap<>();m.put("keHoach",s.keHoach().size());m.putAll(s.tongHopThuKy());return m;}
+    public Map<String,Object> tkDashboard(){return s.dashboardThuKy();}
+    @GetMapping("/thu-ky/bao-cao")
+    public Map<String,Object> tkBaoCao(@RequestParam(required=false) String maKeHoach){return s.theoDoiBaoCaoThuKy(maKeHoach);}
     @GetMapping("/thu-ky/ke-hoach") public List<KeHoachTuDanhGia> tkKeHoach(){return s.keHoach();}
     @PostMapping("/thu-ky/ke-hoach") public KeHoachTuDanhGia tkSaveKh(@RequestBody KeHoachTuDanhGia x){return s.saveKeHoach(x);}
     @PostMapping("/thu-ky/ke-hoach/{id}/gui-duyet") public KeHoachTuDanhGia tkGuiKh(@PathVariable String id,HttpSession session){return s.guiKeHoachKhaoThi(id,currentUser(session));}
@@ -177,12 +217,24 @@ public class ApiController {
     public DanhGiaMinhChung tkDuyetMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session){return s.thuKyDuyetMinhChung(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));}
     @GetMapping("/thu-ky/tong-hop") public Map<String,Object> tkTongHop(@RequestParam(required=false) String maKeHoach){return s.tongHopHoiDong(maKeHoach);}
 
+    // ===== NHÂN SỰ PHỤ TRÁCH BÁO CÁO (PHẦN 1, 3, 4) =====
+    @GetMapping("/nhan-su-bao-cao/dashboard") public Map<String,Object> nsbcDashboard(HttpSession session){Map<String,Object> m=new LinkedHashMap<>();List<PhanCongBaoCao> jobs=s.congViecBaoCao(currentUser(session));m.put("congViec",jobs.size());m.put("dangThucHien",jobs.stream().filter(x->!"Hoàn thành".equalsIgnoreCase(Optional.ofNullable(x.getTrangThai()).orElse(""))).count());m.put("baoCaoPhan",s.baoCaoPhanCuaNguoiDung(currentUser(session)).size());return m;}
+    @GetMapping("/nhan-su-bao-cao/cong-viec") public List<PhanCongBaoCao> nsbcCongViec(HttpSession session){return s.congViecBaoCao(currentUser(session));}
+    @GetMapping("/nhan-su-bao-cao/bao-cao-phan") public List<BaoCaoPhan> nsbcBaoCao(HttpSession session){return s.baoCaoPhanCuaNguoiDung(currentUser(session));}
+    @PostMapping("/nhan-su-bao-cao/bao-cao-phan") public BaoCaoPhan nsbcSave(@RequestBody BaoCaoPhan x,HttpSession session){return s.saveBaoCaoPhan(x,currentUser(session));}
+    @PostMapping("/nhan-su-bao-cao/bao-cao-phan/{id}/gui-duyet") public BaoCaoPhan nsbcGui(@PathVariable String id,HttpSession session){return s.guiBaoCaoPhan(id,currentUser(session));}
+
     // ===== BỘ PHẬN KHẢO THÍ =====
     @GetMapping("/khao-thi/dashboard")
     public Map<String,Object> ktDashboard(){Map<String,Object> m=new LinkedHashMap<>();List<KeHoachTuDanhGia> a=s.keHoach();m.put("keHoach",a.size());m.put("choDuyet",a.stream().filter(x->"Chờ khảo thí duyệt".equalsIgnoreCase(x.getTrangThai())).count());m.putAll(s.tongHopHoiDong());return m;}
     @GetMapping("/khao-thi/ke-hoach") public List<KeHoachTuDanhGia> ktKeHoach(){return s.keHoach();}
     @PostMapping("/khao-thi/ke-hoach/{id}/duyet")
     public KeHoachTuDanhGia ktDuyetKh(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session){return s.khaoThiDuyetKeHoach(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));}
+    @GetMapping("/khao-thi/bao-cao") public List<BaoCaoTieuChi> ktBaoCao(){return s.baoCao().stream().filter(x->"Chờ TT QLCL duyệt".equalsIgnoreCase(x.getTrangThai())).toList();}
+    @GetMapping("/khao-thi/bao-cao-phan") public List<BaoCaoPhan> ktBaoCaoPhan(){return s.baoCaoPhanChoQlcl();}
+    @PostMapping("/khao-thi/bao-cao-phan/{id}/duyet") public BaoCaoPhan ktDuyetBaoCaoPhan(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session){return s.qlclXuLyBaoCaoPhan(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));}
+    @PostMapping("/khao-thi/bao-cao/{id}/duyet")
+    public BaoCaoTieuChi ktDuyetBaoCao(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session){return s.qlclDuyetBaoCao(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));}
     @GetMapping("/khao-thi/tong-hop") public Map<String,Object> ktTongHop(@RequestParam(required=false) String maKeHoach){return s.tongHopHoiDong(maKeHoach);}
 
     private String currentUser(HttpSession session){ return (String)session.getAttribute(AuthService.SESSION_USER_ID); }

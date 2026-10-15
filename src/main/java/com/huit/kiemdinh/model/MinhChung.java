@@ -8,7 +8,7 @@ public class MinhChung {
     @Id private String id;              // MC001
     private String loaiMinhChung;       // TIEU_CHI / CHUNG
     private String capMinhChung;        // Cấp trường / Cấp khoa (chỉ CHUNG)
-    private String maMinhChung;         // H1.01.01.01 (chỉ TIEU_CHI)
+    private String maMinhChung;         // H1.1.01 (chỉ TIEU_CHI)
     private String maTieuChuan;
     private String maTieuChi;
     private String maPhanCong;

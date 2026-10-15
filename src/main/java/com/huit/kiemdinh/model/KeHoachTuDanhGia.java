@@ -11,6 +11,7 @@ public class KeHoachTuDanhGia {
     @Id private String id;
     private String tenKeHoach;
     private String maCTDT;
+    private String maPhienBanCTDT;
     private String maBoTieuChuan;
     private LocalDate ngayBatDau;
     private LocalDate ngayKetThuc;
@@ -21,6 +22,7 @@ public class KeHoachTuDanhGia {
     public String getId(){return id;} public void setId(String v){id=v;}
     public String getTenKeHoach(){return tenKeHoach;} public void setTenKeHoach(String v){tenKeHoach=v;}
     public String getMaCTDT(){return maCTDT;} public void setMaCTDT(String v){maCTDT=v;}
+    public String getMaPhienBanCTDT(){return maPhienBanCTDT;} public void setMaPhienBanCTDT(String v){maPhienBanCTDT=v;}
     public String getMaBoTieuChuan(){return maBoTieuChuan;} public void setMaBoTieuChuan(String v){maBoTieuChuan=v;}
     public LocalDate getNgayBatDau(){return ngayBatDau;} public void setNgayBatDau(LocalDate v){ngayBatDau=v;}
     public LocalDate getNgayKetThuc(){return ngayKetThuc;} public void setNgayKetThuc(LocalDate v){ngayKetThuc=v;}

@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection="tieuChuan")
 public class TieuChuan {
-    @Id private String id;              // H1, H2, ... H8
+    @Id private String id;              // TC1, TC2, ...
     private String maBoTieuChuan;
     private Integer soTieuChuan;
     private String tenTieuChuan;

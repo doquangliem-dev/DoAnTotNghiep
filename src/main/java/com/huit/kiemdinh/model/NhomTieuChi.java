@@ -10,6 +10,7 @@ public class NhomTieuChi {
     private String tenNhom;
     // Các trường cũ được giữ để tương thích dữ liệu đã có. Nhóm không gắn trực tiếp tiêu chuẩn/tiêu chí.
     private String maTieuChuan;
+    private List<String> tieuChuanPhuTrach = new ArrayList<>();
     private String maTruongNhom;
     private String maThuKyNhom;
     private List<String> thanhVien = new ArrayList<>();
@@ -20,6 +21,7 @@ public class NhomTieuChi {
     public String getId(){return id;} public void setId(String v){id=v;}
     public String getTenNhom(){return tenNhom;} public void setTenNhom(String v){tenNhom=v;}
     public String getMaTieuChuan(){return maTieuChuan;} public void setMaTieuChuan(String v){maTieuChuan=v;}
+    public List<String> getTieuChuanPhuTrach(){return tieuChuanPhuTrach;} public void setTieuChuanPhuTrach(List<String> v){tieuChuanPhuTrach=v;}
     public String getMaTruongNhom(){return maTruongNhom;} public void setMaTruongNhom(String v){maTruongNhom=v;}
     public String getMaThuKyNhom(){return maThuKyNhom;} public void setMaThuKyNhom(String v){maThuKyNhom=v;}
     public List<String> getThanhVien(){return thanhVien;} public void setThanhVien(List<String> v){thanhVien=v;}

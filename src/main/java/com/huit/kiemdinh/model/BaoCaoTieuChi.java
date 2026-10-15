@@ -33,6 +33,11 @@ public class BaoCaoTieuChi {
 
     private String trangThai;
     private String maNguoiViet;
+    // Mức duyệt theo góp ý tuần 7: Thành viên 25% -> Trưởng nhóm 50% -> cấp Khoa 75% -> TT QLCL 100%.
+    private Integer mucDoDuyet = 25;
+    private String capDuyetHienTai = "Thành viên";
+    private String duongDanFile;
+    private String tenFileBaoCao;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
     private List<Map<String,Object>> duyetBaoCao = new ArrayList<>();
@@ -52,6 +57,10 @@ public class BaoCaoTieuChi {
     public String getKeHoachHanhDong(){return keHoachHanhDong;} public void setKeHoachHanhDong(String v){keHoachHanhDong=v;}
     public String getTrangThai(){return trangThai;} public void setTrangThai(String v){trangThai=v;}
     public String getMaNguoiViet(){return maNguoiViet;} public void setMaNguoiViet(String v){maNguoiViet=v;}
+    public Integer getMucDoDuyet(){return mucDoDuyet;} public void setMucDoDuyet(Integer v){mucDoDuyet=v;}
+    public String getCapDuyetHienTai(){return capDuyetHienTai;} public void setCapDuyetHienTai(String v){capDuyetHienTai=v;}
+    public String getDuongDanFile(){return duongDanFile;} public void setDuongDanFile(String v){duongDanFile=v;}
+    public String getTenFileBaoCao(){return tenFileBaoCao;} public void setTenFileBaoCao(String v){tenFileBaoCao=v;}
     public LocalDateTime getNgayTao(){return ngayTao;} public void setNgayTao(LocalDateTime v){ngayTao=v;}
     public LocalDateTime getNgayCapNhat(){return ngayCapNhat;} public void setNgayCapNhat(LocalDateTime v){ngayCapNhat=v;}
     public List<Map<String,Object>> getDuyetBaoCao(){return duyetBaoCao;} public void setDuyetBaoCao(List<Map<String,Object>> v){duyetBaoCao=v;}

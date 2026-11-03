@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: he-thong-kiem-dinh
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /login
+    autoDeploy: true
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: APP_SEED_DEMO_DATA
+        value: "false"
+      - key: APP_STORAGE_MODE
+        value: supabase
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: hethongkiemdinh
+      - key: APP_DEFAULT_ADMIN_EMAIL
+        value: admin@huit.edu.vn
+      - key: APP_DEFAULT_ADMIN_PASSWORD
+        sync: false
+      - key: TZ
+        value: Asia/Ho_Chi_Minh

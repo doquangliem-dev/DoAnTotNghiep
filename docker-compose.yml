@@ -1,0 +1,25 @@
+name: he-thong-kiem-dinh
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: he-thong-kiem-dinh:latest
+    container_name: hethongkiemdinh
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      APP_STORAGE_MODE: local
+      APP_STORAGE_ROOT: /app/storage
+      APP_SEED_DEMO_DATA: ${APP_SEED_DEMO_DATA:-false}
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - kiemdinh_storage:/app/storage
+
+volumes:
+  kiemdinh_storage:
+    name: hethongkiemdinh_storage

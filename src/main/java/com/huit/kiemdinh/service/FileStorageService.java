@@ -75,10 +75,10 @@ public class FileStorageService {
                     Path relPath = seedRoot.relativize(src);
                     String relative = relPath.toString().replace('\\', '/');
                     try {
-                        if (!supabaseObjectExists(relative)) {
-                            uploadSupabaseBytes(relative, Files.readAllBytes(src), contentType(relative));
-                            System.out.println("[Storage] Đã đồng bộ seed lên Supabase: " + relative);
-                        }
+                        // Luôn upsert file seed để bản sửa mới ghi đè các PDF seed cũ đã có trên Supabase.
+                        // File người dùng upload có tên timestamp riêng nên không bị ảnh hưởng.
+                        uploadSupabaseBytes(relative, Files.readAllBytes(src), contentType(relative));
+                        System.out.println("[Storage] Đã đồng bộ/cập nhật seed lên Supabase: " + relative);
                     } catch (Exception e) {
                         System.err.println("[Storage] Không thể đồng bộ seed " + relative + ": " + e.getMessage());
                     }

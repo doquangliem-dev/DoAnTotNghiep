@@ -1,0 +1,264 @@
+ĐỐI CHIẾU 52 TIÊU CHÍ MOET VỚI TÀI LIỆU ATTT 2023
+Lưu ý: tài liệu nguồn 2023 dùng 11 tiêu chuẩn; hệ thống hiện tại dùng 8 tiêu chuẩn/52 tiêu chí.
+Mỗi file mới lấy nguyên trang nguồn liên quan, không crop và không cắt giữa trang.
+
+TC1.1 | Mục tiêu của chương trình đào tạo được xác định rõ ràng, phù hợp và gắn kết với sứ mạng, tầm nhìn, chiến lược phát triển của cơ sở đào tạo; phù hợp với mục tiêu của giáo dục đại học.
+  Mục nguồn 2023: 1.1
+  Báo cáo: BC001_TC1.1.pdf | trang PDF nguồn: 22,23,24
+  Minh chứng: MC001_TC1.1.pdf | trang PDF nguồn: 4,5
+
+TC1.2 | Chuẩn đầu ra của chương trình đào tạo được xây dựng rõ ràng; phù hợp với sứ mạng, tầm nhìn và mục tiêu chiến lược của cơ sở đào tạo và được phổ biến đến các bên liên quan.
+  Mục nguồn 2023: 1.2
+  Báo cáo: BC002_TC1.2.pdf | trang PDF nguồn: 24,25
+  Minh chứng: MC002_TC1.2.pdf | trang PDF nguồn: 5,6
+
+TC1.3 | Chuẩn đầu ra của chương trình đào tạo phù hợp với Khung trình độ quốc gia Việt Nam và chuẩn chương trình đào tạo nhóm ngành.
+  Mục nguồn 2023: 1.2, 3.3
+  Báo cáo: BC003_TC1.3.pdf | trang PDF nguồn: 24,25,37,38,39,40
+  Minh chứng: MC003_TC1.3.pdf | trang PDF nguồn: 5,6,15,16,17
+
+TC1.4 | Chuẩn đầu ra của tất cả các học phần được xây dựng phù hợp và tương thích với chuẩn đầu ra của chương trình đào tạo đã công bố.
+  Mục nguồn 2023: 3.2
+  Báo cáo: BC004_TC1.4.pdf | trang PDF nguồn: 34,35,36,37
+  Minh chứng: MC004_TC1.4.pdf | trang PDF nguồn: 14,15
+
+TC1.5 | Chuẩn đầu ra của chương trình đào tạo phản ánh rõ yêu cầu của các bên liên quan, đặc biệt là các bên liên quan bên ngoài.
+  Mục nguồn 2023: 1.3
+  Báo cáo: BC005_TC1.5.pdf | trang PDF nguồn: 25,26,27,28
+  Minh chứng: MC005_TC1.5.pdf | trang PDF nguồn: 6,7,8,9,10
+
+TC1.6 | Chuẩn đầu ra của chương trình đào tạo được đo lường, đánh giá tại thời điểm người học tốt nghiệp.
+  Mục nguồn 2023: 5.1, 10.3
+  Báo cáo: BC006_TC1.6.pdf | trang PDF nguồn: 48,49,101,102,103
+  Minh chứng: MC006_TC1.6.pdf | trang PDF nguồn: 21,22,66,67
+
+TC2.1 | Bản mô tả chương trình đào tạo và đề cương các học phần có đủ thông tin, được cập nhật, phê duyệt và công bố công khai.
+  Mục nguồn 2023: 2.1, 2.2, 2.3
+  Báo cáo: BC007_TC2.1.pdf | trang PDF nguồn: 28,29,30,31,32
+  Minh chứng: MC007_TC2.1.pdf | trang PDF nguồn: 10,11,12,13
+
+TC2.2 | Cấu trúc và nội dung chương trình đào tạo được thiết kế và phát triển để bảo đảm người học đạt chuẩn đầu ra và có khối lượng học tập phù hợp.
+  Mục nguồn 2023: 3.1
+  Báo cáo: BC008_TC2.2.pdf | trang PDF nguồn: 32,33,34
+  Minh chứng: MC008_TC2.2.pdf | trang PDF nguồn: 13,14
+
+TC2.3 | Cấu trúc và nội dung chương trình đào tạo được thiết kế và phát triển dựa trên phản hồi và nhu cầu của các bên liên quan.
+  Mục nguồn 2023: 10.1
+  Báo cáo: BC009_TC2.3.pdf | trang PDF nguồn: 98,99
+  Minh chứng: MC009_TC2.3.pdf | trang PDF nguồn: 62,63
+
+TC2.4 | Đóng góp của từng học phần trong việc đạt được chuẩn đầu ra của chương trình đào tạo là rõ ràng.
+  Mục nguồn 2023: 3.2
+  Báo cáo: BC010_TC2.4.pdf | trang PDF nguồn: 34,35,36,37
+  Minh chứng: MC010_TC2.4.pdf | trang PDF nguồn: 14,15
+
+TC2.5 | Chương trình đào tạo có cấu trúc logic, trình tự hợp lý, có tính linh hoạt và tích hợp.
+  Mục nguồn 2023: 3.3
+  Báo cáo: BC011_TC2.5.pdf | trang PDF nguồn: 37,38,39,40
+  Minh chứng: MC011_TC2.5.pdf | trang PDF nguồn: 15,16,17
+
+TC2.6 | Cấu trúc và nội dung chương trình đào tạo thể hiện rõ các học phần bắt buộc, tự chọn, lý thuyết, thực hành, trải nghiệm và nghiên cứu khoa học.
+  Mục nguồn 2023: 3.3
+  Báo cáo: BC012_TC2.6.pdf | trang PDF nguồn: 37,38,39,40
+  Minh chứng: MC012_TC2.6.pdf | trang PDF nguồn: 15,16,17
+
+TC2.7 | Cấu trúc và nội dung chương trình đào tạo được rà soát, đánh giá và cải tiến theo quy trình, bảo đảm tính cập nhật.
+  Mục nguồn 2023: 10.2
+  Báo cáo: BC013_TC2.7.pdf | trang PDF nguồn: 99,100,101
+  Minh chứng: MC013_TC2.7.pdf | trang PDF nguồn: 63,64,65,66
+
+TC3.1 | Triết lý giáo dục của cơ sở đào tạo được tuyên bố rõ ràng, phổ biến đến các bên liên quan và truyền tải vào hoạt động dạy và học.
+  Mục nguồn 2023: 4.1
+  Báo cáo: BC014_TC3.1.pdf | trang PDF nguồn: 40,41,42
+  Minh chứng: MC014_TC3.1.pdf | trang PDF nguồn: 17,18
+
+TC3.2 | Hoạt động dạy và học được thiết kế tương thích với chuẩn đầu ra của chương trình đào tạo.
+  Mục nguồn 2023: 4.2
+  Báo cáo: BC015_TC3.2.pdf | trang PDF nguồn: 42,43,44,45
+  Minh chứng: MC015_TC3.2.pdf | trang PDF nguồn: 18,19,20
+
+TC3.3 | Hoạt động dạy và học thể hiện việc học tập chủ động và phát triển khả năng học tập suốt đời của người học.
+  Mục nguồn 2023: 4.3
+  Báo cáo: BC016_TC3.3.pdf | trang PDF nguồn: 45,46,47,48
+  Minh chứng: MC016_TC3.3.pdf | trang PDF nguồn: 20,21
+
+TC3.4 | Hoạt động dạy và học thúc đẩy người học đưa ra ý tưởng mới, sáng kiến, đổi mới sáng tạo và tinh thần khởi nghiệp.
+  Mục nguồn 2023: 4.3, 10.4
+  Báo cáo: BC017_TC3.4.pdf | trang PDF nguồn: 45,46,47,48,103,104
+  Minh chứng: MC017_TC3.4.pdf | trang PDF nguồn: 20,21,67,68,69
+
+TC3.5 | Quá trình dạy và học được cải tiến thường xuyên để đáp ứng yêu cầu của thị trường lao động và chuẩn đầu ra.
+  Mục nguồn 2023: 10.3
+  Báo cáo: BC018_TC3.5.pdf | trang PDF nguồn: 101,102,103
+  Minh chứng: MC018_TC3.5.pdf | trang PDF nguồn: 66,67
+
+TC4.1 | Các phương pháp đánh giá kết quả học tập của người học đa dạng, tương thích với chuẩn đầu ra của chương trình đào tạo.
+  Mục nguồn 2023: 5.3
+  Báo cáo: BC019_TC4.1.pdf | trang PDF nguồn: 51,52,53
+  Minh chứng: MC019_TC4.1.pdf | trang PDF nguồn: 23,24
+
+TC4.2 | Có các quy định rõ ràng về đánh giá kết quả học tập, quy trình phúc khảo, được phổ biến và triển khai nhất quán.
+  Mục nguồn 2023: 5.2, 5.5
+  Báo cáo: BC020_TC4.2.pdf | trang PDF nguồn: 49,50,51,54,55,56,57
+  Minh chứng: MC020_TC4.2.pdf | trang PDF nguồn: 22,23,25,26,27
+
+TC4.3 | Các tiêu chuẩn và quy trình đánh giá kết quả học tập, công nhận kết quả học tập và xét tốt nghiệp được phổ biến, triển khai nhất quán.
+  Mục nguồn 2023: 5.2
+  Báo cáo: BC021_TC4.3.pdf | trang PDF nguồn: 49,50,51
+  Minh chứng: MC021_TC4.3.pdf | trang PDF nguồn: 22,23
+
+TC4.4 | Các phương pháp đánh giá được thể hiện qua ma trận, tiêu chí, mức độ đánh giá, đáp án, thang điểm và kế hoạch đánh giá.
+  Mục nguồn 2023: 5.1, 5.3
+  Báo cáo: BC022_TC4.4.pdf | trang PDF nguồn: 48,49,51,52,53
+  Minh chứng: MC022_TC4.4.pdf | trang PDF nguồn: 21,22,23,24
+
+TC4.5 | Các phương pháp đánh giá bảo đảm đo lường được mức độ đạt chuẩn đầu ra học phần và chuẩn đầu ra chương trình đào tạo.
+  Mục nguồn 2023: 5.1
+  Báo cáo: BC023_TC4.5.pdf | trang PDF nguồn: 48,49
+  Minh chứng: MC023_TC4.5.pdf | trang PDF nguồn: 21,22
+
+TC4.6 | Kết quả đánh giá được phản hồi kịp thời cho người học để cải thiện việc học tập.
+  Mục nguồn 2023: 5.4
+  Báo cáo: BC024_TC4.6.pdf | trang PDF nguồn: 53,54
+  Minh chứng: MC024_TC4.6.pdf | trang PDF nguồn: 24,25
+
+TC4.7 | Việc đánh giá kết quả học tập được định kỳ rà soát và cải tiến để bảo đảm đo lường chuẩn đầu ra.
+  Mục nguồn 2023: 10.3
+  Báo cáo: BC025_TC4.7.pdf | trang PDF nguồn: 101,102,103
+  Minh chứng: MC025_TC4.7.pdf | trang PDF nguồn: 66,67
+
+TC5.1 | Kế hoạch phát triển đội ngũ giảng viên, nghiên cứu viên được thực hiện nhằm bảo đảm số lượng và chất lượng.
+  Mục nguồn 2023: 6.1
+  Báo cáo: BC026_TC5.1.pdf | trang PDF nguồn: 57,58,59
+  Minh chứng: MC026_TC5.1.pdf | trang PDF nguồn: 27,28,29
+
+TC5.2 | Số lượng và chất lượng đội ngũ giảng viên, nghiên cứu viên đáp ứng yêu cầu thực hiện chương trình đào tạo; khối lượng công việc được đo lường và giám sát.
+  Mục nguồn 2023: 6.2
+  Báo cáo: BC027_TC5.2.pdf | trang PDF nguồn: 59,60,61,62,63
+  Minh chứng: MC027_TC5.2.pdf | trang PDF nguồn: 29,30,31
+
+TC5.3 | Năng lực của đội ngũ giảng viên, nghiên cứu viên được xác định, đánh giá và thông tin tới các bên liên quan trực tiếp.
+  Mục nguồn 2023: 6.4
+  Báo cáo: BC028_TC5.3.pdf | trang PDF nguồn: 65,66,67
+  Minh chứng: MC028_TC5.3.pdf | trang PDF nguồn: 32,33
+
+TC5.4 | Giảng viên, nghiên cứu viên được phân công nhiệm vụ phù hợp với trình độ, năng lực và kinh nghiệm.
+  Mục nguồn 2023: 6.1, 6.3
+  Báo cáo: BC029_TC5.4.pdf | trang PDF nguồn: 57,58,59,63,64,65
+  Minh chứng: MC029_TC5.4.pdf | trang PDF nguồn: 27,28,29,31,32
+
+TC5.5 | Việc bổ nhiệm, thăng tiến dựa trên hệ thống đánh giá năng lực và kết quả thực hiện nhiệm vụ.
+  Mục nguồn 2023: 6.6
+  Báo cáo: BC030_TC5.5.pdf | trang PDF nguồn: 68,69,70
+  Minh chứng: MC030_TC5.5.pdf | trang PDF nguồn: 36,37,38,39
+
+TC5.6 | Trách nhiệm, quyền hạn và nghĩa vụ của giảng viên, nghiên cứu viên được xác định rõ ràng và phổ biến.
+  Mục nguồn 2023: 6.1, 6.3
+  Báo cáo: BC031_TC5.6.pdf | trang PDF nguồn: 57,58,59,63,64,65
+  Minh chứng: MC031_TC5.6.pdf | trang PDF nguồn: 27,28,29,31,32
+
+TC5.7 | Nhu cầu đào tạo, bồi dưỡng và phát triển chuyên môn được xác định có hệ thống và được triển khai đáp ứng nhu cầu.
+  Mục nguồn 2023: 6.5
+  Báo cáo: BC032_TC5.7.pdf | trang PDF nguồn: 67,68
+  Minh chứng: MC032_TC5.7.pdf | trang PDF nguồn: 33,34,35,36
+
+TC5.8 | Công tác quản lý để đánh giá chất lượng giảng dạy, nghiên cứu khoa học và phục vụ cộng đồng được triển khai theo quy định.
+  Mục nguồn 2023: 6.6, 6.7
+  Báo cáo: BC033_TC5.8.pdf | trang PDF nguồn: 68,69,70,71,72
+  Minh chứng: MC033_TC5.8.pdf | trang PDF nguồn: 36,37,38,39,40
+
+TC6.1 | Chính sách, tiêu chí và quy trình tuyển sinh được xác định rõ ràng, công bố công khai và cập nhật.
+  Mục nguồn 2023: 8.1, 8.2
+  Báo cáo: BC034_TC6.1.pdf | trang PDF nguồn: 81,82,83
+  Minh chứng: MC034_TC6.1.pdf | trang PDF nguồn: 48,49,50
+
+TC6.2 | Năng lực đội ngũ cung cấp dịch vụ hỗ trợ được xác định rõ ràng và được đánh giá để bảo đảm phù hợp nhu cầu các bên liên quan.
+  Mục nguồn 2023: 7.3
+  Báo cáo: BC035_TC6.2.pdf | trang PDF nguồn: 76,77,78
+  Minh chứng: MC035_TC6.2.pdf | trang PDF nguồn: 43,44
+
+TC6.3 | Kế hoạch ngắn hạn và dài hạn đối với dịch vụ hỗ trợ người học được xây dựng và triển khai thực hiện.
+  Mục nguồn 2023: 8.4, 10.5
+  Báo cáo: BC036_TC6.3.pdf | trang PDF nguồn: 85,86,87,104,105
+  Minh chứng: MC036_TC6.3.pdf | trang PDF nguồn: 52,53,54,55,69,70
+
+TC6.4 | Có hệ thống quản lý đào tạo phù hợp để giám sát, ghi nhận tiến độ, kết quả và khối lượng học tập của người học.
+  Mục nguồn 2023: 8.3
+  Báo cáo: BC037_TC6.4.pdf | trang PDF nguồn: 83,84,85
+  Minh chứng: MC037_TC6.4.pdf | trang PDF nguồn: 50,51,52
+
+TC6.5 | Có các hoạt động tư vấn học tập, ngoại khóa, cuộc thi và dịch vụ hỗ trợ giúp cải thiện việc học và khả năng có việc làm.
+  Mục nguồn 2023: 8.4
+  Báo cáo: BC038_TC6.5.pdf | trang PDF nguồn: 85,86,87
+  Minh chứng: MC038_TC6.5.pdf | trang PDF nguồn: 52,53,54,55
+
+TC6.6 | Các dịch vụ hỗ trợ người học được định kỳ đánh giá, đối sánh và cải tiến chất lượng.
+  Mục nguồn 2023: 10.5
+  Báo cáo: BC039_TC6.6.pdf | trang PDF nguồn: 104,105
+  Minh chứng: MC039_TC6.6.pdf | trang PDF nguồn: 69,70
+
+TC7.1 | Có hệ thống phòng làm việc, phòng học và các phòng chức năng với trang thiết bị phù hợp để triển khai chương trình đào tạo.
+  Mục nguồn 2023: 9.1
+  Báo cáo: BC040_TC7.1.pdf | trang PDF nguồn: 89,90,91
+  Minh chứng: MC040_TC7.1.pdf | trang PDF nguồn: 56,57
+
+TC7.2 | Các phòng thí nghiệm, phòng thực hành và trang thiết bị đầy đủ, cập nhật và được sử dụng hiệu quả.
+  Mục nguồn 2023: 9.3
+  Báo cáo: BC041_TC7.2.pdf | trang PDF nguồn: 93,94
+  Minh chứng: MC041_TC7.2.pdf | trang PDF nguồn: 58,59
+
+TC7.3 | Có thư viện, thư viện số và nguồn học liệu được cập nhật đáp ứng nhu cầu đào tạo, nghiên cứu khoa học.
+  Mục nguồn 2023: 9.2
+  Báo cáo: BC042_TC7.3.pdf | trang PDF nguồn: 91,92,93
+  Minh chứng: MC042_TC7.3.pdf | trang PDF nguồn: 57,58
+
+TC7.4 | Có hệ thống công nghệ thông tin, hạ tầng mạng và máy tính dễ tiếp cận, đáp ứng nhu cầu giảng dạy, nghiên cứu và quản lý.
+  Mục nguồn 2023: 9.4
+  Báo cáo: BC043_TC7.4.pdf | trang PDF nguồn: 94,95,96
+  Minh chứng: MC043_TC7.4.pdf | trang PDF nguồn: 59,60
+
+TC7.5 | Môi trường tâm lý, xã hội và cảnh quan thiên nhiên tạo thuận lợi cho đào tạo, nghiên cứu và sự thoải mái của người học.
+  Mục nguồn 2023: 8.5
+  Báo cáo: BC044_TC7.5.pdf | trang PDF nguồn: 87,88,89
+  Minh chứng: MC044_TC7.5.pdf | trang PDF nguồn: 55,56
+
+TC7.6 | Các tiêu chuẩn về môi trường, sức khỏe, an toàn được xác định và triển khai phù hợp.
+  Mục nguồn 2023: 9.5
+  Báo cáo: BC045_TC7.6.pdf | trang PDF nguồn: 96,97,98
+  Minh chứng: MC045_TC7.6.pdf | trang PDF nguồn: 60,61,62
+
+TC7.7 | Năng lực đội ngũ hỗ trợ về cơ sở vật chất và trang thiết bị được xác định và đánh giá đáp ứng nhu cầu.
+  Mục nguồn 2023: 7.3
+  Báo cáo: BC046_TC7.7.pdf | trang PDF nguồn: 76,77,78
+  Minh chứng: MC046_TC7.7.pdf | trang PDF nguồn: 43,44
+
+TC7.8 | Chất lượng cơ sở vật chất phục vụ chương trình đào tạo được định kỳ đánh giá và cải tiến.
+  Mục nguồn 2023: 10.5
+  Báo cáo: BC047_TC7.8.pdf | trang PDF nguồn: 104,105
+  Minh chứng: MC047_TC7.8.pdf | trang PDF nguồn: 69,70
+
+TC8.1 | Tỉ lệ tốt nghiệp, thôi học và thời gian tốt nghiệp trung bình của người học được xác lập, giám sát, đối sánh để cải tiến chất lượng.
+  Mục nguồn 2023: 11.1, 11.2
+  Báo cáo: BC048_TC8.1.pdf | trang PDF nguồn: 107,108,109,110,111
+  Minh chứng: MC048_TC8.1.pdf | trang PDF nguồn: 71,72,73
+
+TC8.2 | Tỉ lệ việc làm, tự tạo việc làm, khởi nghiệp và học tập nâng cao trình độ của người học tốt nghiệp được xác lập, giám sát và đối sánh.
+  Mục nguồn 2023: 11.3
+  Báo cáo: BC049_TC8.2.pdf | trang PDF nguồn: 111,112,113
+  Minh chứng: MC049_TC8.2.pdf | trang PDF nguồn: 73,74
+
+TC8.3 | Hoạt động nghiên cứu khoa học và sản phẩm sáng tạo của người học, giảng viên, nghiên cứu viên được xác lập, giám sát và đối sánh.
+  Mục nguồn 2023: 11.4, 6.7
+  Báo cáo: BC050_TC8.3.pdf | trang PDF nguồn: 113,114,115,70,71,72
+  Minh chứng: MC050_TC8.3.pdf | trang PDF nguồn: 74,75,39,40
+
+TC8.4 | Dữ liệu về mức độ người học đạt chuẩn đầu ra của chương trình đào tạo được xác lập và giám sát để cải tiến chất lượng.
+  Mục nguồn 2023: 5.1, 10.3
+  Báo cáo: BC051_TC8.4.pdf | trang PDF nguồn: 48,49,101,102,103
+  Minh chứng: MC051_TC8.4.pdf | trang PDF nguồn: 21,22,66,67
+
+TC8.5 | Mức độ hài lòng của các bên liên quan được xác lập, giám sát, đối sánh để cải tiến chất lượng.
+  Mục nguồn 2023: 11.5
+  Báo cáo: BC052_TC8.5.pdf | trang PDF nguồn: 115,116,117
+  Minh chứng: MC052_TC8.5.pdf | trang PDF nguồn: 74,75
+

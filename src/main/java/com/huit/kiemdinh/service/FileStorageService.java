@@ -156,16 +156,19 @@ public class FileStorageService {
         return new StoredFile(data, contentType(effectiveRelative));
     }
 
-    public void deleteByWebPath(String webPath) throws IOException {
+    public void deleteByWebPath(String webPath) {
         if (webPath == null || webPath.isBlank()) return;
-        String relative = relativeFromWebPath(webPath);
-        if (isCloud()) {
-            deleteSupabase(relative);
-            return;
+        try {
+            String relative = relativeFromWebPath(webPath);
+            if (isCloud()) {
+                deleteSupabase(relative);
+                return;
+            }
+            Path target = root.resolve(relative).normalize();
+            if (!target.startsWith(root)) return;
+            Files.deleteIfExists(target);
+        } catch (IOException ignored) {
         }
-        Path target = root.resolve(relative).normalize();
-        if (!target.startsWith(root)) throw new IOException("Đường dẫn file không hợp lệ");
-        Files.deleteIfExists(target);
     }
 
     private void uploadSupabase(String relative, MultipartFile file) throws IOException {

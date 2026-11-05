@@ -50,6 +50,9 @@ public class FileStorageService {
             if (supabaseUrl.isBlank() || supabaseServiceRoleKey.isBlank()) {
                 throw new IllegalStateException("APP_STORAGE_MODE=supabase nhưng thiếu SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
             }
+            Thread syncThread = new Thread(this::syncSeedFilesToSupabase, "supabase-seed-sync");
+            syncThread.setDaemon(true);
+            syncThread.start();
             return;
         }
         Files.createDirectories(root.resolve("ctdt"));
@@ -60,6 +63,67 @@ public class FileStorageService {
         migrateLegacyUploads();
     }
 
+
+
+    private void syncSeedFilesToSupabase() {
+        if (!Files.isDirectory(seedRoot)) return;
+        for (String sub : new String[]{"ctdt", "minhchung", "minh-chung-chung", "bao-cao"}) {
+            Path from = seedRoot.resolve(sub);
+            if (!Files.isDirectory(from)) continue;
+            try (var stream = Files.walk(from)) {
+                stream.filter(Files::isRegularFile).forEach(src -> {
+                    Path relPath = seedRoot.relativize(src);
+                    String relative = relPath.toString().replace('\\', '/');
+                    try {
+                        if (!supabaseObjectExists(relative)) {
+                            uploadSupabaseBytes(relative, Files.readAllBytes(src), contentType(relative));
+                            System.out.println("[Storage] Đã đồng bộ seed lên Supabase: " + relative);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("[Storage] Không thể đồng bộ seed " + relative + ": " + e.getMessage());
+                    }
+                });
+            } catch (IOException e) {
+                System.err.println("[Storage] Không thể đọc thư mục seed " + sub + ": " + e.getMessage());
+            }
+        }
+    }
+
+    private boolean supabaseObjectExists(String relative) throws IOException {
+        try {
+            HttpRequest request = HttpRequest.newBuilder(objectInfoUri(relative))
+                    .header("Authorization", "Bearer " + supabaseServiceRoleKey)
+                    .header("apikey", supabaseServiceRoleKey)
+                    .method("HEAD", HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<Void> response = httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) return true;
+            if (response.statusCode() == 404 || response.statusCode() == 400) return false;
+            throw new IOException("Supabase kiểm tra file thất bại (HTTP " + response.statusCode() + ")");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Kiểm tra file Supabase bị gián đoạn", e);
+        }
+    }
+
+    private void uploadSupabaseBytes(String relative, byte[] bytes, String contentType) throws IOException {
+        try {
+            HttpRequest request = HttpRequest.newBuilder(objectUri(relative, false))
+                    .header("Authorization", "Bearer " + supabaseServiceRoleKey)
+                    .header("apikey", supabaseServiceRoleKey)
+                    .header("Content-Type", contentType)
+                    .header("x-upsert", "true")
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(bytes))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new IOException("Supabase upload seed thất bại (HTTP " + response.statusCode() + "): " + response.body());
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Upload seed bị gián đoạn", e);
+        }
+    }
 
     private void seedBundledFiles() {
         if (!Files.isDirectory(seedRoot)) return;
@@ -147,7 +211,16 @@ public class FileStorageService {
         String effectiveRelative = relative;
         byte[] data;
         if (isCloud()) {
-            data = downloadSupabase(effectiveRelative);
+            try {
+                data = downloadSupabase(effectiveRelative);
+            } catch (IOException cloudError) {
+                Path seeded = seedRoot.resolve(effectiveRelative).normalize();
+                if (seeded.startsWith(seedRoot) && Files.isRegularFile(seeded)) {
+                    data = Files.readAllBytes(seeded);
+                } else {
+                    throw cloudError;
+                }
+            }
         } else {
             Path target = root.resolve(effectiveRelative).normalize();
             if (!target.startsWith(root) || !Files.isRegularFile(target)) throw new NoSuchFileException(effectiveRelative);
@@ -230,6 +303,12 @@ public class FileStorageService {
         String encodedPath = encodePath(relative);
         String prefix = authenticatedDownload ? "/storage/v1/object/authenticated/" : "/storage/v1/object/";
         return URI.create(supabaseUrl + prefix + encodedBucket + "/" + encodedPath);
+    }
+
+    private URI objectInfoUri(String relative) {
+        String encodedBucket = encodeSegment(supabaseBucket);
+        String encodedPath = encodePath(relative);
+        return URI.create(supabaseUrl + "/storage/v1/object/info/" + encodedBucket + "/" + encodedPath);
     }
 
     private String relativeFromWebPath(String webPath) throws IOException {

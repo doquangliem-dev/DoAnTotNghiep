@@ -15,6 +15,7 @@ services:
     environment:
       APP_STORAGE_MODE: local
       APP_STORAGE_ROOT: /app/storage
+      APP_STORAGE_SEED_ROOT: /app/storage-seed
       APP_SEED_DEMO_DATA: ${APP_SEED_DEMO_DATA:-false}
       TZ: Asia/Ho_Chi_Minh
     volumes:

@@ -15,6 +15,8 @@ public class MinhChungChung {
     private String donViBanHanh;
     private String moTa;
     private String duongDanFile;
+    private String duongDanTaiLieuThamChieu;
+    private String tenTaiLieuThamChieu;
     private String tenFile;
     private String loaiFile;
     private String maNguoiTao;
@@ -31,6 +33,8 @@ public class MinhChungChung {
     public String getDonViBanHanh(){return donViBanHanh;} public void setDonViBanHanh(String v){donViBanHanh=v;}
     public String getMoTa(){return moTa;} public void setMoTa(String v){moTa=v;}
     public String getDuongDanFile(){return duongDanFile;} public void setDuongDanFile(String v){duongDanFile=v;}
+    public String getDuongDanTaiLieuThamChieu(){return duongDanTaiLieuThamChieu;} public void setDuongDanTaiLieuThamChieu(String v){duongDanTaiLieuThamChieu=v;}
+    public String getTenTaiLieuThamChieu(){return tenTaiLieuThamChieu;} public void setTenTaiLieuThamChieu(String v){tenTaiLieuThamChieu=v;}
     public String getTenFile(){return tenFile;} public void setTenFile(String v){tenFile=v;}
     public String getLoaiFile(){return loaiFile;} public void setLoaiFile(String v){loaiFile=v;}
     public String getMaNguoiTao(){return maNguoiTao;} public void setMaNguoiTao(String v){maNguoiTao=v;}

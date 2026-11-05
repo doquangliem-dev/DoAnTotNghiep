@@ -7,11 +7,13 @@ COPY pom.xml ./
 RUN mvn -B -DskipTests dependency:go-offline
 
 COPY src ./src
+COPY storage-seed /app/storage-seed
 RUN mvn -B -DskipTests clean package
 
 RUN mkdir -p /app/storage
 
 ENV APP_STORAGE_ROOT=/app/storage
+ENV APP_STORAGE_SEED_ROOT=/app/storage-seed
 ENV APP_SEED_DEMO_DATA=false
 ENV TZ=Asia/Ho_Chi_Minh
 

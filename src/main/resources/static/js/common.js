@@ -152,3 +152,8 @@ window.addEventListener('error',e=>{if(e.error){console.error(e.error);showGloba
 
 activeNav();
 if(location.pathname!='/login') loadCurrentUser();
+
+function evidenceFileHtml(x){
+  if(x?.duongDanFile) return `<a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>`;
+  return '<span class="file-state">Chưa có file</span>';
+}

@@ -28,7 +28,7 @@ const presetNames={
  'ABET':'ABET (Accreditation Board for Engineering and Technology)',
  'FIBAA':'FIBAA (Foundation for International Business Administration Accreditation)',
  'ASIIN':'ASIIN (Accreditation Agency for Degree Programmes in Engineering, Informatics, the Natural Sciences and Mathematics)',
- 'MOET':'Bộ tiêu chuẩn theo Bộ tiêu chuẩn MOET'
+ 'MOET':'Bộ tiêu chuẩn theo '
 };
 $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.remove('active'));$$('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')});
 async function load(){[bo,tc,tchi]=await Promise.all([api('/bo-tieu-chuan'),api('/tieu-chuan'),api('/tieu-chi')]);fill();render()}

@@ -915,6 +915,19 @@ public class HeThongService {
         }catch(IOException e){throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Không thể lưu file báo cáo nhóm",e);}
     }
 
+    public BaoCaoNhom deleteBaoCaoNhomFile(String id,String userId){
+        BaoCaoNhom x=bcnRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy báo cáo nhóm"));
+        NhomTieuChi g=nhomRepo.findById(x.getMaNhomTieuChi()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy nhóm"));
+        if(!isSecretaryOfGroup(g,userId) && !isLeaderOfGroup(g,userId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không thuộc nhóm của báo cáo này");
+        String state=Optional.ofNullable(x.getTrangThai()).orElse("Đang tổng hợp");
+        if(!List.of("Đang tổng hợp","Yêu cầu chỉnh sửa").contains(state))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Báo cáo nhóm đã nộp nên file đã được khóa");
+        storage.deleteByWebPath(x.getDuongDanFile());
+        x.setDuongDanFile(null); x.setTenFileBaoCao(null); x.setNgayCapNhat(LocalDateTime.now());
+        return bcnRepo.save(x);
+    }
+
     public BaoCaoNhom truongNhomDuyetBaoCaoNhom(String id,String ketQua,String nhanXet,String userId){
         BaoCaoNhom x=bcnRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy báo cáo nhóm"));
         NhomTieuChi g=nhomRepo.findById(x.getMaNhomTieuChi()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy nhóm"));
@@ -1536,11 +1549,8 @@ public class HeThongService {
             old=mcRepo.findById(x.getId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy minh chứng"));
             if(!Objects.equals(old.getMaNguoiUpload(),userId)) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được sửa minh chứng do chính mình tạo");
             if(!Objects.equals(old.getMaTieuChi(),x.getMaTieuChi())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không được đổi tiêu chí của minh chứng đã tạo");
-            if(!List.of("Đang soạn","Từ chối","Chờ Trưởng nhóm duyệt","Chờ Thư ký duyệt").contains(Optional.ofNullable(old.getTrangThai()).orElse("")))
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng đã khóa, không thể chỉnh sửa");
-            // Khi đang chờ duyệt cấp tiếp theo không cho sửa nội dung để tránh thay đổi sau khi đã được cấp trước phê duyệt.
-            if("Chờ Thư ký duyệt".equalsIgnoreCase(old.getTrangThai()) && !leaderRole)
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng đã được Trưởng nhóm duyệt, không thể sửa");
+            if(!List.of("Đang soạn","Từ chối").contains(Optional.ofNullable(old.getTrangThai()).orElse("")))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng đã nộp và đang trong quy trình duyệt, không thể chỉnh sửa");
             x.setMaMinhChung(old.getMaMinhChung());
             x.setDuongDanFile(old.getDuongDanFile()); x.setLoaiFile(old.getLoaiFile()); x.setKichThuoc(old.getKichThuoc()); x.setNgayUpload(old.getNgayUpload());
         }
@@ -1548,7 +1558,7 @@ public class HeThongService {
         x.setMaPhanCong(assignment.getId()); x.setMaKeHoach(assignment.getMaKeHoach());
         if(isNew) x.setTrangThai("Đang soạn");
         else if("Từ chối".equalsIgnoreCase(Optional.ofNullable(old.getTrangThai()).orElse("")))
-            x.setTrangThai(leaderRole?"Chờ Thư ký duyệt":"Chờ Trưởng nhóm duyệt");
+            x.setTrangThai("Đang soạn");
         else x.setTrangThai(old.getTrangThai()); // trạng thái là dữ liệu do server quản lý
         MinhChung saved=saveMinhChung(x);
         markAssignmentInProgress(assignment.getId());
@@ -1607,15 +1617,45 @@ public class HeThongService {
         if(!Objects.equals(mc.getMaNguoiUpload(),userId)) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được tải file cho minh chứng do chính mình tạo");
         TieuChi tc=tchiRepo.findById(mc.getMaTieuChi()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng không gắn tiêu chí hợp lệ"));
         if(findAssignmentForEvidence(userId,tc,leaderRole)==null) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không còn được phân công tiêu chí này");
-        String state=Optional.ofNullable(mc.getTrangThai()).orElse("");
-        if("Đã duyệt".equalsIgnoreCase(state)||"Chờ Thư ký duyệt".equalsIgnoreCase(state)&&!leaderRole)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng đã khóa, không thể thay file");
+        String state=Optional.ofNullable(mc.getTrangThai()).orElse("Đang soạn");
+        if(!List.of("Đang soạn","Từ chối").contains(state))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng đã nộp nên file đã được khóa");
+        // Upload file chỉ lưu bản nháp. Việc nộp sang cấp duyệt được thực hiện bằng endpoint riêng.
         MinhChung saved=uploadMinhChung(id,file);
-        if("Đang soạn".equalsIgnoreCase(Optional.ofNullable(saved.getTrangThai()).orElse(""))) {
-            saved.setTrangThai(leaderRole?"Chờ Thư ký duyệt":"Chờ Trưởng nhóm duyệt");
+        if("Từ chối".equalsIgnoreCase(Optional.ofNullable(saved.getTrangThai()).orElse(""))) {
+            saved.setTrangThai("Đang soạn");
             saved=mcRepo.save(saved);
         }
         return saved;
+    }
+
+    public MinhChung guiMinhChungNguoiDung(String id,String userId,boolean leaderRole){
+        MinhChung mc=mcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy minh chứng"));
+        if(!Objects.equals(mc.getMaNguoiUpload(),userId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được nộp minh chứng do chính mình tạo");
+        TieuChi tc=tchiRepo.findById(mc.getMaTieuChi()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng không gắn tiêu chí hợp lệ"));
+        if(findAssignmentForEvidence(userId,tc,leaderRole)==null)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không còn được phân công tiêu chí này");
+        String state=Optional.ofNullable(mc.getTrangThai()).orElse("Đang soạn");
+        if(!List.of("Đang soạn","Từ chối").contains(state))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng đã được nộp và đang trong quy trình duyệt");
+        if(mc.getDuongDanFile()==null||mc.getDuongDanFile().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Vui lòng tải file minh chứng trước khi nộp");
+        mc.setTrangThai(leaderRole?"Chờ Thư ký duyệt":"Chờ Trưởng nhóm duyệt");
+        return mcRepo.save(mc);
+    }
+
+    public MinhChung deleteMinhChungFileNguoiDung(String id,String userId,boolean leaderRole){
+        MinhChung mc=mcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy minh chứng"));
+        if(!Objects.equals(mc.getMaNguoiUpload(),userId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được xóa file minh chứng do chính mình tạo");
+        String state=Optional.ofNullable(mc.getTrangThai()).orElse("Đang soạn");
+        if(!List.of("Đang soạn","Từ chối").contains(state))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng đã nộp nên file đã được khóa");
+        removeEvidencePhysicalFile(mc.getDuongDanFile());
+        mc.setDuongDanFile(null); mc.setLoaiFile(null); mc.setKichThuoc(null); mc.setNgayUpload(null);
+        if("Từ chối".equalsIgnoreCase(state)) mc.setTrangThai("Đang soạn");
+        return mcRepo.save(mc);
     }
 
     public DanhGiaMinhChung truongNhomDuyetMinhChung(String id,String ketQua,String nhanXet,String leaderId){
@@ -1746,6 +1786,18 @@ public class HeThongService {
             bc.setDuongDanFile(storage.saveBaoCao(id,file)); bc.setTenFileBaoCao(original); bc.setNgayCapNhat(LocalDateTime.now());
             return bcRepo.save(bc);
         }catch(IOException e){throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Không thể lưu file báo cáo",e);}
+    }
+
+    public BaoCaoTieuChi deleteBaoCaoThanhVienFile(String id,String userId){
+        BaoCaoTieuChi bc=bcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy báo cáo"));
+        if(!Objects.equals(bc.getMaNguoiViet(),userId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được xóa file báo cáo của mình");
+        String state=Optional.ofNullable(bc.getTrangThai()).orElse("Đang soạn");
+        if(!List.of("Đang soạn","Yêu cầu chỉnh sửa").contains(state))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Báo cáo đã nộp nên file đã được khóa");
+        storage.deleteByWebPath(bc.getDuongDanFile());
+        bc.setDuongDanFile(null); bc.setTenFileBaoCao(null); bc.setNgayCapNhat(LocalDateTime.now());
+        return bcRepo.save(bc);
     }
 
     public List<MinhChung> minhChungThanhVien(String userId){
@@ -1940,6 +1992,9 @@ public class HeThongService {
     public BaoCaoPhan uploadBaoCaoPhan(String id,MultipartFile file,String userId,boolean adminOverride){
         if(file==null||file.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Vui lòng chọn file báo cáo");
         BaoCaoPhan x=bcpRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy phần báo cáo"));
+        String state=Optional.ofNullable(x.getTrangThai()).orElse("Đang soạn");
+        if(!List.of("Đang soạn","Yêu cầu chỉnh sửa").contains(state))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Phần báo cáo đã nộp nên file đã được khóa");
         if(!adminOverride){
             PhanCongBaoCao job=pcbcRepo.findById(x.getMaPhanCong()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy phân công báo cáo"));
             boolean allowed=Objects.equals(job.getMaNguoiDung(),userId)||(job.getMaNhanSuHoTroList()!=null&&job.getMaNhanSuHoTroList().contains(userId));
@@ -1958,6 +2013,21 @@ public class HeThongService {
             x.setNgayCapNhat(LocalDateTime.now());
             return bcpRepo.save(x);
         }catch(IOException e){throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Không thể lưu file báo cáo",e);}
+    }
+
+    public BaoCaoPhan deleteBaoCaoPhanFile(String id,String userId,boolean adminOverride){
+        BaoCaoPhan x=bcpRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy phần báo cáo"));
+        String state=Optional.ofNullable(x.getTrangThai()).orElse("Đang soạn");
+        if(!List.of("Đang soạn","Yêu cầu chỉnh sửa").contains(state))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Phần báo cáo đã nộp nên file đã được khóa");
+        if(!adminOverride){
+            PhanCongBaoCao job=pcbcRepo.findById(x.getMaPhanCong()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy phân công báo cáo"));
+            boolean allowed=Objects.equals(job.getMaNguoiDung(),userId)||(job.getMaNhanSuHoTroList()!=null&&job.getMaNhanSuHoTroList().contains(userId));
+            if(!allowed) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không được xóa file của phần báo cáo này");
+        }
+        storage.deleteByWebPath(x.getDuongDanFile());
+        x.setDuongDanFile(null); x.setTenFileBaoCao(null); x.setNgayCapNhat(LocalDateTime.now());
+        return bcpRepo.save(x);
     }
 
     public BaoCaoPhan adminXuLyBaoCaoPhan(String id,String ketQua,String nhanXet,String adminId){

@@ -489,19 +489,19 @@ db.chuongTrinhDaoTao.insertOne({
       maPhienBan:"PB2022",namHoc:"2022",namPhienBan:2022,soPhienBan:1,
       tenPhienBan:"Phiên bản CTĐT năm 2022",noiDungCapNhat:"Phiên bản ban đầu",
       ngayBanHanh:ISODate("2022-08-15T00:00:00.000Z"),trangThai:"Đã ban hành",
-      maNguoiCapNhat:"ND001",chuanDauRa:[]
+      maNguoiCapNhat:"ND001",fileDinhKem:"/uploads/ctdt/CTDT001_PB2022.pdf",tenFileGoc:"CTDT001_PB2022.pdf",chuanDauRa:[]
     },
     {
       maPhienBan:"PB2024",namHoc:"2024",namPhienBan:2024,soPhienBan:2,
       tenPhienBan:"Phiên bản CTĐT năm 2024",noiDungCapNhat:"Rà soát, cập nhật CTĐT năm 2024",
       ngayBanHanh:ISODate("2024-08-15T00:00:00.000Z"),trangThai:"Đã ban hành",
-      maNguoiCapNhat:"ND001",chuanDauRa:[]
+      maNguoiCapNhat:"ND001",fileDinhKem:"/uploads/ctdt/CTDT001_PB2024.pdf",tenFileGoc:"CTDT001_PB2024.pdf",chuanDauRa:[]
     },
     {
       maPhienBan:"PB2026",namHoc:"2026",namPhienBan:2026,soPhienBan:3,
       tenPhienBan:"Phiên bản CTĐT năm 2026",noiDungCapNhat:"Rà soát, cập nhật CTĐT năm 2026",
       ngayBanHanh:ISODate("2026-08-15T00:00:00.000Z"),trangThai:"Đang áp dụng",
-      maNguoiCapNhat:"ND001",
+      maNguoiCapNhat:"ND001",fileDinhKem:"/uploads/ctdt/CTDT001_PB2026.pdf",tenFileGoc:"CTDT001_PB2026.pdf",
       chuanDauRa:[
         {maPLO:"PLO1",tenPLO:"Kiến thức chuyên môn",moTaPLO:"Vận dụng kiến thức chuyên môn để giải quyết vấn đề.",loaiPLO:"Kiến thức",capDo:4,thuTu:1},
         {maPLO:"PLO2",tenPLO:"Kỹ năng nghề nghiệp",moTaPLO:"Phân tích, thiết kế và triển khai giải pháp công nghệ thông tin.",loaiPLO:"Kỹ năng",capDo:4,thuTu:2},
@@ -681,6 +681,18 @@ db.minhChungChung.insertMany(commonEvidence.map(r => ({
   ngayCapNhat:ISODate("2026-09-01T08:00:00.000Z")
 })));
 
+// Gắn file vật lý thật cho minh chứng dùng chung.
+db.minhChungChung.updateOne({_id:"MCC001"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC001.pdf",tenFile:"MCC001.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC002"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC002.pdf",tenFile:"MCC002.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC003"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC003.pdf",tenFile:"MCC003.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC004"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC004.pdf",tenFile:"MCC004.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC005"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC005.pdf",tenFile:"MCC005.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC006"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC006.pdf",tenFile:"MCC006.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC007"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC007.pdf",tenFile:"MCC007.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC008"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC008.pdf",tenFile:"MCC008.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC009"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC009.pdf",tenFile:"MCC009.pdf"}});
+db.minhChungChung.updateOne({_id:"MCC010"},{$set:{duongDanFile:"/uploads/minh-chung-chung/MCC010.pdf",tenFile:"MCC010.pdf"}});
+
 const reportStates = [
   ["Đang soạn",25,"Thành viên"],
   ["Chờ Trưởng nhóm duyệt",25,"Thành viên"],
@@ -705,7 +717,7 @@ criteria.forEach((c,index) => {
     moTa:`Minh chứng demo phục vụ quá trình tự đánh giá ${critId}.`,
     ngayUpload:new Date(Date.UTC(2026,8,20,8,i,0)),
     maNguoiUpload:pc.maNguoiDung,
-    duongDanFile:"/demo/minh-chung-mau.pdf",loaiFile:"pdf",kichThuoc:NumberLong("1024"),
+    duongDanFile:`/uploads/minhchung/MC${String(i).padStart(3,"0")}_${critId}.pdf`,loaiFile:"pdf",kichThuoc:NumberLong("0"),
     trangThai:i%3===0?"Đã duyệt":(i%3===1?"Chờ Trưởng nhóm duyệt":"Chờ Thư ký duyệt")
   });
 
@@ -727,6 +739,114 @@ criteria.forEach((c,index) => {
 db.minhChung.insertMany(evidences);
 db.baoCaoTieuChi.insertMany(criterionReports);
 
+// Kích thước file minh chứng thật.
+db.minhChung.updateOne({_id:"MC001"},{$set:{duongDanFile:"/uploads/minhchung/MC001_TC1.1.pdf",kichThuoc:NumberLong("646156")}});
+db.minhChung.updateOne({_id:"MC002"},{$set:{duongDanFile:"/uploads/minhchung/MC002_TC1.2.pdf",kichThuoc:NumberLong("562425")}});
+db.minhChung.updateOne({_id:"MC003"},{$set:{duongDanFile:"/uploads/minhchung/MC003_TC1.3.pdf",kichThuoc:NumberLong("562260")}});
+db.minhChung.updateOne({_id:"MC004"},{$set:{duongDanFile:"/uploads/minhchung/MC004_TC1.4.pdf",kichThuoc:NumberLong("563562")}});
+db.minhChung.updateOne({_id:"MC005"},{$set:{duongDanFile:"/uploads/minhchung/MC005_TC1.5.pdf",kichThuoc:NumberLong("561238")}});
+db.minhChung.updateOne({_id:"MC006"},{$set:{duongDanFile:"/uploads/minhchung/MC006_TC1.6.pdf",kichThuoc:NumberLong("560458")}});
+db.minhChung.updateOne({_id:"MC007"},{$set:{duongDanFile:"/uploads/minhchung/MC007_TC2.1.pdf",kichThuoc:NumberLong("562022")}});
+db.minhChung.updateOne({_id:"MC008"},{$set:{duongDanFile:"/uploads/minhchung/MC008_TC2.2.pdf",kichThuoc:NumberLong("562329")}});
+db.minhChung.updateOne({_id:"MC009"},{$set:{duongDanFile:"/uploads/minhchung/MC009_TC2.3.pdf",kichThuoc:NumberLong("561230")}});
+db.minhChung.updateOne({_id:"MC010"},{$set:{duongDanFile:"/uploads/minhchung/MC010_TC2.4.pdf",kichThuoc:NumberLong("561113")}});
+db.minhChung.updateOne({_id:"MC011"},{$set:{duongDanFile:"/uploads/minhchung/MC011_TC2.5.pdf",kichThuoc:NumberLong("560679")}});
+db.minhChung.updateOne({_id:"MC012"},{$set:{duongDanFile:"/uploads/minhchung/MC012_TC2.6.pdf",kichThuoc:NumberLong("563408")}});
+db.minhChung.updateOne({_id:"MC013"},{$set:{duongDanFile:"/uploads/minhchung/MC013_TC2.7.pdf",kichThuoc:NumberLong("562115")}});
+db.minhChung.updateOne({_id:"MC014"},{$set:{duongDanFile:"/uploads/minhchung/MC014_TC3.1.pdf",kichThuoc:NumberLong("562120")}});
+db.minhChung.updateOne({_id:"MC015"},{$set:{duongDanFile:"/uploads/minhchung/MC015_TC3.2.pdf",kichThuoc:NumberLong("721103")}});
+db.minhChung.updateOne({_id:"MC016"},{$set:{duongDanFile:"/uploads/minhchung/MC016_TC3.3.pdf",kichThuoc:NumberLong("561633")}});
+db.minhChung.updateOne({_id:"MC017"},{$set:{duongDanFile:"/uploads/minhchung/MC017_TC3.4.pdf",kichThuoc:NumberLong("561952")}});
+db.minhChung.updateOne({_id:"MC018"},{$set:{duongDanFile:"/uploads/minhchung/MC018_TC3.5.pdf",kichThuoc:NumberLong("563190")}});
+db.minhChung.updateOne({_id:"MC019"},{$set:{duongDanFile:"/uploads/minhchung/MC019_TC4.1.pdf",kichThuoc:NumberLong("561989")}});
+db.minhChung.updateOne({_id:"MC020"},{$set:{duongDanFile:"/uploads/minhchung/MC020_TC4.2.pdf",kichThuoc:NumberLong("562160")}});
+db.minhChung.updateOne({_id:"MC021"},{$set:{duongDanFile:"/uploads/minhchung/MC021_TC4.3.pdf",kichThuoc:NumberLong("564831")}});
+db.minhChung.updateOne({_id:"MC022"},{$set:{duongDanFile:"/uploads/minhchung/MC022_TC4.4.pdf",kichThuoc:NumberLong("560417")}});
+db.minhChung.updateOne({_id:"MC023"},{$set:{duongDanFile:"/uploads/minhchung/MC023_TC4.5.pdf",kichThuoc:NumberLong("714127")}});
+db.minhChung.updateOne({_id:"MC024"},{$set:{duongDanFile:"/uploads/minhchung/MC024_TC4.6.pdf",kichThuoc:NumberLong("559795")}});
+db.minhChung.updateOne({_id:"MC025"},{$set:{duongDanFile:"/uploads/minhchung/MC025_TC4.7.pdf",kichThuoc:NumberLong("562674")}});
+db.minhChung.updateOne({_id:"MC026"},{$set:{duongDanFile:"/uploads/minhchung/MC026_TC5.1.pdf",kichThuoc:NumberLong("645922")}});
+db.minhChung.updateOne({_id:"MC027"},{$set:{duongDanFile:"/uploads/minhchung/MC027_TC5.2.pdf",kichThuoc:NumberLong("648820")}});
+db.minhChung.updateOne({_id:"MC028"},{$set:{duongDanFile:"/uploads/minhchung/MC028_TC5.3.pdf",kichThuoc:NumberLong("562260")}});
+db.minhChung.updateOne({_id:"MC029"},{$set:{duongDanFile:"/uploads/minhchung/MC029_TC5.4.pdf",kichThuoc:NumberLong("564244")}});
+db.minhChung.updateOne({_id:"MC030"},{$set:{duongDanFile:"/uploads/minhchung/MC030_TC5.5.pdf",kichThuoc:NumberLong("562064")}});
+db.minhChung.updateOne({_id:"MC031"},{$set:{duongDanFile:"/uploads/minhchung/MC031_TC5.6.pdf",kichThuoc:NumberLong("564234")}});
+db.minhChung.updateOne({_id:"MC032"},{$set:{duongDanFile:"/uploads/minhchung/MC032_TC5.7.pdf",kichThuoc:NumberLong("564576")}});
+db.minhChung.updateOne({_id:"MC033"},{$set:{duongDanFile:"/uploads/minhchung/MC033_TC5.8.pdf",kichThuoc:NumberLong("561992")}});
+db.minhChung.updateOne({_id:"MC034"},{$set:{duongDanFile:"/uploads/minhchung/MC034_TC6.1.pdf",kichThuoc:NumberLong("558908")}});
+db.minhChung.updateOne({_id:"MC035"},{$set:{duongDanFile:"/uploads/minhchung/MC035_TC6.2.pdf",kichThuoc:NumberLong("560784")}});
+db.minhChung.updateOne({_id:"MC036"},{$set:{duongDanFile:"/uploads/minhchung/MC036_TC6.3.pdf",kichThuoc:NumberLong("562454")}});
+db.minhChung.updateOne({_id:"MC037"},{$set:{duongDanFile:"/uploads/minhchung/MC037_TC6.4.pdf",kichThuoc:NumberLong("561767")}});
+db.minhChung.updateOne({_id:"MC038"},{$set:{duongDanFile:"/uploads/minhchung/MC038_TC6.5.pdf",kichThuoc:NumberLong("562257")}});
+db.minhChung.updateOne({_id:"MC039"},{$set:{duongDanFile:"/uploads/minhchung/MC039_TC6.6.pdf",kichThuoc:NumberLong("562154")}});
+db.minhChung.updateOne({_id:"MC040"},{$set:{duongDanFile:"/uploads/minhchung/MC040_TC7.1.pdf",kichThuoc:NumberLong("562639")}});
+db.minhChung.updateOne({_id:"MC041"},{$set:{duongDanFile:"/uploads/minhchung/MC041_TC7.2.pdf",kichThuoc:NumberLong("561857")}});
+db.minhChung.updateOne({_id:"MC042"},{$set:{duongDanFile:"/uploads/minhchung/MC042_TC7.3.pdf",kichThuoc:NumberLong("647471")}});
+db.minhChung.updateOne({_id:"MC043"},{$set:{duongDanFile:"/uploads/minhchung/MC043_TC7.4.pdf",kichThuoc:NumberLong("648006")}});
+db.minhChung.updateOne({_id:"MC044"},{$set:{duongDanFile:"/uploads/minhchung/MC044_TC7.5.pdf",kichThuoc:NumberLong("562015")}});
+db.minhChung.updateOne({_id:"MC045"},{$set:{duongDanFile:"/uploads/minhchung/MC045_TC7.6.pdf",kichThuoc:NumberLong("561142")}});
+db.minhChung.updateOne({_id:"MC046"},{$set:{duongDanFile:"/uploads/minhchung/MC046_TC7.7.pdf",kichThuoc:NumberLong("715000")}});
+db.minhChung.updateOne({_id:"MC047"},{$set:{duongDanFile:"/uploads/minhchung/MC047_TC7.8.pdf",kichThuoc:NumberLong("561494")}});
+db.minhChung.updateOne({_id:"MC048"},{$set:{duongDanFile:"/uploads/minhchung/MC048_TC8.1.pdf",kichThuoc:NumberLong("562321")}});
+db.minhChung.updateOne({_id:"MC049"},{$set:{duongDanFile:"/uploads/minhchung/MC049_TC8.2.pdf",kichThuoc:NumberLong("563306")}});
+db.minhChung.updateOne({_id:"MC050"},{$set:{duongDanFile:"/uploads/minhchung/MC050_TC8.3.pdf",kichThuoc:NumberLong("560849")}});
+db.minhChung.updateOne({_id:"MC051"},{$set:{duongDanFile:"/uploads/minhchung/MC051_TC8.4.pdf",kichThuoc:NumberLong("561016")}});
+db.minhChung.updateOne({_id:"MC052"},{$set:{duongDanFile:"/uploads/minhchung/MC052_TC8.5.pdf",kichThuoc:NumberLong("562061")}});
+
+// Gắn file báo cáo tiêu chí thật.
+db.baoCaoTieuChi.updateOne({_id:"BC001"},{$set:{duongDanFile:"/uploads/bao-cao/BC001_TC1.1.pdf",tenFileBaoCao:"BC001_TC1.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC002"},{$set:{duongDanFile:"/uploads/bao-cao/BC002_TC1.2.pdf",tenFileBaoCao:"BC002_TC1.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC003"},{$set:{duongDanFile:"/uploads/bao-cao/BC003_TC1.3.pdf",tenFileBaoCao:"BC003_TC1.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC004"},{$set:{duongDanFile:"/uploads/bao-cao/BC004_TC1.4.pdf",tenFileBaoCao:"BC004_TC1.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC005"},{$set:{duongDanFile:"/uploads/bao-cao/BC005_TC1.5.pdf",tenFileBaoCao:"BC005_TC1.5.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC006"},{$set:{duongDanFile:"/uploads/bao-cao/BC006_TC1.6.pdf",tenFileBaoCao:"BC006_TC1.6.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC007"},{$set:{duongDanFile:"/uploads/bao-cao/BC007_TC2.1.pdf",tenFileBaoCao:"BC007_TC2.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC008"},{$set:{duongDanFile:"/uploads/bao-cao/BC008_TC2.2.pdf",tenFileBaoCao:"BC008_TC2.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC009"},{$set:{duongDanFile:"/uploads/bao-cao/BC009_TC2.3.pdf",tenFileBaoCao:"BC009_TC2.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC010"},{$set:{duongDanFile:"/uploads/bao-cao/BC010_TC2.4.pdf",tenFileBaoCao:"BC010_TC2.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC011"},{$set:{duongDanFile:"/uploads/bao-cao/BC011_TC2.5.pdf",tenFileBaoCao:"BC011_TC2.5.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC012"},{$set:{duongDanFile:"/uploads/bao-cao/BC012_TC2.6.pdf",tenFileBaoCao:"BC012_TC2.6.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC013"},{$set:{duongDanFile:"/uploads/bao-cao/BC013_TC2.7.pdf",tenFileBaoCao:"BC013_TC2.7.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC014"},{$set:{duongDanFile:"/uploads/bao-cao/BC014_TC3.1.pdf",tenFileBaoCao:"BC014_TC3.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC015"},{$set:{duongDanFile:"/uploads/bao-cao/BC015_TC3.2.pdf",tenFileBaoCao:"BC015_TC3.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC016"},{$set:{duongDanFile:"/uploads/bao-cao/BC016_TC3.3.pdf",tenFileBaoCao:"BC016_TC3.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC017"},{$set:{duongDanFile:"/uploads/bao-cao/BC017_TC3.4.pdf",tenFileBaoCao:"BC017_TC3.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC018"},{$set:{duongDanFile:"/uploads/bao-cao/BC018_TC3.5.pdf",tenFileBaoCao:"BC018_TC3.5.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC019"},{$set:{duongDanFile:"/uploads/bao-cao/BC019_TC4.1.pdf",tenFileBaoCao:"BC019_TC4.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC020"},{$set:{duongDanFile:"/uploads/bao-cao/BC020_TC4.2.pdf",tenFileBaoCao:"BC020_TC4.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC021"},{$set:{duongDanFile:"/uploads/bao-cao/BC021_TC4.3.pdf",tenFileBaoCao:"BC021_TC4.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC022"},{$set:{duongDanFile:"/uploads/bao-cao/BC022_TC4.4.pdf",tenFileBaoCao:"BC022_TC4.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC023"},{$set:{duongDanFile:"/uploads/bao-cao/BC023_TC4.5.pdf",tenFileBaoCao:"BC023_TC4.5.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC024"},{$set:{duongDanFile:"/uploads/bao-cao/BC024_TC4.6.pdf",tenFileBaoCao:"BC024_TC4.6.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC025"},{$set:{duongDanFile:"/uploads/bao-cao/BC025_TC4.7.pdf",tenFileBaoCao:"BC025_TC4.7.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC026"},{$set:{duongDanFile:"/uploads/bao-cao/BC026_TC5.1.pdf",tenFileBaoCao:"BC026_TC5.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC027"},{$set:{duongDanFile:"/uploads/bao-cao/BC027_TC5.2.pdf",tenFileBaoCao:"BC027_TC5.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC028"},{$set:{duongDanFile:"/uploads/bao-cao/BC028_TC5.3.pdf",tenFileBaoCao:"BC028_TC5.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC029"},{$set:{duongDanFile:"/uploads/bao-cao/BC029_TC5.4.pdf",tenFileBaoCao:"BC029_TC5.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC030"},{$set:{duongDanFile:"/uploads/bao-cao/BC030_TC5.5.pdf",tenFileBaoCao:"BC030_TC5.5.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC031"},{$set:{duongDanFile:"/uploads/bao-cao/BC031_TC5.6.pdf",tenFileBaoCao:"BC031_TC5.6.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC032"},{$set:{duongDanFile:"/uploads/bao-cao/BC032_TC5.7.pdf",tenFileBaoCao:"BC032_TC5.7.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC033"},{$set:{duongDanFile:"/uploads/bao-cao/BC033_TC5.8.pdf",tenFileBaoCao:"BC033_TC5.8.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC034"},{$set:{duongDanFile:"/uploads/bao-cao/BC034_TC6.1.pdf",tenFileBaoCao:"BC034_TC6.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC035"},{$set:{duongDanFile:"/uploads/bao-cao/BC035_TC6.2.pdf",tenFileBaoCao:"BC035_TC6.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC036"},{$set:{duongDanFile:"/uploads/bao-cao/BC036_TC6.3.pdf",tenFileBaoCao:"BC036_TC6.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC037"},{$set:{duongDanFile:"/uploads/bao-cao/BC037_TC6.4.pdf",tenFileBaoCao:"BC037_TC6.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC038"},{$set:{duongDanFile:"/uploads/bao-cao/BC038_TC6.5.pdf",tenFileBaoCao:"BC038_TC6.5.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC039"},{$set:{duongDanFile:"/uploads/bao-cao/BC039_TC6.6.pdf",tenFileBaoCao:"BC039_TC6.6.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC040"},{$set:{duongDanFile:"/uploads/bao-cao/BC040_TC7.1.pdf",tenFileBaoCao:"BC040_TC7.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC041"},{$set:{duongDanFile:"/uploads/bao-cao/BC041_TC7.2.pdf",tenFileBaoCao:"BC041_TC7.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC042"},{$set:{duongDanFile:"/uploads/bao-cao/BC042_TC7.3.pdf",tenFileBaoCao:"BC042_TC7.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC043"},{$set:{duongDanFile:"/uploads/bao-cao/BC043_TC7.4.pdf",tenFileBaoCao:"BC043_TC7.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC044"},{$set:{duongDanFile:"/uploads/bao-cao/BC044_TC7.5.pdf",tenFileBaoCao:"BC044_TC7.5.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC045"},{$set:{duongDanFile:"/uploads/bao-cao/BC045_TC7.6.pdf",tenFileBaoCao:"BC045_TC7.6.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC046"},{$set:{duongDanFile:"/uploads/bao-cao/BC046_TC7.7.pdf",tenFileBaoCao:"BC046_TC7.7.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC047"},{$set:{duongDanFile:"/uploads/bao-cao/BC047_TC7.8.pdf",tenFileBaoCao:"BC047_TC7.8.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC048"},{$set:{duongDanFile:"/uploads/bao-cao/BC048_TC8.1.pdf",tenFileBaoCao:"BC048_TC8.1.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC049"},{$set:{duongDanFile:"/uploads/bao-cao/BC049_TC8.2.pdf",tenFileBaoCao:"BC049_TC8.2.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC050"},{$set:{duongDanFile:"/uploads/bao-cao/BC050_TC8.3.pdf",tenFileBaoCao:"BC050_TC8.3.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC051"},{$set:{duongDanFile:"/uploads/bao-cao/BC051_TC8.4.pdf",tenFileBaoCao:"BC051_TC8.4.pdf"}});
+db.baoCaoTieuChi.updateOne({_id:"BC052"},{$set:{duongDanFile:"/uploads/bao-cao/BC052_TC8.5.pdf",tenFileBaoCao:"BC052_TC8.5.pdf"}});
+
 const groupReports=[];
 let bcnNo=1;
 groups.forEach(g => {
@@ -743,6 +863,8 @@ groups.forEach(g => {
       tonTaiTongHop:"Một số dữ liệu và minh chứng cần tiếp tục hoàn thiện.",
       keHoachCaiTien:"Tiếp tục rà soát, cập nhật và hoàn thiện các nội dung theo phản hồi.",
       maThuKyNhom:g.maThuKyNhom,maTruongNhom:g.maTruongNhom,trangThai:"Đang tổng hợp",
+      duongDanFile:`/uploads/bao-cao/BCN${String(bcnNo-1).padStart(3,"0")}_${std}.pdf`,
+      tenFileBaoCao:`BCN${String(bcnNo-1).padStart(3,"0")}_${std}.pdf`,
       ngayTao:ISODate("2026-10-01T08:00:00.000Z"),
       ngayCapNhat:ISODate("2026-10-01T08:00:00.000Z")
     });
@@ -792,7 +914,7 @@ const partBase={
 db.baoCaoPhan.insertMany([
   {
     _id:"BCP001",maBaoCaoTuDanhGia:"BCTDG001",maKeHoach:"KH001",soPhan:1,
-    tenPhan:"Phần 1 - Khái quát",maPhanCong:"PCB001",maNguoiPhuTrach:"ND004",
+    tenPhan:"Phần 1 - Khái quát",maPhanCong:"PCB001",maNguoiPhuTrach:"ND004",duongDanFile:"/uploads/bao-cao/BCP001_Phan1_KhaiQuat.pdf",tenFileBaoCao:"BCP001_Phan1_KhaiQuat.pdf",
     noiDung:{
       datVanDe:"Chương trình đào tạo thực hiện tự đánh giá nhằm rà soát mức độ đáp ứng các yêu cầu bảo đảm chất lượng.",
       tongQuanCoSoGiaoDuc:"Nội dung tổng quan về cơ sở giáo dục.",
@@ -804,7 +926,7 @@ db.baoCaoPhan.insertMany([
   },
   {
     _id:"BCP003",maBaoCaoTuDanhGia:"BCTDG001",maKeHoach:"KH001",soPhan:3,
-    tenPhan:"Phần 3 - Kết luận",maPhanCong:"PCB002",maNguoiPhuTrach:"ND005",
+    tenPhan:"Phần 3 - Kết luận",maPhanCong:"PCB002",maNguoiPhuTrach:"ND005",duongDanFile:"/uploads/bao-cao/BCP003_Phan3_KetLuan.pdf",tenFileBaoCao:"BCP003_Phan3_KetLuan.pdf",
     noiDung:{
       tongHopDiemManh:"Tổng hợp điểm mạnh từ các tiêu chuẩn.",
       tongHopTonTai:"Tổng hợp tồn tại và nội dung cần cải tiến.",
@@ -815,7 +937,7 @@ db.baoCaoPhan.insertMany([
   },
   {
     _id:"BCP004",maBaoCaoTuDanhGia:"BCTDG001",maKeHoach:"KH001",soPhan:4,
-    tenPhan:"Phần 4 - Phụ lục",maPhanCong:"PCB003",maNguoiPhuTrach:"ND052",
+    tenPhan:"Phần 4 - Phụ lục",maPhanCong:"PCB003",maNguoiPhuTrach:"ND052",duongDanFile:"/uploads/bao-cao/BCP004_Phan4_PhuLuc.pdf",tenFileBaoCao:"BCP004_Phan4_PhuLuc.pdf",
     noiDung:{bangTongHopKetQua:true,coSoDuLieuKiemDinh:true,danhMucMinhChung:true,cacQuyetDinhLienQuan:true},
     danhSachMinhChungCapTruong:commonEvidence.filter(x=>x[2]==="Cấp Trường").map(x=>x[0]),
     danhSachMinhChungCapKhoa:commonEvidence.filter(x=>x[2]==="Cấp Khoa").map(x=>x[0]),

@@ -24,18 +24,21 @@ public class FileStorageService {
     private final String supabaseUrl;
     private final String supabaseServiceRoleKey;
     private final String supabaseBucket;
+    private final Path seedRoot;
     private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
 
     public FileStorageService(@Value("${app.storage.root}") String rootPath,
                               @Value("${app.storage.mode:local}") String mode,
                               @Value("${app.storage.supabase.url:}") String supabaseUrl,
                               @Value("${app.storage.supabase.service-role-key:}") String supabaseServiceRoleKey,
-                              @Value("${app.storage.supabase.bucket:hethongkiemdinh}") String supabaseBucket) {
+                              @Value("${app.storage.supabase.bucket:hethongkiemdinh}") String supabaseBucket,
+                              @Value("${app.storage.seed-root:storage-seed}") String seedRootPath) {
         this.root = Path.of(rootPath).toAbsolutePath().normalize();
         this.mode = mode == null ? "local" : mode.trim().toLowerCase(Locale.ROOT);
         this.supabaseUrl = trimSlash(supabaseUrl);
         this.supabaseServiceRoleKey = supabaseServiceRoleKey == null ? "" : supabaseServiceRoleKey.trim();
         this.supabaseBucket = supabaseBucket == null || supabaseBucket.isBlank() ? "hethongkiemdinh" : supabaseBucket.trim();
+        this.seedRoot = Path.of(seedRootPath).toAbsolutePath().normalize();
     }
 
     public Path getRoot() { return root; }
@@ -53,7 +56,32 @@ public class FileStorageService {
         Files.createDirectories(root.resolve("minhchung"));
         Files.createDirectories(root.resolve("minh-chung-chung"));
         Files.createDirectories(root.resolve("bao-cao"));
+        seedBundledFiles();
         migrateLegacyUploads();
+    }
+
+
+    private void seedBundledFiles() {
+        if (!Files.isDirectory(seedRoot)) return;
+        for (String sub : new String[]{"ctdt", "minhchung", "minh-chung-chung", "bao-cao"}) {
+            Path from = seedRoot.resolve(sub);
+            Path to = root.resolve(sub);
+            if (!Files.isDirectory(from)) continue;
+            try {
+                Files.createDirectories(to);
+                try (var stream = Files.walk(from)) {
+                    stream.filter(Files::isRegularFile).forEach(src -> {
+                        Path relative = from.relativize(src);
+                        Path dst = to.resolve(relative).normalize();
+                        if (!dst.startsWith(to)) return;
+                        try {
+                            Files.createDirectories(dst.getParent());
+                            Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException ignored) {}
+                    });
+                }
+            } catch (IOException ignored) {}
+        }
     }
 
     private void migrateLegacyUploads() {
@@ -116,28 +144,16 @@ public class FileStorageService {
 
     public StoredFile readByWebPath(String webPath) throws IOException {
         String relative = relativeFromWebPath(webPath);
+        String effectiveRelative = relative;
         byte[] data;
         if (isCloud()) {
-            data = downloadSupabase(relative);
+            data = downloadSupabase(effectiveRelative);
         } else {
-            Path target = root.resolve(relative).normalize();
-            if (!target.startsWith(root) || !Files.isRegularFile(target)) throw new NoSuchFileException(relative);
+            Path target = root.resolve(effectiveRelative).normalize();
+            if (!target.startsWith(root) || !Files.isRegularFile(target)) throw new NoSuchFileException(effectiveRelative);
             data = Files.readAllBytes(target);
         }
-        return new StoredFile(data, contentType(relative));
-    }
-
-    public void deleteByWebPath(String webPath) {
-        if (webPath == null || webPath.isBlank() || !webPath.startsWith("/uploads/")) return;
-        try {
-            String relative = relativeFromWebPath(webPath);
-            if (isCloud()) {
-                deleteSupabase(relative);
-            } else {
-                Path target = root.resolve(relative).normalize();
-                if (target.startsWith(root)) Files.deleteIfExists(target);
-            }
-        } catch (Exception ignored) {}
+        return new StoredFile(data, contentType(effectiveRelative));
     }
 
     private void uploadSupabase(String relative, MultipartFile file) throws IOException {

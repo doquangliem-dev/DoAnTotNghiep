@@ -16,6 +16,8 @@ public class MinhChung {
     private String tenMinhChung;
     private String moTa;
     private String duongDanFile;
+    private String duongDanTaiLieuThamChieu;
+    private String tenTaiLieuThamChieu;
     private String loaiFile;
     private Long kichThuoc;
     private LocalDateTime ngayUpload;
@@ -34,6 +36,8 @@ public class MinhChung {
     public String getTenMinhChung(){return tenMinhChung;} public void setTenMinhChung(String v){tenMinhChung=v;}
     public String getMoTa(){return moTa;} public void setMoTa(String v){moTa=v;}
     public String getDuongDanFile(){return duongDanFile;} public void setDuongDanFile(String v){duongDanFile=v;}
+    public String getDuongDanTaiLieuThamChieu(){return duongDanTaiLieuThamChieu;} public void setDuongDanTaiLieuThamChieu(String v){duongDanTaiLieuThamChieu=v;}
+    public String getTenTaiLieuThamChieu(){return tenTaiLieuThamChieu;} public void setTenTaiLieuThamChieu(String v){tenTaiLieuThamChieu=v;}
     public String getLoaiFile(){return loaiFile;} public void setLoaiFile(String v){loaiFile=v;}
     public Long getKichThuoc(){return kichThuoc;} public void setKichThuoc(Long v){kichThuoc=v;}
     public LocalDateTime getNgayUpload(){return ngayUpload;} public void setNgayUpload(LocalDateTime v){ngayUpload=v;}

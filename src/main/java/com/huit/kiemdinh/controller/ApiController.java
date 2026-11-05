@@ -165,6 +165,10 @@ public class ApiController {
     public MinhChung tnSaveMc(@RequestBody MinhChung x,HttpSession session){return s.luuMinhChungNguoiDung(x,currentUser(session),true);}
     @PostMapping(value="/truong-nhom/minh-chung/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public MinhChung tnUploadMc(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){return s.uploadMinhChungNguoiDung(id,file,currentUser(session),true);}
+    @DeleteMapping("/truong-nhom/minh-chung/{id}/file")
+    public MinhChung tnDeleteMcFile(@PathVariable String id,HttpSession session){return s.deleteMinhChungFileNguoiDung(id,currentUser(session),true);}
+    @PostMapping("/truong-nhom/minh-chung/{id}/gui-duyet")
+    public MinhChung tnGuiMc(@PathVariable String id,HttpSession session){return s.guiMinhChungNguoiDung(id,currentUser(session),true);}
     @PostMapping("/truong-nhom/minh-chung/{id}/duyet")
     public DanhGiaMinhChung tnDuyetMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session){return s.truongNhomDuyetMinhChung(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));}
     @GetMapping("/truong-nhom/bao-cao-nhom")
@@ -187,12 +191,18 @@ public class ApiController {
     public MinhChung tvSaveMc(@RequestBody MinhChung x,HttpSession session){return s.luuMinhChungNguoiDung(x,currentUser(session),false);}
     @PostMapping(value="/thanh-vien/minh-chung/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public MinhChung tvUploadMc(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){return s.uploadMinhChungNguoiDung(id,file,currentUser(session),false);}
+    @DeleteMapping("/thanh-vien/minh-chung/{id}/file")
+    public MinhChung tvDeleteMcFile(@PathVariable String id,HttpSession session){return s.deleteMinhChungFileNguoiDung(id,currentUser(session),false);}
+    @PostMapping("/thanh-vien/minh-chung/{id}/gui-duyet")
+    public MinhChung tvGuiMc(@PathVariable String id,HttpSession session){return s.guiMinhChungNguoiDung(id,currentUser(session),false);}
     @PostMapping("/thanh-vien/bao-cao")
     public BaoCaoTieuChi tvSaveBc(@RequestBody BaoCaoTieuChi x,HttpSession session){return s.luuBaoCaoThanhVien(x,currentUser(session));}
     @PostMapping("/thanh-vien/bao-cao/{id}/gui-duyet")
     public BaoCaoTieuChi tvGuiDuyetBc(@PathVariable String id,HttpSession session){return s.guiBaoCaoThanhVien(id,currentUser(session));}
     @PostMapping(value="/thanh-vien/bao-cao/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaoCaoTieuChi tvUploadBaoCao(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){return s.uploadBaoCaoThanhVien(id,file,currentUser(session));}
+    @DeleteMapping("/thanh-vien/bao-cao/{id}/file")
+    public BaoCaoTieuChi tvDeleteBaoCaoFile(@PathVariable String id,HttpSession session){return s.deleteBaoCaoThanhVienFile(id,currentUser(session));}
     @GetMapping("/thanh-vien/thu-ky-nhom/bao-cao-nhom")
     public List<BaoCaoNhom> tvBaoCaoNhom(HttpSession session){return s.baoCaoNhomCuaThuKy(currentUser(session));}
     @GetMapping("/thanh-vien/thu-ky-nhom/phan-cong")
@@ -211,6 +221,8 @@ public class ApiController {
     public BaoCaoNhom tvGuiBaoCaoNhom(@PathVariable String id,HttpSession session){return s.guiBaoCaoNhom(id,currentUser(session));}
     @PostMapping(value="/thanh-vien/thu-ky-nhom/bao-cao-nhom/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaoCaoNhom tvUploadBaoCaoNhom(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){return s.uploadBaoCaoNhom(id,file,currentUser(session));}
+    @DeleteMapping("/thanh-vien/thu-ky-nhom/bao-cao-nhom/{id}/file")
+    public BaoCaoNhom tvDeleteBaoCaoNhomFile(@PathVariable String id,HttpSession session){return s.deleteBaoCaoNhomFile(id,currentUser(session));}
 
     // ===== THƯ KÝ CHƯƠNG TRÌNH =====
     @GetMapping("/thu-ky/dashboard")
@@ -236,10 +248,17 @@ public class ApiController {
     @PostMapping("/nhan-su-bao-cao/bao-cao-phan/{id}/gui-duyet") public BaoCaoPhan nsbcGui(@PathVariable String id,HttpSession session){return s.guiBaoCaoPhan(id,currentUser(session));}
     @PostMapping(value="/nhan-su-bao-cao/bao-cao-phan/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaoCaoPhan nsbcUpload(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){return s.uploadBaoCaoPhan(id,file,currentUser(session),false);}
+    @DeleteMapping("/nhan-su-bao-cao/bao-cao-phan/{id}/file")
+    public BaoCaoPhan nsbcDeleteFile(@PathVariable String id,HttpSession session){return s.deleteBaoCaoPhanFile(id,currentUser(session),false);}
     @PostMapping(value="/admin/bao-cao-phan/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaoCaoPhan adminUploadBaoCaoPhan(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session){
         if(!hasRole(session,"Quản trị")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Chỉ Quản trị viên được tải file Phần 1, 3, 4");
         return s.uploadBaoCaoPhan(id,file,currentUser(session),true);
+    }
+    @DeleteMapping("/admin/bao-cao-phan/{id}/file")
+    public BaoCaoPhan adminDeleteBaoCaoPhanFile(@PathVariable String id,HttpSession session){
+        if(!hasRole(session,"Quản trị")) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Chỉ Quản trị viên được xóa file Phần 1, 3, 4");
+        return s.deleteBaoCaoPhanFile(id,currentUser(session),true);
     }
 
     // ===== TRUNG TÂM QUẢN LÝ CHẤT LƯỢNG =====

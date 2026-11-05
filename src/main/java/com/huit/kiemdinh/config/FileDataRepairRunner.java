@@ -2,16 +2,14 @@ package com.huit.kiemdinh.config;
 
 import com.huit.kiemdinh.model.*;
 import com.huit.kiemdinh.repository.*;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
-@Order(50)
-public class FileDataRepairRunner implements ApplicationRunner {
+public class FileDataRepairRunner {
     private final MinhChungRepository minhChungRepo;
     private final MinhChungChungRepository minhChungChungRepo;
     private final BaoCaoTieuChiRepository baoCaoTieuChiRepo;
@@ -30,16 +28,26 @@ public class FileDataRepairRunner implements ApplicationRunner {
         this.baoCaoPhanRepo = baoCaoPhanRepo;
     }
 
-    @Override
-    public void run(ApplicationArguments args) {
-        int mc = repairMinhChung();
-        int mcc = repairMinhChungChung();
-        int bc = repairBaoCaoTieuChi();
-        int bcn = repairBaoCaoNhom();
-        int bcp = repairBaoCaoPhan();
-        System.out.println("[FileRepair] Mongo file paths repaired: minhChung=" + mc
-                + ", minhChungChung=" + mcc + ", baoCaoTieuChi=" + bc
-                + ", baoCaoNhom=" + bcn + ", baoCaoPhan=" + bcp);
+    @EventListener(ApplicationReadyEvent.class)
+    public void scheduleRepair() {
+        Thread worker = new Thread(this::repairSafely, "mongo-file-repair");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void repairSafely() {
+        try {
+            int mc = repairMinhChung();
+            int mcc = repairMinhChungChung();
+            int bc = repairBaoCaoTieuChi();
+            int bcn = repairBaoCaoNhom();
+            int bcp = repairBaoCaoPhan();
+            System.out.println("[FileRepair] Mongo file paths repaired: minhChung=" + mc
+                    + ", minhChungChung=" + mcc + ", baoCaoTieuChi=" + bc
+                    + ", baoCaoNhom=" + bcn + ", baoCaoPhan=" + bcp);
+        } catch (Exception e) {
+            System.err.println("[FileRepair] Bỏ qua sửa file nền do Mongo chậm/lỗi: " + e.getMessage());
+        }
     }
 
     private int repairMinhChung() {
@@ -139,7 +147,6 @@ public class FileDataRepairRunner implements ApplicationRunner {
         if (current == null || current.isBlank()) return true;
         if (!current.startsWith(prefix)) return false;
         String file = current.substring(current.lastIndexOf('/') + 1);
-        // Preserve real user uploads: save methods include a 13-digit timestamp in the filename.
         if (file.matches(".*_\\d{13}(?:_[^.]*)?\\.[A-Za-z0-9]+$")) return false;
         return file.startsWith(seedPrefix);
     }

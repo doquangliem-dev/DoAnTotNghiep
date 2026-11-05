@@ -7,17 +7,15 @@ import com.huit.kiemdinh.repository.NguoiDungRepository;
 import com.huit.kiemdinh.repository.VaiTroRepository;
 import com.huit.kiemdinh.security.AuthService;
 import com.huit.kiemdinh.service.CodeGeneratorService;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.core.annotation.Order;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 
 @Component
-@Order(1)
-public class BootstrapDataConfig implements ApplicationRunner {
+public class BootstrapDataConfig {
     private final VaiTroRepository roleRepo;
     private final NguoiDungRepository userRepo;
     private final CodeGeneratorService codes;
@@ -37,10 +35,19 @@ public class BootstrapDataConfig implements ApplicationRunner {
         this.defaultAdminPassword=defaultAdminPassword;
     }
 
-    @Override public void run(ApplicationArguments args){
-        // Bản 28 không tự migrate Bộ tiêu chuẩn/TC/nhóm. MongoDB là nguồn dữ liệu nghiệp vụ đã chốt.
-        ensureRoles();
-        ensureDefaultAdmin();
+    @EventListener(ApplicationReadyEvent.class)
+    public void scheduleBootstrap(){
+        Thread worker = new Thread(() -> {
+            try {
+                ensureRoles();
+                ensureDefaultAdmin();
+                System.out.println("[Bootstrap] Đã kiểm tra vai trò/tài khoản quản trị.");
+            } catch (Exception e) {
+                System.err.println("[Bootstrap] Bỏ qua bootstrap nền do Mongo chậm/lỗi: " + e.getMessage());
+            }
+        }, "mongo-bootstrap");
+        worker.setDaemon(true);
+        worker.start();
     }
 
     private void ensureRoles(){

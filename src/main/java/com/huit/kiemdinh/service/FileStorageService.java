@@ -14,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -25,7 +26,9 @@ public class FileStorageService {
     private final String supabaseServiceRoleKey;
     private final String supabaseBucket;
     private final Path seedRoot;
-    private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .followRedirects(HttpClient.Redirect.NORMAL).build();
 
     public FileStorageService(@Value("${app.storage.root}") String rootPath,
                               @Value("${app.storage.mode:local}") String mode,
@@ -92,6 +95,7 @@ public class FileStorageService {
     private boolean supabaseObjectExists(String relative) throws IOException {
         try {
             HttpRequest request = HttpRequest.newBuilder(objectInfoUri(relative))
+                    .timeout(Duration.ofSeconds(25))
                     .header("Authorization", "Bearer " + supabaseServiceRoleKey)
                     .header("apikey", supabaseServiceRoleKey)
                     .method("HEAD", HttpRequest.BodyPublishers.noBody())
@@ -109,6 +113,7 @@ public class FileStorageService {
     private void uploadSupabaseBytes(String relative, byte[] bytes, String contentType) throws IOException {
         try {
             HttpRequest request = HttpRequest.newBuilder(objectUri(relative, false))
+                    .timeout(Duration.ofSeconds(30))
                     .header("Authorization", "Bearer " + supabaseServiceRoleKey)
                     .header("apikey", supabaseServiceRoleKey)
                     .header("Content-Type", contentType)
@@ -248,6 +253,7 @@ public class FileStorageService {
         try {
             String contentType = Optional.ofNullable(file.getContentType()).filter(s -> !s.isBlank()).orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             HttpRequest request = HttpRequest.newBuilder(objectUri(relative, false))
+                    .timeout(Duration.ofSeconds(30))
                     .header("Authorization", "Bearer " + supabaseServiceRoleKey)
                     .header("apikey", supabaseServiceRoleKey)
                     .header("Content-Type", contentType)
@@ -267,6 +273,7 @@ public class FileStorageService {
     private byte[] downloadSupabase(String relative) throws IOException {
         try {
             HttpRequest request = HttpRequest.newBuilder(objectUri(relative, true))
+                    .timeout(Duration.ofSeconds(30))
                     .header("Authorization", "Bearer " + supabaseServiceRoleKey)
                     .header("apikey", supabaseServiceRoleKey)
                     .GET().build();
@@ -285,6 +292,7 @@ public class FileStorageService {
     private void deleteSupabase(String relative) throws IOException {
         try {
             HttpRequest request = HttpRequest.newBuilder(objectUri(relative, false))
+                    .timeout(Duration.ofSeconds(30))
                     .header("Authorization", "Bearer " + supabaseServiceRoleKey)
                     .header("apikey", supabaseServiceRoleKey)
                     .DELETE().build();

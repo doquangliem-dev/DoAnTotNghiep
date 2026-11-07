@@ -1,0 +1,53 @@
+KIỂM TRA HỆ THỐNG - 07/11/2026
+
+1. BỘ FILE
+- Tổng số PDF: 128
+- Tổng số trang: 455
+- CTĐT: 3 file (giữ tài liệu nguồn CNTT; không tạo giả CTĐT)
+- Minh chứng tiêu chí: 52 file
+- Minh chứng dùng chung: 10 file
+- Báo cáo tiêu chí: 52 file
+- Báo cáo nhóm/tiêu chuẩn: 8 file
+- Báo cáo Phần 1/3/4: 3 file
+- PDF lỗi: 0
+- Trang gần như trống: 0
+- Nội dung ATTT trong minh chứng/báo cáo mẫu CNTT: 0
+
+2. DỮ LIỆU BÁO CÁO NHÓM
+Ánh xạ chuẩn:
+- NT001: TC1, TC2
+- NT002: TC3, TC4
+- NT003: TC5
+- NT004: TC6, TC7
+- NT005: TC8
+Mã báo cáo nhóm canonical:
+- BCN001=TC1, BCN002=TC2, BCN003=TC3, BCN004=TC4
+- BCN005=TC5, BCN006=TC6, BCN007=TC7, BCN008=TC8
+Bảng tổng hợp hiển thị danh sách tiêu chí liên quan và mức duyệt, không để dấu gạch ngang khi dữ liệu có thể xác định.
+
+3. LUỒNG DUYỆT BÁO CÁO
+- Thành viên / Thư ký nhóm: 25%
+- Trưởng nhóm duyệt: 50%
+- Gửi TTQLCL sau bước tổng hợp: 75%
+- TTQLCL duyệt: 100%
+TTQLCL có thao tác duyệt/yêu cầu chỉnh sửa báo cáo nhóm.
+
+4. RÀ SOÁT VAI TRÒ / API
+Đã rà các template của:
+- Admin
+- Thành viên
+- Trưởng nhóm
+- Thư ký chương trình
+- Hội đồng
+- TTQLCL
+- Nhân sự báo cáo
+Các API literal trên giao diện đã được đối chiếu với Controller. Không phát hiện chức năng giao diện gọi endpoint không tồn tại. Đường dẫn báo cáo phần được ghép động theo id và có endpoint tương ứng trong Controller.
+
+5. FORMAT SOURCE
+- 42 template HTML đã format lại.
+- 43 script JS/inline JS kiểm tra bằng node --check: 0 lỗi.
+- Java kiểm tra cú pháp: 0 lỗi cú pháp.
+- Không còn dòng HTML/Java/JS/CSS dài trên 500 ký tự.
+
+6. GHI CHÚ CTĐT
+Không có tài liệu CNTT 2026 riêng trong bộ nguồn đã cung cấp. Phiên bản PB2026 đang sử dụng bản CNTT thực gần nhất có sẵn thay vì tạo giả một CTĐT mới.

@@ -1,24 +1,430 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Theo dõi báo cáo</title><link rel="stylesheet" href="/css/app.css"></head>
-<body class="role-page role-secretary"><div class="top"><span>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định</span><span>Thư ký · Theo dõi báo cáo</span></div><div class="shell"><aside class="sidebar"><div class="user"></div><nav class="nav"><a href="/thu-ky">▦ Tổng quan</a><a href="/thu-ky/ke-hoach">▣ Kế hoạch tự đánh giá</a><a href="/thu-ky/minh-chung">✓ Duyệt minh chứng</a><a href="/thu-ky/bao-cao">▤ Theo dõi báo cáo</a><a href="/thu-ky/tong-hop">∑ Tổng hợp & nộp TTQLCL</a></nav></aside><main class="main">
-<section class="role-hero"><div><span class="hero-kicker">▤ Theo dõi tiến trình báo cáo</span><h1>Báo cáo tự đánh giá toàn chương trình</h1><p>Theo dõi báo cáo tiêu chí, báo cáo nhóm và các Phần 1/3/4. Thư ký chương trình không thay thế cấp duyệt chuyên môn mà tập trung điều phối, kiểm tra tiến độ và tổng hợp.</p></div><div class="hero-actions"><a class="btn btn-outline" href="/thu-ky/tong-hop">Xem tổng hợp TC1–TC8</a></div></section>
-<div class="role-toolbar" style="margin-bottom:12px"><select id="plan" class="grow"><option value="">Tất cả kế hoạch</option></select><input id="search" placeholder="Tìm mã tiêu chí, báo cáo, trạng thái..."></div><div class="summary-strip" id="summary"></div>
-<div class="tabs"><button class="active" data-tab="criteria">Báo cáo tiêu chí</button><button data-tab="groups">Báo cáo nhóm</button><button data-tab="parts">Phần 1 / 3 / 4</button><button data-tab="package">Gói hồ sơ gửi TTQLCL</button></div>
-<section id="criteria" class="tab active"><div class="role-card"><div class="card-head"><div><b>Báo cáo theo tiêu chí</b><span class="head-sub">Mức duyệt 25% → 50% → 75% → 100%</span></div></div><div class="card-body"><div class="role-table"><table><thead><tr><th>Mã</th><th>Tiêu chí</th><th>Nhan đề</th><th>Trạng thái</th><th>Mức duyệt</th><th>File</th><th>Cấp hiện tại</th><th>Cập nhật</th></tr></thead><tbody id="criteriaRows"></tbody></table></div></div></div></section>
-<section id="groups" class="tab"><div class="role-card"><div class="card-head"><div><b>Báo cáo tổng hợp nhóm</b><span class="head-sub">Do Thư ký nhóm tổng hợp và Trưởng nhóm duyệt</span></div></div><div class="card-body"><div class="role-table"><table><thead><tr><th>Mã</th><th>Nhóm</th><th>Tiêu chuẩn</th><th>Tên báo cáo</th><th>Trạng thái</th><th>File</th><th>Nhận xét Trưởng nhóm</th></tr></thead><tbody id="groupRows"></tbody></table></div></div></div></section>
-<section id="parts" class="tab"><div class="role-card"><div class="card-head"><div><b>Các phần báo cáo chung</b><span class="head-sub">Phần 1, 3, 4 do nhân sự ngoài nhóm phụ trách</span></div></div><div class="card-body"><div class="role-table"><table><thead><tr><th>Phần</th><th>Tên phần</th><th>Người phụ trách</th><th>Trạng thái</th><th>Mức duyệt</th><th>File</th><th>Cấp hiện tại</th></tr></thead><tbody id="partRows"></tbody></table></div></div></div></section>
-<section id="package" class="tab"><div class="role-card"><div class="card-head"><div><b>Tổng hợp hồ sơ sau Hội đồng</b><span class="head-sub">Chỉ gửi TTQLCL khi toàn bộ báo cáo tiêu chí và Phần 1/3/4 đã đạt 75%, báo cáo nhóm đã được Trưởng nhóm duyệt.</span></div><button id="sendPackageBtn" class="btn btn-primary" onclick="sendPackage()">Gửi toàn bộ sang TTQLCL</button></div><div class="card-body"><div id="packageStatus" class="notice"></div><div class="role-table"><table><thead><tr><th>Loại</th><th>Mã</th><th>Nội dung</th><th>Trạng thái</th><th>Mức duyệt</th><th>File</th></tr></thead><tbody id="packageRows"></tbody></table></div></div></div></section>
-</main></div><script src="/js/common.js"></script><script>
-let data={baoCaoTieuChi:[],baoCaoNhom:[],baoCaoPhan:[]},plans=[],pkg={};
-$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.remove('active'));$$('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')});
-const fileBtn=x=>x?.duongDanFile?`<a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>`:'<span class="muted">Chưa có file</span>';
-async function init(){plans=await api('/thu-ky/ke-hoach');plan.innerHTML='<option value="">Tất cả kế hoạch</option>'+plans.map(x=>`<option value="${esc(x.id)}">${esc(x.id)} - ${esc(x.tenKeHoach||'')}</option>`).join('');if(plans.length)plan.value=plans[0].id;await load()}
-async function load(){const v=plan.value;[data,pkg]=await Promise.all([api('/thu-ky/bao-cao'+(v?'?maKeHoach='+encodeURIComponent(v):'')),api('/thu-ky/goi-bao-cao'+(v?'?maKeHoach='+encodeURIComponent(v):''))]);render()}
-function render(){const q=search.value.trim().toLowerCase();const criteria=(data.baoCaoTieuChi||[]).filter(x=>!q||JSON.stringify(x).toLowerCase().includes(q));const groups=(data.baoCaoNhom||[]).filter(x=>!q||JSON.stringify(x).toLowerCase().includes(q));const parts=(data.baoCaoPhan||[]).filter(x=>!q||JSON.stringify(x).toLowerCase().includes(q));summary.innerHTML=`<div class="summary-mini"><b>${data.tongBaoCaoTieuChi||0}</b><span>Báo cáo tiêu chí</span></div><div class="summary-mini"><b>${data.baoCaoTieuChiTu50||0}</b><span>Đã qua Trưởng nhóm</span></div><div class="summary-mini"><b>${pkg.tieuChiHoiDongDuyet||0}/${pkg.tongTieuChi||0}</b><span>Hội đồng đã duyệt</span></div><div class="summary-mini"><b>${pkg.baoCaoNhomDaDuyet||0}/${pkg.tongBaoCaoNhom||0}</b><span>Báo cáo nhóm đã duyệt</span></div><div class="summary-mini"><b>${pkg.baoCaoPhanHoiDongDuyet||0}/${pkg.tongBaoCaoPhan||0}</b><span>Phần chung đạt 75%</span></div>`;
-criteriaRows.innerHTML=criteria.map(x=>`<tr><td><span class="role-code">${esc(x.id)}</span></td><td><b>${esc(criterionCode(x.maTieuChi))}</b><div class="muted">${esc(standardCode(x.maTieuChuan))}</div></td><td>${esc(x.nhanDeTieuChi||'')}</td><td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai||'')}</span></td><td><b>${reportApprovalPercent(x)}%</b></td><td>${fileBtn(x)}</td><td>${esc(x.capDuyetHienTai||'')}</td><td>${fmtDate(x.ngayCapNhat)||'-'}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">Chưa có báo cáo tiêu chí</td></tr>';
-groupRows.innerHTML=groups.map(x=>`<tr><td><span class="role-code">${esc(x.id)}</span></td><td>${esc(x.maNhomTieuChi||'')}</td><td><b>${esc(standardCode(x.maTieuChuan))}</b></td><td>${esc(x.tenBaoCao||'')}</td><td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai||'')}</span></td><td>${fileBtn(x)}</td><td>${esc(x.nhanXetTruongNhom||'Chưa có')}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">Chưa có báo cáo nhóm</td></tr>';
-partRows.innerHTML=parts.map(x=>`<tr><td><b>Phần ${x.soPhan||''}</b></td><td>${esc(x.tenPhan||'')}</td><td>${esc(x.maNguoiPhuTrach||'')}</td><td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai||'')}</span></td><td><b>${reportApprovalPercent(x)}%</b></td><td>${fileBtn(x)}</td><td>${esc(x.capDuyetHienTai||'')}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">Chưa có dữ liệu Phần 1/3/4</td></tr>';
-renderPackage()}
-function renderPackage(){const rows=[];(pkg.baoCaoTieuChi||[]).forEach(x=>rows.push({type:'Tiêu chí',id:x.id,name:criterionCode(x.maTieuChi),status:x.trangThai,pct:reportApprovalPercent(x),file:x}));(pkg.baoCaoNhom||[]).forEach(x=>rows.push({type:'Báo cáo nhóm',id:x.id,name:`${x.maNhomTieuChi||''} · ${standardCode(x.maTieuChuan)}`,status:x.trangThai,pct:x.trangThai==='Đã duyệt'?100:0,file:x}));(pkg.baoCaoPhan||[]).forEach(x=>rows.push({type:'Phần chung',id:x.id,name:x.tenPhan||('Phần '+x.soPhan),status:x.trangThai,pct:reportApprovalPercent(x),file:x}));packageRows.innerHTML=rows.map(r=>`<tr><td>${esc(r.type)}</td><td>${esc(r.id)}</td><td>${esc(r.name)}</td><td><span class="badge ${statusBadge(r.status)}">${esc(r.status||'')}</span></td><td>${r.pct}%</td><td>${fileBtn(r.file)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Chưa có hồ sơ</td></tr>';packageStatus.innerHTML=pkg.duDieuKienGuiQlcl?'<b>Đã đủ điều kiện.</b> Có thể gửi toàn bộ hồ sơ sang TTQLCL.':'<b>Chưa đủ điều kiện.</b> Cần đủ file báo cáo; Hội đồng duyệt đủ báo cáo tiêu chí và Phần 1/3/4 ở mức 75%; đồng thời tất cả báo cáo nhóm phải được Trưởng nhóm duyệt.';sendPackageBtn.disabled=!pkg.duDieuKienGuiQlcl}
-async function sendPackage(){if(!pkg.duDieuKienGuiQlcl)return; if(!confirm('Gửi toàn bộ hồ sơ đã tổng hợp sang TTQLCL?'))return;try{const v=plan.value;const r=await api('/thu-ky/goi-bao-cao/gui-ttqlcl'+(v?'?maKeHoach='+encodeURIComponent(v):''),{method:'POST'});alert(`Đã gửi ${r.baoCaoTieuChiDaGui||0} báo cáo tiêu chí và ${r.baoCaoPhanDaGui||0} phần báo cáo sang TTQLCL.`);await load()}catch(e){alert(e.message)}}
-plan.onchange=load;search.oninput=render;init();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Theo dõi báo cáo
+  </title>
+  <link href="/css/app.css" rel="stylesheet"/>
+ </head>
+ <body class="role-page role-secretary">
+  <div class="top">
+   <span>
+    ◉ Hệ thống ĐBCL - Tự đánh giá &amp; Kiểm định
+   </span>
+   <span>
+    Thư ký · Theo dõi báo cáo
+   </span>
+  </div>
+  <div class="shell">
+   <aside class="sidebar">
+    <div class="user">
+    </div>
+    <nav class="nav">
+     <a href="/thu-ky">
+      ▦ Tổng quan
+     </a>
+     <a href="/thu-ky/ke-hoach">
+      ▣ Kế hoạch tự đánh giá
+     </a>
+     <a href="/thu-ky/minh-chung">
+      ✓ Duyệt minh chứng
+     </a>
+     <a href="/thu-ky/bao-cao">
+      ▤ Theo dõi báo cáo
+     </a>
+     <a href="/thu-ky/tong-hop">
+      ∑ Tổng hợp &amp; nộp TTQLCL
+     </a>
+    </nav>
+   </aside>
+   <main class="main">
+    <section class="role-hero">
+     <div>
+      <span class="hero-kicker">
+       ▤ Theo dõi tiến trình báo cáo
+      </span>
+      <h1>
+       Báo cáo tự đánh giá toàn chương trình
+      </h1>
+      <p>
+       Theo dõi báo cáo tiêu chí, báo cáo nhóm và các Phần 1/3/4. Thư ký chương trình không thay thế cấp duyệt chuyên môn mà tập trung điều phối, kiểm tra tiến độ và tổng hợp.
+      </p>
+     </div>
+     <div class="hero-actions">
+      <a class="btn btn-outline" href="/thu-ky/tong-hop">
+       Xem tổng hợp TC1–TC8
+      </a>
+     </div>
+    </section>
+    <div class="role-toolbar" style="margin-bottom:12px">
+     <select class="grow" id="plan">
+      <option value="">
+       Tất cả kế hoạch
+      </option>
+     </select>
+     <input id="search" placeholder="Tìm mã tiêu chí, báo cáo, trạng thái..."/>
+    </div>
+    <div class="summary-strip" id="summary">
+    </div>
+    <div class="tabs">
+     <button class="active" data-tab="criteria">
+      Báo cáo tiêu chí
+     </button>
+     <button data-tab="groups">
+      Báo cáo nhóm
+     </button>
+     <button data-tab="parts">
+      Phần 1 / 3 / 4
+     </button>
+     <button data-tab="package">
+      Gói hồ sơ gửi TTQLCL
+     </button>
+    </div>
+    <section class="tab active" id="criteria">
+     <div class="role-card">
+      <div class="card-head">
+       <div>
+        <b>
+         Báo cáo theo tiêu chí
+        </b>
+        <span class="head-sub">
+         Mức duyệt 25% → 50% → 75% → 100%
+        </span>
+       </div>
+      </div>
+      <div class="card-body">
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Mã
+           </th>
+           <th>
+            Tiêu chí
+           </th>
+           <th>
+            Nhan đề
+           </th>
+           <th>
+            Trạng thái
+           </th>
+           <th>
+            Mức duyệt
+           </th>
+           <th>
+            File
+           </th>
+           <th>
+            Cấp hiện tại
+           </th>
+           <th>
+            Cập nhật
+           </th>
+          </tr>
+         </thead>
+         <tbody id="criteriaRows">
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section class="tab" id="groups">
+     <div class="role-card">
+      <div class="card-head">
+       <div>
+        <b>
+         Báo cáo tổng hợp nhóm
+        </b>
+        <span class="head-sub">
+         Do Thư ký nhóm tổng hợp và Trưởng nhóm duyệt
+        </span>
+       </div>
+      </div>
+      <div class="card-body">
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Mã
+           </th>
+           <th>
+            Nhóm
+           </th>
+           <th>
+            Tiêu chuẩn
+           </th>
+           <th>
+            Tên báo cáo
+           </th>
+           <th>
+            Trạng thái
+           </th>
+           <th>
+            File
+           </th>
+           <th>
+            Nhận xét Trưởng nhóm
+           </th>
+          </tr>
+         </thead>
+         <tbody id="groupRows">
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section class="tab" id="parts">
+     <div class="role-card">
+      <div class="card-head">
+       <div>
+        <b>
+         Các phần báo cáo chung
+        </b>
+        <span class="head-sub">
+         Phần 1, 3, 4 do nhân sự ngoài nhóm phụ trách
+        </span>
+       </div>
+      </div>
+      <div class="card-body">
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Phần
+           </th>
+           <th>
+            Tên phần
+           </th>
+           <th>
+            Người phụ trách
+           </th>
+           <th>
+            Trạng thái
+           </th>
+           <th>
+            Mức duyệt
+           </th>
+           <th>
+            File
+           </th>
+           <th>
+            Cấp hiện tại
+           </th>
+          </tr>
+         </thead>
+         <tbody id="partRows">
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </div>
+    </section>
+    <section class="tab" id="package">
+     <div class="role-card">
+      <div class="card-head">
+       <div>
+        <b>
+         Tổng hợp hồ sơ sau Hội đồng
+        </b>
+        <span class="head-sub">
+         Chỉ gửi TTQLCL khi toàn bộ báo cáo tiêu chí và Phần 1/3/4 đã đạt 75%, báo cáo nhóm đã được Trưởng nhóm duyệt.
+        </span>
+       </div>
+       <button class="btn btn-primary" id="sendPackageBtn" onclick="sendPackage()">
+        Gửi toàn bộ sang TTQLCL
+       </button>
+      </div>
+      <div class="card-body">
+       <div class="notice" id="packageStatus">
+       </div>
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Loại
+           </th>
+           <th>
+            Mã
+           </th>
+           <th>
+            Nội dung
+           </th>
+           <th>
+            Trạng thái
+           </th>
+           <th>
+            Mức duyệt
+           </th>
+           <th>
+            File
+           </th>
+          </tr>
+         </thead>
+         <tbody id="packageRows">
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </div>
+    </section>
+   </main>
+  </div>
+  <script src="/js/common.js">
+  </script>
+  <script>
+
+     let data = {
+    baoCaoTieuChi: [], baoCaoNhom: [], baoCaoPhan: []
+  }, plans = [], pkg = {
+  };
+  $$('.tabs button').forEach(b => b.onclick = () => {
+    $$('.tabs button').forEach(x => x.classList.remove('active'));
+    $$('.tab').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    $('#' + b.dataset.tab).classList.add('active');
+  });
+  const fileBtn = x => x?.duongDanFile ? `<a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>` : '<span class="muted">Chưa có file</span>';
+  async function init() {
+    plans = await api('/thu-ky/ke-hoach');
+    plan.innerHTML = '<option value="">Tất cả kế hoạch</option>' + plans.map(x => `<option value="${esc(x.id)}">${esc(x.id)} - ${esc(x.tenKeHoach || '')}</option>`).join('');
+    if (plans.length)
+         plan.value = plans[0].id;
+    await load();
+  }
+  async function load() {
+    const v = plan.value;
+    [data, pkg] = await Promise.all([api('/thu-ky/bao-cao' + (v ? '?maKeHoach=' + encodeURIComponent(v) : '')), api('/thu-ky/goi-bao-cao' + (v ? '?maKeHoach=' + encodeURIComponent(v) : ''))]);
+    render();
+  }
+  function render() {
+    const q = search.value.trim().toLowerCase();
+    const criteria = (data.baoCaoTieuChi || []).filter(x => !q || JSON.stringify(x).toLowerCase().includes(q));
+    const groups = (data.baoCaoNhom || []).filter(x => !q || JSON.stringify(x).toLowerCase().includes(q));
+    const parts = (data.baoCaoPhan || []).filter(x => !q || JSON.stringify(x).toLowerCase().includes(q));
+    summary.innerHTML = `<div class="summary-mini">
+  <b>${data.tongBaoCaoTieuChi || 0}</b>
+  <span>Báo cáo tiêu chí</span>
+  </div>
+  <div class="summary-mini">
+  <b>${data.baoCaoTieuChiTu50 || 0}</b>
+  <span>Đã qua Trưởng nhóm</span>
+  </div>
+  <div class="summary-mini">
+  <b>${pkg.tieuChiHoiDongDuyet || 0}/${pkg.tongTieuChi || 0}</b>
+  <span>Hội đồng đã duyệt</span>
+  </div>
+  <div class="summary-mini">
+  <b>${pkg.baoCaoNhomDaDuyet || 0}/${pkg.tongBaoCaoNhom || 0}</b>
+  <span>Báo cáo nhóm đã duyệt</span>
+  </div>
+  <div class="summary-mini">
+  <b>${pkg.baoCaoPhanHoiDongDuyet || 0}/${pkg.tongBaoCaoPhan || 0}</b>
+  <span>Phần chung đạt 75%</span>
+  </div>`;
+    criteriaRows.innerHTML = criteria.map(x => `<tr>
+  <td>
+  <span class="role-code">${esc(x.id)}</span>
+  </td>
+  <td>
+  <b>${esc(criterionCode(x.maTieuChi))}</b>
+  <div class="muted">${esc(standardCode(x.maTieuChuan))}</div>
+  </td>
+  <td>${esc(x.nhanDeTieuChi || '')}</td>
+  <td>
+  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
+  </td>
+  <td>
+  <b>${reportApprovalPercent(x)}%</b>
+  </td>
+  <td>${fileBtn(x)}</td>
+  <td>${esc(x.capDuyetHienTai || '')}</td>
+  <td>${fmtDate(x.ngayCapNhat) || '-'}</td>
+  </tr>`).join('') || '<tr><td colspan="8" class="empty">Chưa có báo cáo tiêu chí</td></tr>';
+    groupRows.innerHTML = groups.map(x => `<tr>
+  <td>
+  <span class="role-code">${esc(x.id)}</span>
+  </td>
+  <td>${esc(x.maNhomTieuChi || '')}</td>
+  <td>
+  <b>${esc(standardCode(x.maTieuChuan))}</b>
+  </td>
+  <td>${esc(x.tenBaoCao || '')}</td>
+  <td>
+  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
+  </td>
+  <td>${fileBtn(x)}</td>
+  <td>${esc(x.nhanXetTruongNhom || 'Chưa có')}</td>
+  </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có báo cáo nhóm</td></tr>';
+    partRows.innerHTML = parts.map(x => `<tr>
+  <td>
+  <b>Phần ${x.soPhan || ''}</b>
+  </td>
+  <td>${esc(x.tenPhan || '')}</td>
+  <td>${esc(x.maNguoiPhuTrach || '')}</td>
+  <td>
+  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
+  </td>
+  <td>
+  <b>${reportApprovalPercent(x)}%</b>
+  </td>
+  <td>${fileBtn(x)}</td>
+  <td>${esc(x.capDuyetHienTai || '')}</td>
+  </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có dữ liệu Phần 1/3/4</td></tr>';
+    renderPackage();
+  }
+  function renderPackage() {
+    const rows = [];
+    (pkg.baoCaoTieuChi || []).forEach(x => rows.push({
+      type: 'Tiêu chí', id: x.id, name: criterionCode(x.maTieuChi), status: x.trangThai, pct: reportApprovalPercent(x), file: x
+    }));
+    (pkg.baoCaoNhom || []).forEach(x => rows.push({
+      type: 'Báo cáo nhóm', id: x.id, name: `${x.maNhomTieuChi || ''} · ${standardCode(x.maTieuChuan)}`, status: x.trangThai, pct: (x.mucDoDuyet ?? 25), file: x
+    }));
+    (pkg.baoCaoPhan || []).forEach(x => rows.push({
+      type: 'Phần chung', id: x.id, name: x.tenPhan || ('Phần ' + x.soPhan), status: x.trangThai, pct: reportApprovalPercent(x), file: x
+    }));
+    packageRows.innerHTML = rows.map(r => `<tr>
+  <td>${esc(r.type)}</td>
+  <td>${esc(r.id)}</td>
+  <td>${esc(r.name)}</td>
+  <td>
+  <span class="badge ${statusBadge(r.status)}">${esc(r.status || '')}</span>
+  </td>
+  <td>${r.pct}%</td>
+  <td>${fileBtn(r.file)}</td>
+  </tr>`).join('') || '<tr><td colspan="6" class="empty">Chưa có hồ sơ</td></tr>';
+    packageStatus.innerHTML = pkg.duDieuKienGuiQlcl ? '<b>Đã đủ điều kiện.</b> Có thể gửi toàn bộ hồ sơ sang TTQLCL.' : '<b>Chưa đủ điều kiện.</b> Cần đủ file báo cáo; Hội đồng duyệt đủ báo cáo tiêu chí và Phần 1/3/4 ở mức 75%; đồng thời tất cả báo cáo nhóm phải được Trưởng nhóm duyệt.';
+    sendPackageBtn.disabled = !pkg.duDieuKienGuiQlcl;
+  }
+  async function sendPackage() {
+    if (!pkg.duDieuKienGuiQlcl)
+         return;
+    if (!confirm('Gửi toàn bộ hồ sơ đã tổng hợp sang TTQLCL?'))
+         return;
+    try {
+      const v = plan.value;
+      const r = await api('/thu-ky/goi-bao-cao/gui-ttqlcl' + (v ? '?maKeHoach=' + encodeURIComponent(v) : ''), {
+        method: 'POST'
+      });
+      alert(`Đã gửi ${r.baoCaoTieuChiDaGui || 0} báo cáo tiêu chí và ${r.baoCaoPhanDaGui || 0} phần báo cáo sang TTQLCL.`);
+      await load();
+    }
+     catch (e) {
+      alert(e.message);
+    }
+    }
+  plan.onchange = load;
+  search.oninput = render;
+  init();
+</script>
+ </body>
+</html>
+

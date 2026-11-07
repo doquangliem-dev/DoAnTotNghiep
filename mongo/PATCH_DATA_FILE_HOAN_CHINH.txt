@@ -180,3 +180,19 @@ var x=db.baoCaoPhan.findOne({_id:"BCP003"}); if(x){var set={}; if(!isUserUpload(
 var x=db.baoCaoPhan.findOne({_id:"BCP004"}); if(x){var set={}; if(!isUserUpload(x.duongDanFile)){set.duongDanFile="/uploads/bao-cao/BCP004_Phan4_PhuLuc.pdf";set.tenFileBaoCao="BCP004_Phan4_PhuLuc.pdf";}  db.baoCaoPhan.updateOne({_id:"BCP004"},{$set:set});}
 print("DONE - dữ liệu/file đã được đồng bộ, CTĐT không bị thay đổi.");
 printjson({minhChung:db.minhChung.countDocuments({duongDanFile:{$exists:true,$ne:""}}),minhChungChung:db.minhChungChung.countDocuments({duongDanFile:{$exists:true,$ne:""}}),baoCaoTieuChi:db.baoCaoTieuChi.countDocuments({duongDanFile:{$exists:true,$ne:""}}),baoCaoNhom:db.baoCaoNhom.countDocuments({duongDanFile:{$exists:true,$ne:""}}),baoCaoPhan:db.baoCaoPhan.countDocuments({duongDanFile:{$exists:true,$ne:""}})});
+
+// Đồng bộ báo cáo nhóm theo đúng phân công Excel và mức duyệt
+const canonicalGroupReports = [
+  ["BCN001","TC1","NT001"],["BCN002","TC2","NT001"],
+  ["BCN003","TC3","NT002"],["BCN004","TC4","NT002"],
+  ["BCN005","TC5","NT003"],["BCN006","TC6","NT004"],
+  ["BCN007","TC7","NT004"],["BCN008","TC8","NT005"]
+];
+canonicalGroupReports.forEach(r=>{
+  const g=db.nhomTieuChi.findOne({_id:r[2]});
+  const x=db.baoCaoNhom.findOne({_id:r[0]});
+  if(!x)return;
+  const set={maTieuChuan:r[1],maNhomTieuChi:r[2],mucDoDuyet:(x.mucDoDuyet==null?25:x.mucDoDuyet),capDuyetHienTai:(x.capDuyetHienTai||"Thư ký nhóm")};
+  if(g){set.maThuKyNhom=g.maThuKyNhom;set.maTruongNhom=g.maTruongNhom;}
+  db.baoCaoNhom.updateOne({_id:r[0]},{$set:set});
+});

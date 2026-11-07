@@ -1,1 +1,117 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Theo dõi chương trình đào tạo</title><link rel="stylesheet" href="/css/app.css"></head><body><div class="top"><span>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định CTĐT</span><span>Trung tâm Quản lý chất lượng</span></div><div class="shell"><aside class="sidebar"><div class="user"></div><nav class="nav"><a href="/khao-thi">▦ Tổng quan</a><a href="/khao-thi/ctdt">▤ Theo dõi CTĐT</a><a href="/khao-thi/ke-hoach">✓ Phê duyệt kế hoạch</a><a href="/khao-thi/tien-do">◷ Theo dõi tiến độ</a><a href="/khao-thi/bao-cao">▱ Báo cáo tự đánh giá</a><a href="/khao-thi/minh-chung">▧ Minh chứng</a><a href="/khao-thi/phan-cong">♟ Theo dõi phân công</a><a href="/khao-thi/tong-hop">☷ Theo dõi kết quả</a><a href="/khao-thi/thong-ke">▥ Thống kê tổng hợp</a></nav></aside><main class="main"><div class="page-head"><h1>Theo dõi chương trình đào tạo</h1></div><div class="card"><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Mã</th><th>Tên CTĐT</th><th>Ngành</th><th>Năm</th><th>Trạng thái</th><th>Phiên bản</th></tr></thead><tbody id="rows"></tbody></table></div></div></div></main></div><script src="/js/common.js"></script><script>async function load(){const a=await api('/khao-thi/ctdt');rows.innerHTML=a.map(x=>`<tr><td><b>${esc(x.id)}</b></td><td>${esc(x.tenChuongTrinh||x.tenCTDT||'')}</td><td>${esc(x.tenNganh||x.nganh||'')}</td><td>${esc(x.namBanHanh||x.nam||'')}</td><td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai||'')}</span></td><td>${(x.phienBan||x.phienBans||[]).length||0}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Chưa có CTĐT</td></tr>'}load();</script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Theo dõi chương trình đào tạo
+  </title>
+  <link href="/css/app.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="top">
+   <span>
+    ◉ Hệ thống ĐBCL - Tự đánh giá &amp; Kiểm định CTĐT
+   </span>
+   <span>
+    Trung tâm Quản lý chất lượng
+   </span>
+  </div>
+  <div class="shell">
+   <aside class="sidebar">
+    <div class="user">
+    </div>
+    <nav class="nav">
+     <a href="/khao-thi">
+      ▦ Tổng quan
+     </a>
+     <a href="/khao-thi/ctdt">
+      ▤ Theo dõi CTĐT
+     </a>
+     <a href="/khao-thi/ke-hoach">
+      ✓ Phê duyệt kế hoạch
+     </a>
+     <a href="/khao-thi/tien-do">
+      ◷ Theo dõi tiến độ
+     </a>
+     <a href="/khao-thi/bao-cao">
+      ▱ Báo cáo tự đánh giá
+     </a>
+     <a href="/khao-thi/minh-chung">
+      ▧ Minh chứng
+     </a>
+     <a href="/khao-thi/phan-cong">
+      ♟ Theo dõi phân công
+     </a>
+     <a href="/khao-thi/tong-hop">
+      ☷ Theo dõi kết quả
+     </a>
+     <a href="/khao-thi/thong-ke">
+      ▥ Thống kê tổng hợp
+     </a>
+    </nav>
+   </aside>
+   <main class="main">
+    <div class="page-head">
+     <h1>
+      Theo dõi chương trình đào tạo
+     </h1>
+    </div>
+    <div class="card">
+     <div class="card-body">
+      <div class="table-wrap">
+       <table>
+        <thead>
+         <tr>
+          <th>
+           Mã
+          </th>
+          <th>
+           Tên CTĐT
+          </th>
+          <th>
+           Ngành
+          </th>
+          <th>
+           Năm
+          </th>
+          <th>
+           Trạng thái
+          </th>
+          <th>
+           Phiên bản
+          </th>
+         </tr>
+        </thead>
+        <tbody id="rows">
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script src="/js/common.js">
+  </script>
+  <script>
+
+     async function load() {
+    const a = await api('/khao-thi/ctdt');
+    rows.innerHTML = a.map(x => `<tr>
+  <td>
+  <b>${esc(x.id)}</b>
+  </td>
+  <td>${esc(x.tenChuongTrinh || x.tenCTDT || '')}</td>
+  <td>${esc(x.tenNganh || x.nganh || '')}</td>
+  <td>${esc(x.namBanHanh || x.nam || '')}</td>
+  <td>
+  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
+  </td>
+  <td>${(x.phienBan || x.phienBans || []).length || 0}</td>
+  </tr>`).join('') || '<tr><td colspan="6" class="empty">Chưa có CTĐT</td></tr>';
+  }
+  load();
+</script>
+ </body>
+</html>
+

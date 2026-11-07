@@ -1,1 +1,128 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Theo dõi phân công</title><link rel="stylesheet" href="/css/app.css"></head><body><div class="top"><span>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định CTĐT</span><span>Trung tâm Quản lý chất lượng</span></div><div class="shell"><aside class="sidebar"><div class="user"></div><nav class="nav"><a href="/khao-thi">▦ Tổng quan</a><a href="/khao-thi/ctdt">▤ Theo dõi CTĐT</a><a href="/khao-thi/ke-hoach">✓ Phê duyệt kế hoạch</a><a href="/khao-thi/tien-do">◷ Theo dõi tiến độ</a><a href="/khao-thi/bao-cao">▱ Báo cáo tự đánh giá</a><a href="/khao-thi/minh-chung">▧ Minh chứng</a><a href="/khao-thi/phan-cong">♟ Theo dõi phân công</a><a href="/khao-thi/tong-hop">☷ Theo dõi kết quả</a><a href="/khao-thi/thong-ke">▥ Thống kê tổng hợp</a></nav></aside><main class="main"><div class="page-head"><h1>Theo dõi phân công</h1></div><div class="card"><div class="card-body"><input id="search" placeholder="Tìm nhóm, tiêu chuẩn, tiêu chí hoặc người phụ trách..." style="width:100%;margin-bottom:14px"><div class="table-wrap"><table><thead><tr><th>Mã</th><th>Nhóm</th><th>Tiêu chuẩn</th><th>Tiêu chí</th><th>Người phụ trách</th><th>Vai trò</th><th>Trạng thái</th></tr></thead><tbody id="rows"></tbody></table></div></div></div></main></div><script src="/js/common.js"></script><script>let a=[],users=[],groups=[];const name=id=>users.find(x=>x.id===id)?.hoTen||id||'-',gname=id=>groups.find(x=>x.id===id)?.tenNhom||id||'-';function render(){const q=search.value.toLowerCase();const x=a.filter(v=>JSON.stringify(v).toLowerCase().includes(q)||name(v.maNguoiDung).toLowerCase().includes(q)||gname(v.maNhomTieuChi).toLowerCase().includes(q));rows.innerHTML=x.map(v=>`<tr><td>${esc(v.id)}</td><td>${esc(gname(v.maNhomTieuChi))}</td><td>${esc(standardCode(v.maTieuChuan||''))}</td><td>${esc(criterionCode(v.maTieuChi||''))}</td><td>${esc(name(v.maNguoiDung))}</td><td>${esc(v.vaiTroTrongNhom||'')}</td><td><span class="badge ${statusBadge(v.trangThai)}">${esc(v.trangThai||'')}</span></td></tr>`).join('')||'<tr><td colspan="7" class="empty">Chưa có phân công</td></tr>'}async function load(){[a,users,groups]=await Promise.all([api('/khao-thi/phan-cong'),api('/nguoi-dung'),api('/nhom-tieu-chi')]);render()}search.oninput=render;load();</script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Theo dõi phân công
+  </title>
+  <link href="/css/app.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="top">
+   <span>
+    ◉ Hệ thống ĐBCL - Tự đánh giá &amp; Kiểm định CTĐT
+   </span>
+   <span>
+    Trung tâm Quản lý chất lượng
+   </span>
+  </div>
+  <div class="shell">
+   <aside class="sidebar">
+    <div class="user">
+    </div>
+    <nav class="nav">
+     <a href="/khao-thi">
+      ▦ Tổng quan
+     </a>
+     <a href="/khao-thi/ctdt">
+      ▤ Theo dõi CTĐT
+     </a>
+     <a href="/khao-thi/ke-hoach">
+      ✓ Phê duyệt kế hoạch
+     </a>
+     <a href="/khao-thi/tien-do">
+      ◷ Theo dõi tiến độ
+     </a>
+     <a href="/khao-thi/bao-cao">
+      ▱ Báo cáo tự đánh giá
+     </a>
+     <a href="/khao-thi/minh-chung">
+      ▧ Minh chứng
+     </a>
+     <a href="/khao-thi/phan-cong">
+      ♟ Theo dõi phân công
+     </a>
+     <a href="/khao-thi/tong-hop">
+      ☷ Theo dõi kết quả
+     </a>
+     <a href="/khao-thi/thong-ke">
+      ▥ Thống kê tổng hợp
+     </a>
+    </nav>
+   </aside>
+   <main class="main">
+    <div class="page-head">
+     <h1>
+      Theo dõi phân công
+     </h1>
+    </div>
+    <div class="card">
+     <div class="card-body">
+      <input id="search" placeholder="Tìm nhóm, tiêu chuẩn, tiêu chí hoặc người phụ trách..." style="width:100%;margin-bottom:14px"/>
+      <div class="table-wrap">
+       <table>
+        <thead>
+         <tr>
+          <th>
+           Mã
+          </th>
+          <th>
+           Nhóm
+          </th>
+          <th>
+           Tiêu chuẩn
+          </th>
+          <th>
+           Tiêu chí
+          </th>
+          <th>
+           Người phụ trách
+          </th>
+          <th>
+           Vai trò
+          </th>
+          <th>
+           Trạng thái
+          </th>
+         </tr>
+        </thead>
+        <tbody id="rows">
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script src="/js/common.js">
+  </script>
+  <script>
+
+     let a = [], users = [], groups = [];
+  const name = id => users.find(x => x.id === id)?.hoTen || id || '-', gname = id => groups.find(x => x.id === id)?.tenNhom || id || '-';
+  function render() {
+    const q = search.value.toLowerCase();
+    const x = a.filter(v => JSON.stringify(v).toLowerCase().includes(q) || name(v.maNguoiDung).toLowerCase().includes(q) || gname(v.maNhomTieuChi).toLowerCase().includes(q));
+    rows.innerHTML = x.map(v => `<tr>
+  <td>${esc(v.id)}</td>
+  <td>${esc(gname(v.maNhomTieuChi))}</td>
+  <td>${esc(standardCode(v.maTieuChuan || ''))}</td>
+  <td>${esc(criterionCode(v.maTieuChi || ''))}</td>
+  <td>${esc(name(v.maNguoiDung))}</td>
+  <td>${esc(v.vaiTroTrongNhom || '')}</td>
+  <td>
+  <span class="badge ${statusBadge(v.trangThai)}">${esc(v.trangThai || '')}</span>
+  </td>
+  </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có phân công</td></tr>';
+  }
+  async function load() {
+    [a, users, groups] = await Promise.all([api('/khao-thi/phan-cong'), api('/nguoi-dung'), api('/nhom-tieu-chi')]);
+    render();
+  }
+  search.oninput = render;
+  load();
+</script>
+ </body>
+</html>
+

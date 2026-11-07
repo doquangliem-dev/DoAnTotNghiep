@@ -1,1 +1,238 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trung tâm Quản lý chất lượng</title><link rel="stylesheet" href="/css/app.css"><style>.qlcl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:18px}.qlcl-card{background:#fff;border:1px solid #dbe4f0;border-radius:18px;padding:18px}.qlcl-card h3{margin:0 0 14px;font-size:17px}.bar-chart{height:250px;display:flex;align-items:flex-end;gap:18px;padding:12px 8px 0;border-bottom:1px solid #dbe4f0}.bar-item{flex:1;min-width:54px;text-align:center}.bar{width:100%;max-width:74px;margin:0 auto;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#4f46e5,#312e81);min-height:8px;transition:.25s}.bar-value{font-weight:800;margin-bottom:8px}.bar-label{font-size:12px;margin-top:8px;color:#475569;line-height:1.3}.progress-list{display:grid;gap:12px}.progress-row{display:grid;grid-template-columns:120px 1fr 44px;gap:10px;align-items:center}.progress-track{height:12px;border-radius:999px;background:#eef2f7;overflow:hidden}.progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#2563eb,#6d28d9)}.score-ring{width:150px;height:150px;margin:18px auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#4f46e5 var(--pct),#e5e7eb 0)}.score-ring:before{content:"";width:112px;height:112px;border-radius:50%;background:#fff;position:absolute}.score-ring b{position:relative;font-size:28px}.score-wrap{position:relative;text-align:center}@media(max-width:1000px){.qlcl-grid{grid-template-columns:1fr}.bar-chart{height:220px}}</style></head><body><div class="top"><span>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định CTĐT</span><span>Trung tâm Quản lý chất lượng</span></div><div class="shell"><aside class="sidebar"><div class="user"></div><nav class="nav"><a href="/khao-thi">▦ Tổng quan</a><a href="/khao-thi/ctdt">▤ Theo dõi CTĐT</a><a href="/khao-thi/ke-hoach">✓ Phê duyệt kế hoạch</a><a href="/khao-thi/tien-do">◷ Theo dõi tiến độ</a><a href="/khao-thi/bao-cao">▱ Báo cáo tự đánh giá</a><a href="/khao-thi/minh-chung">▧ Minh chứng</a><a href="/khao-thi/phan-cong">♟ Theo dõi phân công</a><a href="/khao-thi/tong-hop">☷ Theo dõi kết quả</a><a href="/khao-thi/thong-ke">▥ Thống kê tổng hợp</a></nav></aside><main class="main"><div class="page-head"><h1>Trung tâm Quản lý chất lượng</h1></div><div class="summary-strip" id="stats"></div><div class="qlcl-grid"><section class="qlcl-card" style="grid-column:span 2"><h3>Tổng quan khối lượng</h3><div class="bar-chart" id="bars"></div></section><section class="qlcl-card"><h3>Điểm đánh giá trung bình</h3><div class="score-wrap"><div class="score-ring" id="scoreRing" style="--pct:0%"><b id="scoreValue">0/5</b></div><div id="scoreMeta" class="muted"></div></div></section><section class="qlcl-card" style="grid-column:1/-1"><h3>Tiến độ theo tiêu chuẩn</h3><div class="progress-list" id="standardProgress"></div></section></div></main></div><script src="/js/common.js"></script><script>async function load(){const d=await api('/khao-thi/dashboard');const x=[['CTĐT',d.ctdt||0],['Kế hoạch',d.keHoach||0],['Chờ xử lý',d.choDuyet||0],['Phân công',d.phanCong||0],['Minh chứng',d.minhChung||0],['Điểm TB',(d.mucDanhGiaTrungBinh||0)+'/5']];stats.innerHTML=x.map(v=>`<div class="summary-mini"><b>${esc(v[1])}</b><span>${esc(v[0])}</span></div>`).join('');const barData=[['CTĐT',d.ctdt||0],['Kế hoạch',d.keHoach||0],['Phân công',d.phanCong||0],['Minh chứng',d.minhChung||0],['Báo cáo',d.tongBaoCao||0],['Đánh giá',d.tongDanhGia||0]];const max=Math.max(1,...barData.map(v=>Number(v[1])||0));bars.innerHTML=barData.map(v=>`<div class="bar-item"><div class="bar-value">${esc(v[1])}</div><div class="bar" style="height:${Math.max(8,Math.round((Number(v[1])||0)*190/max))}px"></div><div class="bar-label">${esc(v[0])}</div></div>`).join('');const score=Math.max(0,Math.min(5,Number(d.mucDanhGiaTrungBinh)||0));scoreRing.style.setProperty('--pct',(score/5*100)+'%');scoreValue.textContent=score.toFixed(2)+'/5';scoreMeta.textContent=`${d.soTieuChiDaChamDiem||0} tiêu chí đã chấm · ${d.soTieuChiChuaDanhGia||0} chưa đánh giá`;const standards=d.tieuChuan||[];standardProgress.innerHTML=standards.map(r=>{const pct=Number(r.tyLeHoanThanh)||0;return `<div class="progress-row"><b>${esc(r.maTieuChuan||'')}</b><div class="progress-track"><div class="progress-fill" style="width:${Math.max(0,Math.min(100,pct))}%"></div></div><span>${pct}%</span></div>`}).join('')||'<div class="muted">Chưa có dữ liệu tiến độ</div>'}load().catch(showGlobalError);</script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Trung tâm Quản lý chất lượng
+  </title>
+  <link href="/css/app.css" rel="stylesheet"/>
+  <style>
+.qlcl-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+  margin-top:18px
+}
+.qlcl-card {
+  background:#fff;
+  border:1px solid #dbe4f0;
+  border-radius:18px;
+  padding:18px
+}
+.qlcl-card h3 {
+  margin:0 0 14px;
+  font-size:17px
+}
+.bar-chart {
+  height:250px;
+  display:flex;
+  align-items:flex-end;
+  gap:18px;
+  padding:12px 8px 0;
+  border-bottom:1px solid #dbe4f0
+}
+.bar-item {
+  flex:1;
+  min-width:54px;
+  text-align:center
+}
+.bar {
+  width:100%;
+  max-width:74px;
+  margin:0 auto;
+  border-radius:10px 10px 0 0;
+  background:linear-gradient(180deg,#4f46e5,#312e81);
+  min-height:8px;
+  transition:.25s
+}
+.bar-value {
+  font-weight:800;
+  margin-bottom:8px
+}
+.bar-label {
+  font-size:12px;
+  margin-top:8px;
+  color:#475569;
+  line-height:1.3
+}
+.progress-list {
+  display:grid;
+  gap:12px
+}
+.progress-row {
+  display:grid;
+  grid-template-columns:120px 1fr 44px;
+  gap:10px;
+  align-items:center
+}
+.progress-track {
+  height:12px;
+  border-radius:999px;
+  background:#eef2f7;
+  overflow:hidden
+}
+.progress-fill {
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#2563eb,#6d28d9)
+}
+.score-ring {
+  width:150px;
+  height:150px;
+  margin:18px auto;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:conic-gradient(#4f46e5 var(--pct),#e5e7eb 0)
+}
+.score-ring:before {
+  content:"";
+  width:112px;
+  height:112px;
+  border-radius:50%;
+  background:#fff;
+  position:absolute
+}
+.score-ring b {
+  position:relative;
+  font-size:28px
+}
+.score-wrap {
+  position:relative;
+  text-align:center
+}
+@media(max-width:1000px) {
+  .qlcl-grid {
+    grid-template-columns:1fr
+  }
+  .bar-chart {
+    height:220px
+  }
+}
+</style>
+ </head>
+ <body>
+  <div class="top">
+   <span>
+    ◉ Hệ thống ĐBCL - Tự đánh giá &amp; Kiểm định CTĐT
+   </span>
+   <span>
+    Trung tâm Quản lý chất lượng
+   </span>
+  </div>
+  <div class="shell">
+   <aside class="sidebar">
+    <div class="user">
+    </div>
+    <nav class="nav">
+     <a href="/khao-thi">
+      ▦ Tổng quan
+     </a>
+     <a href="/khao-thi/ctdt">
+      ▤ Theo dõi CTĐT
+     </a>
+     <a href="/khao-thi/ke-hoach">
+      ✓ Phê duyệt kế hoạch
+     </a>
+     <a href="/khao-thi/tien-do">
+      ◷ Theo dõi tiến độ
+     </a>
+     <a href="/khao-thi/bao-cao">
+      ▱ Báo cáo tự đánh giá
+     </a>
+     <a href="/khao-thi/minh-chung">
+      ▧ Minh chứng
+     </a>
+     <a href="/khao-thi/phan-cong">
+      ♟ Theo dõi phân công
+     </a>
+     <a href="/khao-thi/tong-hop">
+      ☷ Theo dõi kết quả
+     </a>
+     <a href="/khao-thi/thong-ke">
+      ▥ Thống kê tổng hợp
+     </a>
+    </nav>
+   </aside>
+   <main class="main">
+    <div class="page-head">
+     <h1>
+      Trung tâm Quản lý chất lượng
+     </h1>
+    </div>
+    <div class="summary-strip" id="stats">
+    </div>
+    <div class="qlcl-grid">
+     <section class="qlcl-card" style="grid-column:span 2">
+      <h3>
+       Tổng quan khối lượng
+      </h3>
+      <div class="bar-chart" id="bars">
+      </div>
+     </section>
+     <section class="qlcl-card">
+      <h3>
+       Điểm đánh giá trung bình
+      </h3>
+      <div class="score-wrap">
+       <div class="score-ring" id="scoreRing" style="--pct:0%">
+        <b id="scoreValue">
+         0/5
+        </b>
+       </div>
+       <div class="muted" id="scoreMeta">
+       </div>
+      </div>
+     </section>
+     <section class="qlcl-card" style="grid-column:1/-1">
+      <h3>
+       Tiến độ theo tiêu chuẩn
+      </h3>
+      <div class="progress-list" id="standardProgress">
+      </div>
+     </section>
+    </div>
+   </main>
+  </div>
+  <script src="/js/common.js">
+  </script>
+  <script>
+
+     async function load() {
+    const d = await api('/khao-thi/dashboard');
+    const x = [['CTĐT', d.ctdt || 0], ['Kế hoạch', d.keHoach || 0], ['Chờ xử lý', d.choDuyet || 0], ['Phân công', d.phanCong || 0], ['Minh chứng', d.minhChung || 0], ['Điểm TB', (d.mucDanhGiaTrungBinh || 0) + '/5']];
+    stats.innerHTML = x.map(v => `<div class="summary-mini">
+  <b>${esc(v[1])}</b>
+  <span>${esc(v[0])}</span>
+  </div>`).join('');
+    const barData = [['CTĐT', d.ctdt || 0], ['Kế hoạch', d.keHoach || 0], ['Phân công', d.phanCong || 0], ['Minh chứng', d.minhChung || 0], ['Báo cáo', d.tongBaoCao || 0], ['Đánh giá', d.tongDanhGia || 0]];
+    const max = Math.max(1, ...barData.map(v => Number(v[1]) || 0));
+    bars.innerHTML = barData.map(v => `<div class="bar-item">
+  <div class="bar-value">${esc(v[1])}</div>
+  <div class="bar" style="height:${Math.max(8, Math.round((Number(v[1]) || 0) * 190 / max))}px">
+  </div>
+  <div class="bar-label">${esc(v[0])}</div>
+  </div>`).join('');
+    const score = Math.max(0, Math.min(5, Number(d.mucDanhGiaTrungBinh) || 0));
+    scoreRing.style.setProperty('--pct', (score / 5 * 100) + '%');
+    scoreValue.textContent = score.toFixed(2) + '/5';
+    scoreMeta.textContent = `${d.soTieuChiDaChamDiem || 0} tiêu chí đã chấm · ${d.soTieuChiChuaDanhGia || 0} chưa đánh giá`;
+    const standards = d.tieuChuan || [];
+    standardProgress.innerHTML = standards.map(r => {
+      const pct = Number(r.tyLeHoanThanh) || 0;
+      return `<div class="progress-row">
+  <b>${esc(r.maTieuChuan || '')}</b>
+  <div class="progress-track">
+  <div class="progress-fill" style="width:${Math.max(0, Math.min(100, pct))}%">
+  </div>
+  </div>
+  <span>${pct}%</span>
+  </div>`;
+    }).join('') || '<div class="muted">Chưa có dữ liệu tiến độ</div>';
+  }
+  load().catch(showGlobalError);
+</script>
+ </body>
+</html>
+

@@ -1,17 +1,421 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thư ký nhóm - Tổng hợp báo cáo</title><link rel="stylesheet" href="/css/app.css"></head><body><div class="top"><div>◉ Hệ thống ĐBCL - Thư ký nhóm</div></div><div class="shell"><aside class="sidebar"><div class="user"><div class="avatar">TK</div><div><b>Thư ký nhóm</b><small>Chức vụ nội bộ nhóm</small></div></div><nav class="nav"><a href="/thanh-vien">▦ Tổng quan</a><a href="/thanh-vien/cong-viec">♟ Công việc được giao</a><a href="/thanh-vien/minh-chung">▧ Minh chứng</a><a href="/thanh-vien/bao-cao">▱ Báo cáo tiêu chí</a><a href="/thanh-vien/tong-hop-nhom">∑ Tổng hợp báo cáo nhóm</a></nav></aside><main class="main"><div class="page-head"><h1>Tổng hợp báo cáo nhóm</h1></div><div class="card"><div class="card-body"><div class="toolbar"><button class="btn-primary" onclick="openNew()">+ Tạo báo cáo tổng hợp</button></div><div class="table-wrap"><table><thead><tr><th>Mã</th><th>Nhóm</th><th>Kế hoạch</th><th>Tiêu chuẩn</th><th>Tên báo cáo</th><th>Trạng thái</th><th>File</th><th>Feedback Trưởng nhóm</th><th>Thao tác</th></tr></thead><tbody id="rows"></tbody></table></div></div></div>
-<div class="modal" id="mEdit"><div class="modal-box" style="max-width:920px"><div class="modal-head"><span id="title">Báo cáo nhóm</span><button onclick="closeModal('mEdit')">×</button></div><div class="modal-body"><input type="hidden" id="id"><div class="form-grid"><div class="field"><label>Nhóm</label><select id="groupId"></select></div><div class="field"><label>Kế hoạch</label><select id="planId"></select></div><div class="field full"><label>Tiêu chuẩn</label><select id="standardId"></select></div><div class="field full"><label>Tên báo cáo</label><input id="name"></div></div><div class="notice" id="leaderFeedback" style="display:none;margin-bottom:10px"></div><div class="notice" id="sourceInfo" style="margin:10px 0">Chưa chọn nguồn tổng hợp</div><div class="role-table" style="margin:12px 0"><table><thead><tr><th>Tiêu chí</th><th>Báo cáo</th><th>Trạng thái</th><th>Mức duyệt</th><th>Sẵn sàng</th></tr></thead><tbody id="sourceRows"><tr><td colspan="5" class="empty">Chưa chọn nguồn tổng hợp</td></tr></tbody></table></div><div class="field"><label>Mô tả tổng hợp</label><textarea id="hienTrang" rows="8"></textarea></div><div class="field"><label>Điểm mạnh</label><textarea id="manh" rows="4"></textarea></div><div class="field"><label>Tồn tại</label><textarea id="tonTai" rows="4"></textarea></div><div class="field"><label>Kế hoạch cải tiến / đề xuất</label><textarea id="caiTien" rows="5"></textarea></div><div class="field"><label>File báo cáo nhóm</label><input id="reportFile" type="file" accept=".pdf,.doc,.docx"><div id="currentFile" class="notice" style="margin-top:8px">Chưa có file</div></div></div><div class="modal-foot"><button class="btn-light" onclick="closeModal('mEdit')">Đóng</button><button class="btn-primary" onclick="saveDraft(false)">Lưu nội dung</button><button class="btn-primary" onclick="saveDraft(true)">Gửi Trưởng nhóm</button></div></div></div>
-</main></div><script src="/js/common.js"></script><script>
-let data=[],assignments=[],groups=[],plans=[],standards=[],secretaryInfo=null,sourceReady=false;
-async function load(){try{[data,assignments,groups,plans,standards,secretaryInfo]=await Promise.all([api('/thanh-vien/thu-ky-nhom/bao-cao-nhom?_='+Date.now()),api('/thanh-vien/thu-ky-nhom/phan-cong?_='+Date.now()),api('/nhom-tieu-chi'),api('/ke-hoach'),api('/tieu-chuan'),api('/thanh-vien/thu-ky-nhom/thong-tin')]);if(!secretaryInfo?.laThuKyNhom){document.querySelector('.main').innerHTML='';return}render()}catch(e){alert(e.message)}}
-const gname=id=>groups.find(x=>x.id===id)?.tenNhom||id||''; const pname=id=>plans.find(x=>x.id===id)?.tenKeHoach||id||'';
-function render(){rows.innerHTML=data.map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(gname(x.maNhomTieuChi))}</td><td>${esc(x.maKeHoach||'')}</td><td><b>${esc(standardCode(x.maTieuChuan))}</b></td><td>${esc(x.tenBaoCao||'')}</td><td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai||'')}</span></td><td>${x.duongDanFile?`<div class="file-tools"><a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a><span class="file-name">${esc(x.tenFileBaoCao||'Đã có file')}</span></div>`:'<span class="file-state">Chưa có file</span>'}</td><td><small>${esc(x.nhanXetTruongNhom||'Chưa có')}</small></td><td><button class="btn-light" onclick="edit('${x.id}')">Xem / Sửa</button></td></tr>`).join('')||'<tr><td colspan="9" class="empty">Chưa có báo cáo tổng hợp. Nhấn “Tạo báo cáo tổng hợp”.</td></tr>'}
-function parentAssignments(){return assignments.filter(x=>!x.maTieuChi&&x.maNhomTieuChi&&x.maTieuChuan&&x.maKeHoach&&x.trangThai!=='Hủy phân công')}
-function fillSelectors(selected={}){const ps=parentAssignments();const gids=[...new Set(ps.map(x=>x.maNhomTieuChi))];groupId.innerHTML=gids.map(g=>`<option value="${esc(g)}">${esc(gname(g))}</option>`).join('');if(selected.group)groupId.value=selected.group;fillPlans(selected.plan,selected.standard)}
-function fillPlans(plan,standard){const ps=parentAssignments().filter(x=>x.maNhomTieuChi===groupId.value);const pids=[...new Set(ps.map(x=>x.maKeHoach))];planId.innerHTML=pids.map(p=>`<option value="${esc(p)}">${esc(p)} - ${esc(pname(p))}</option>`).join('');if(plan)planId.value=plan;fillStandards(standard)}
-function fillStandards(selected){const ps=parentAssignments().filter(x=>x.maNhomTieuChi===groupId.value&&x.maKeHoach===planId.value);const ids=[...new Set(ps.map(x=>x.maTieuChuan))];standardId.innerHTML=ids.map(s=>`<option value="${esc(s)}">${esc(standardCode(s))} - ${esc(standards.find(t=>t.id===s)?.tenTieuChuan||'')}</option>`).join('');if(selected)standardId.value=selected;updateSource()}
-async function updateSource(){const count=assignments.filter(x=>x.maNhomTieuChi===groupId.value&&x.maKeHoach===planId.value&&x.maTieuChuan===standardId.value&&x.maTieuChi).length;sourceInfo.textContent=`Nguồn tổng hợp: ${count} phân công tiêu chí thuộc ${standardCode(standardId.value)} trong kế hoạch ${planId.value||'-'}. Đang kiểm tra trạng thái báo cáo...`;sourceReady=false;if(!groupId.value||!planId.value||!standardId.value){sourceRows.innerHTML='<tr><td colspan="5" class="empty">Chưa chọn đủ Kế hoạch + Nhóm + Tiêu chuẩn</td></tr>';return}try{const d=await api('/thanh-vien/thu-ky-nhom/nguon-bao-cao?maNhom='+encodeURIComponent(groupId.value)+'&maKeHoach='+encodeURIComponent(planId.value)+'&maTieuChuan='+encodeURIComponent(standardId.value));sourceReady=!!d.duDieuKien;sourceInfo.innerHTML=`Nguồn tổng hợp: <b>${d.sanSang||0}/${d.tongTieuChi||0}</b> báo cáo tiêu chí đã qua Trưởng nhóm (≥50%). ${sourceReady?'<span class="badge b-green">Đủ điều kiện gửi</span>':'<span class="badge b-red">Chưa đủ điều kiện gửi</span>'}`;sourceRows.innerHTML=(d.tieuChi||[]).map(r=>`<tr><td><b>${esc(criterionCode(r.maTieuChi))}</b></td><td>${r.baoCaoId?esc(r.baoCaoId):'<span class="muted">Chưa có</span>'}</td><td><span class="badge ${statusBadge(r.trangThai)}">${esc(r.trangThai||'')}</span></td><td><b>${r.mucDoDuyet||0}%</b></td><td>${r.sanSangTongHop?'<span class="badge b-green">Sẵn sàng</span>':'<span class="badge b-red">Chưa</span>'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Chưa có phân công tiêu chí</td></tr>'}catch(e){sourceInfo.textContent=e.message;sourceRows.innerHTML='<tr><td colspan="5" class="empty">Không tải được nguồn tổng hợp</td></tr>'}}
-function openNew(){id.value='';title.textContent='Tạo báo cáo tổng hợp';leaderFeedback.style.display='none';leaderFeedback.textContent='';fillSelectors();name.value='';hienTrang.value='';manh.value='';tonTai.value='';caiTien.value='';reportFile.value='';currentFile.textContent='Chưa có file';[groupId,planId,standardId].forEach(x=>x.disabled=false);openModal('mEdit')}
-function edit(k){const x=data.find(v=>v.id===k);id.value=x.id;title.textContent=x.id+' - '+(x.tenBaoCao||'');leaderFeedback.style.display=x.nhanXetTruongNhom?'block':'none';leaderFeedback.innerHTML=x.nhanXetTruongNhom?'<b>Phản hồi Trưởng nhóm:</b> '+esc(x.nhanXetTruongNhom):'';fillSelectors({group:x.maNhomTieuChi,plan:x.maKeHoach,standard:x.maTieuChuan});name.value=x.tenBaoCao||'';hienTrang.value=x.moTaTongHop||'';manh.value=x.diemManhTongHop||'';tonTai.value=x.tonTaiTongHop||'';caiTien.value=x.keHoachCaiTien||'';reportFile.value='';const lock=!['Đang tổng hợp','Yêu cầu chỉnh sửa'].includes(x.trangThai||'');currentFile.innerHTML=x.duongDanFile?`<div class="file-tools"><span class="file-name">${esc(x.tenFileBaoCao||'File hiện tại')}</span><a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>${!lock?`<button type="button" class="file-btn delete" onclick="deleteGroupFile('${x.id}')">Xóa file</button>`:''}</div>`:'<span class="file-state">Chưa có file</span>';[groupId,planId,standardId,name,hienTrang,manh,tonTai,caiTien,reportFile].forEach(v=>v.disabled=lock);openModal('mEdit')}
-async function deleteGroupFile(k){if(!confirm('Xóa file báo cáo nhóm đã tải? Nội dung tổng hợp vẫn được giữ.'))return;try{await api('/thanh-vien/thu-ky-nhom/bao-cao-nhom/'+encodeURIComponent(k)+'/file',{method:'DELETE'});currentFile.innerHTML='<span class="file-state">Chưa có file</span>';reportFile.value='';await load()}catch(e){alert(e.message)}}
-async function saveDraft(send){try{if(send&&!sourceReady)return alert('Chưa thể gửi: tất cả báo cáo tiêu chí của tiêu chuẩn phải được Trưởng nhóm duyệt tối thiểu 50%.');const payload={id:id.value||null,maNhomTieuChi:groupId.value,maKeHoach:planId.value,maTieuChuan:standardId.value,tenBaoCao:name.value.trim(),moTaTongHop:hienTrang.value.trim(),diemManhTongHop:manh.value.trim(),tonTaiTongHop:tonTai.value.trim(),keHoachCaiTien:caiTien.value.trim()};let saved=await api('/thanh-vien/thu-ky-nhom/bao-cao-nhom',{method:'POST',body:JSON.stringify(payload)});const f=reportFile.files?.[0];if(f){const fd=new FormData();fd.append('file',f);const rr=await fetch('/api/thanh-vien/thu-ky-nhom/bao-cao-nhom/'+encodeURIComponent(saved.id)+'/upload',{method:'POST',body:fd});if(!rr.ok)throw new Error(await rr.text())}if(send)await api('/thanh-vien/thu-ky-nhom/bao-cao-nhom/'+encodeURIComponent(saved.id)+'/gui-duyet',{method:'POST'});closeModal('mEdit');await load()}catch(e){alert(e.message)}}
-groupId.onchange=()=>fillPlans();planId.onchange=()=>fillStandards();standardId.onchange=updateSource;load();</script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Thư ký nhóm - Tổng hợp báo cáo
+  </title>
+  <link href="/css/app.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="top">
+   <div>
+    ◉ Hệ thống ĐBCL - Thư ký nhóm
+   </div>
+  </div>
+  <div class="shell">
+   <aside class="sidebar">
+    <div class="user">
+     <div class="avatar">
+      TK
+     </div>
+     <div>
+      <b>
+       Thư ký nhóm
+      </b>
+      <small>
+       Chức vụ nội bộ nhóm
+      </small>
+     </div>
+    </div>
+    <nav class="nav">
+     <a href="/thanh-vien">
+      ▦ Tổng quan
+     </a>
+     <a href="/thanh-vien/cong-viec">
+      ♟ Công việc được giao
+     </a>
+     <a href="/thanh-vien/minh-chung">
+      ▧ Minh chứng
+     </a>
+     <a href="/thanh-vien/bao-cao">
+      ▱ Báo cáo tiêu chí
+     </a>
+     <a href="/thanh-vien/tong-hop-nhom">
+      ∑ Tổng hợp báo cáo nhóm
+     </a>
+    </nav>
+   </aside>
+   <main class="main">
+    <div class="page-head">
+     <h1>
+      Tổng hợp báo cáo nhóm
+     </h1>
+    </div>
+    <div class="card">
+     <div class="card-body">
+      <div class="toolbar">
+       <button class="btn-primary" onclick="openNew()">
+        + Tạo báo cáo tổng hợp
+       </button>
+      </div>
+      <div class="table-wrap">
+       <table>
+        <thead>
+         <tr>
+          <th>
+           Mã
+          </th>
+          <th>
+           Nhóm
+          </th>
+          <th>
+           Kế hoạch
+          </th>
+          <th>
+           Tiêu chuẩn
+          </th>
+          <th>
+           Tên báo cáo
+          </th>
+          <th>
+           Trạng thái
+          </th>
+          <th>
+           File
+          </th>
+          <th>
+           Feedback Trưởng nhóm
+          </th>
+          <th>
+           Thao tác
+          </th>
+         </tr>
+        </thead>
+        <tbody id="rows">
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+    <div class="modal" id="mEdit">
+     <div class="modal-box" style="max-width:920px">
+      <div class="modal-head">
+       <span id="title">
+        Báo cáo nhóm
+       </span>
+       <button onclick="closeModal('mEdit')">
+        ×
+       </button>
+      </div>
+      <div class="modal-body">
+       <input id="id" type="hidden"/>
+       <div class="form-grid">
+        <div class="field">
+         <label>
+          Nhóm
+         </label>
+         <select id="groupId">
+         </select>
+        </div>
+        <div class="field">
+         <label>
+          Kế hoạch
+         </label>
+         <select id="planId">
+         </select>
+        </div>
+        <div class="field full">
+         <label>
+          Tiêu chuẩn
+         </label>
+         <select id="standardId">
+         </select>
+        </div>
+        <div class="field full">
+         <label>
+          Tên báo cáo
+         </label>
+         <input id="name"/>
+        </div>
+       </div>
+       <div class="notice" id="leaderFeedback" style="display:none;margin-bottom:10px">
+       </div>
+       <div class="notice" id="sourceInfo" style="margin:10px 0">
+        Chưa chọn nguồn tổng hợp
+       </div>
+       <div class="role-table" style="margin:12px 0">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Tiêu chí
+           </th>
+           <th>
+            Báo cáo
+           </th>
+           <th>
+            Trạng thái
+           </th>
+           <th>
+            Mức duyệt
+           </th>
+           <th>
+            Sẵn sàng
+           </th>
+          </tr>
+         </thead>
+         <tbody id="sourceRows">
+          <tr>
+           <td class="empty" colspan="5">
+            Chưa chọn nguồn tổng hợp
+           </td>
+          </tr>
+         </tbody>
+        </table>
+       </div>
+       <div class="field">
+        <label>
+         Mô tả tổng hợp
+        </label>
+        <textarea id="hienTrang" rows="8"></textarea>
+       </div>
+       <div class="field">
+        <label>
+         Điểm mạnh
+        </label>
+        <textarea id="manh" rows="4"></textarea>
+       </div>
+       <div class="field">
+        <label>
+         Tồn tại
+        </label>
+        <textarea id="tonTai" rows="4"></textarea>
+       </div>
+       <div class="field">
+        <label>
+         Kế hoạch cải tiến / đề xuất
+        </label>
+        <textarea id="caiTien" rows="5"></textarea>
+       </div>
+       <div class="field">
+        <label>
+         File báo cáo nhóm
+        </label>
+        <input accept=".pdf,.doc,.docx" id="reportFile" type="file"/>
+        <div class="notice" id="currentFile" style="margin-top:8px">
+         Chưa có file
+        </div>
+       </div>
+      </div>
+      <div class="modal-foot">
+       <button class="btn-light" onclick="closeModal('mEdit')">
+        Đóng
+       </button>
+       <button class="btn-primary" onclick="saveDraft(false)">
+        Lưu nội dung
+       </button>
+       <button class="btn-primary" onclick="saveDraft(true)">
+        Gửi Trưởng nhóm
+       </button>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script src="/js/common.js">
+  </script>
+  <script>
+
+     let data = [], assignments = [], groups = [], plans = [], standards = [], secretaryInfo = null, sourceReady = false;
+  async function load() {
+    try {
+      [data, assignments, groups, plans, standards, secretaryInfo] = await Promise.all([api('/thanh-vien/thu-ky-nhom/bao-cao-nhom?_=' + Date.now()), api('/thanh-vien/thu-ky-nhom/phan-cong?_=' + Date.now()), api('/nhom-tieu-chi'), api('/ke-hoach'), api('/tieu-chuan'), api('/thanh-vien/thu-ky-nhom/thong-tin')]);
+      if (!secretaryInfo?.laThuKyNhom) {
+        document.querySelector('.main').innerHTML = '';
+        return;
+      }
+      render();
+    }
+     catch (e) {
+      alert(e.message);
+    }
+    }
+  const gname = id => groups.find(x => x.id === id)?.tenNhom || id || '';
+  const pname = id => plans.find(x => x.id === id)?.tenKeHoach || id || '';
+  function render() {
+    rows.innerHTML = data.map(x => `<tr>
+  <td>${esc(x.id)}</td>
+  <td>${esc(gname(x.maNhomTieuChi))}</td>
+  <td>${esc(x.maKeHoach || '')}</td>
+  <td>
+  <b>${esc(standardCode(x.maTieuChuan))}</b>
+  </td>
+  <td>${esc(x.tenBaoCao || '')}</td>
+  <td>
+  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
+  </td>
+  <td>${x.duongDanFile ? `<div class="file-tools">
+  <a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>
+  <span class="file-name">${esc(x.tenFileBaoCao || 'Đã có file')}</span>
+  </div>` : '<span class="file-state">Chưa có file</span>'}</td>
+  <td>
+  <small>${esc(x.nhanXetTruongNhom || 'Chưa có')}</small>
+  </td>
+  <td>
+  <button class="btn-light" onclick="edit('${x.id}')">Xem / Sửa</button>
+  </td>
+  </tr>`).join('') || '<tr><td colspan="9" class="empty">Chưa có báo cáo tổng hợp. Nhấn “Tạo báo cáo tổng hợp”.</td></tr>';
+  }
+  function parentAssignments() {
+    return assignments.filter(x => !x.maTieuChi && x.maNhomTieuChi && x.maTieuChuan && x.maKeHoach && x.trangThai !== 'Hủy phân công');
+  }
+  function fillSelectors(selected = {
+  }) {
+    const ps = parentAssignments();
+    const gids = [...new Set(ps.map(x => x.maNhomTieuChi))];
+    groupId.innerHTML = gids.map(g => `<option value="${esc(g)}">${esc(gname(g))}</option>`).join('');
+    if (selected.group)
+         groupId.value = selected.group;
+    fillPlans(selected.plan, selected.standard);
+  }
+  function fillPlans(plan, standard) {
+    const ps = parentAssignments().filter(x => x.maNhomTieuChi === groupId.value);
+    const pids = [...new Set(ps.map(x => x.maKeHoach))];
+    planId.innerHTML = pids.map(p => `<option value="${esc(p)}">${esc(p)} - ${esc(pname(p))}</option>`).join('');
+    if (plan)
+         planId.value = plan;
+    fillStandards(standard);
+  }
+  function fillStandards(selected) {
+    const ps = parentAssignments().filter(x => x.maNhomTieuChi === groupId.value && x.maKeHoach === planId.value);
+    const ids = [...new Set(ps.map(x => x.maTieuChuan))];
+    standardId.innerHTML = ids.map(s => `<option value="${esc(s)}">${esc(standardCode(s))} - ${esc(standards.find(t => t.id === s)?.tenTieuChuan || '')}</option>`).join('');
+    if (selected)
+         standardId.value = selected;
+    updateSource();
+  }
+  async function updateSource() {
+    const count = assignments.filter(x => x.maNhomTieuChi === groupId.value && x.maKeHoach === planId.value && x.maTieuChuan === standardId.value && x.maTieuChi).length;
+    sourceInfo.textContent = `Nguồn tổng hợp: ${count} phân công tiêu chí thuộc ${standardCode(standardId.value)} trong kế hoạch ${planId.value || '-'}. Đang kiểm tra trạng thái báo cáo...`;
+    sourceReady = false;
+    if (!groupId.value || !planId.value || !standardId.value) {
+      sourceRows.innerHTML = '<tr><td colspan="5" class="empty">Chưa chọn đủ Kế hoạch + Nhóm + Tiêu chuẩn</td></tr>';
+      return;
+    }
+    try {
+      const d = await api('/thanh-vien/thu-ky-nhom/nguon-bao-cao?maNhom=' + encodeURIComponent(groupId.value) + '&maKeHoach=' + encodeURIComponent(planId.value) + '&maTieuChuan=' + encodeURIComponent(standardId.value));
+      sourceReady = !!d.duDieuKien;
+      sourceInfo.innerHTML = `Nguồn tổng hợp: <b>${d.sanSang || 0}/${d.tongTieuChi || 0}</b> báo cáo tiêu chí đã qua Trưởng nhóm (≥50%). ${sourceReady ? '<span class="badge b-green">Đủ điều kiện gửi</span>' : '<span class="badge b-red">Chưa đủ điều kiện gửi</span>'}`;
+      sourceRows.innerHTML = (d.tieuChi || []).map(r => `<tr>
+  <td>
+  <b>${esc(criterionCode(r.maTieuChi))}</b>
+  </td>
+  <td>${r.baoCaoId ? esc(r.baoCaoId) : '<span class="muted">Chưa có</span>'}</td>
+  <td>
+  <span class="badge ${statusBadge(r.trangThai)}">${esc(r.trangThai || '')}</span>
+  </td>
+  <td>
+  <b>${r.mucDoDuyet || 0}%</b>
+  </td>
+  <td>${r.sanSangTongHop ? '<span class="badge b-green">Sẵn sàng</span>' : '<span class="badge b-red">Chưa</span>'}</td>
+  </tr>`).join('') || '<tr><td colspan="5" class="empty">Chưa có phân công tiêu chí</td></tr>';
+    }
+     catch (e) {
+      sourceInfo.textContent = e.message;
+      sourceRows.innerHTML = '<tr><td colspan="5" class="empty">Không tải được nguồn tổng hợp</td></tr>';
+    }
+    }
+  function openNew() {
+    id.value = '';
+    title.textContent = 'Tạo báo cáo tổng hợp';
+    leaderFeedback.style.display = 'none';
+    leaderFeedback.textContent = '';
+    fillSelectors();
+    name.value = '';
+    hienTrang.value = '';
+    manh.value = '';
+    tonTai.value = '';
+    caiTien.value = '';
+    reportFile.value = '';
+    currentFile.textContent = 'Chưa có file';
+    [groupId, planId, standardId].forEach(x => x.disabled = false);
+    openModal('mEdit');
+  }
+  function edit(k) {
+    const x = data.find(v => v.id === k);
+    id.value = x.id;
+    title.textContent = x.id + ' - ' + (x.tenBaoCao || '');
+    leaderFeedback.style.display = x.nhanXetTruongNhom ? 'block' : 'none';
+    leaderFeedback.innerHTML = x.nhanXetTruongNhom ? '<b>Phản hồi Trưởng nhóm:</b> ' + esc(x.nhanXetTruongNhom) : '';
+    fillSelectors({
+      group: x.maNhomTieuChi, plan: x.maKeHoach, standard: x.maTieuChuan
+    });
+    name.value = x.tenBaoCao || '';
+    hienTrang.value = x.moTaTongHop || '';
+    manh.value = x.diemManhTongHop || '';
+    tonTai.value = x.tonTaiTongHop || '';
+    caiTien.value = x.keHoachCaiTien || '';
+    reportFile.value = '';
+    const lock = !['Đang tổng hợp', 'Yêu cầu chỉnh sửa'].includes(x.trangThai || '');
+    currentFile.innerHTML = x.duongDanFile ? `<div class="file-tools">
+  <span class="file-name">${esc(x.tenFileBaoCao || 'File hiện tại')}</span>
+  <a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>${!lock ? `<button type="button" class="file-btn delete" onclick="deleteGroupFile('${x.id}')">Xóa file</button>` : ''}</div>` : '<span class="file-state">Chưa có file</span>';
+    [groupId, planId, standardId, name, hienTrang, manh, tonTai, caiTien, reportFile].forEach(v => v.disabled = lock);
+    openModal('mEdit');
+  }
+  async function deleteGroupFile(k) {
+    if (!confirm('Xóa file báo cáo nhóm đã tải? Nội dung tổng hợp vẫn được giữ.'))
+         return;
+    try {
+      await api('/thanh-vien/thu-ky-nhom/bao-cao-nhom/' + encodeURIComponent(k) + '/file', {
+        method: 'DELETE'
+      });
+      currentFile.innerHTML = '<span class="file-state">Chưa có file</span>';
+      reportFile.value = '';
+      await load();
+    }
+     catch (e) {
+      alert(e.message);
+    }
+    }
+  async function saveDraft(send) {
+    try {
+      if (send && !sourceReady)
+             return alert('Chưa thể gửi: tất cả báo cáo tiêu chí của tiêu chuẩn phải được Trưởng nhóm duyệt tối thiểu 50%.');
+      const payload = {
+        id: id.value || null, maNhomTieuChi: groupId.value, maKeHoach: planId.value, maTieuChuan: standardId.value, tenBaoCao: name.value.trim(), moTaTongHop: hienTrang.value.trim(), diemManhTongHop: manh.value.trim(), tonTaiTongHop: tonTai.value.trim(), keHoachCaiTien: caiTien.value.trim()
+      };
+      let saved = await api('/thanh-vien/thu-ky-nhom/bao-cao-nhom', {
+        method: 'POST', body: JSON.stringify(payload)
+      });
+      const f = reportFile.files?.[0];
+      if (f) {
+        const fd = new FormData();
+        fd.append('file', f);
+        const rr = await fetch('/api/thanh-vien/thu-ky-nhom/bao-cao-nhom/' + encodeURIComponent(saved.id) + '/upload', {
+          method: 'POST', body: fd
+        });
+        if (!rr.ok)
+                 throw new Error(await rr.text());
+      }
+      if (send)
+             await api('/thanh-vien/thu-ky-nhom/bao-cao-nhom/' + encodeURIComponent(saved.id) + '/gui-duyet', {
+        method: 'POST'
+      });
+      closeModal('mEdit');
+      await load();
+    }
+     catch (e) {
+      alert(e.message);
+    }
+    }
+  groupId.onchange = () => fillPlans();
+  planId.onchange = () => fillStandards();
+  standardId.onchange = updateSource;
+  load();
+</script>
+ </body>
+</html>
+

@@ -1,13 +1,10 @@
 package com.huit.kiemdinh.config;
-
 import com.huit.kiemdinh.model.*;
 import com.huit.kiemdinh.repository.*;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
 import java.util.*;
-
 @Component
 public class FileDataRepairRunner {
     private final MinhChungRepository minhChungRepo;
@@ -15,26 +12,23 @@ public class FileDataRepairRunner {
     private final BaoCaoTieuChiRepository baoCaoTieuChiRepo;
     private final BaoCaoNhomRepository baoCaoNhomRepo;
     private final BaoCaoPhanRepository baoCaoPhanRepo;
-
     public FileDataRepairRunner(MinhChungRepository minhChungRepo,
-                                MinhChungChungRepository minhChungChungRepo,
-                                BaoCaoTieuChiRepository baoCaoTieuChiRepo,
-                                BaoCaoNhomRepository baoCaoNhomRepo,
-                                BaoCaoPhanRepository baoCaoPhanRepo) {
+    MinhChungChungRepository minhChungChungRepo,
+    BaoCaoTieuChiRepository baoCaoTieuChiRepo,
+    BaoCaoNhomRepository baoCaoNhomRepo,
+    BaoCaoPhanRepository baoCaoPhanRepo) {
         this.minhChungRepo = minhChungRepo;
         this.minhChungChungRepo = minhChungChungRepo;
         this.baoCaoTieuChiRepo = baoCaoTieuChiRepo;
         this.baoCaoNhomRepo = baoCaoNhomRepo;
         this.baoCaoPhanRepo = baoCaoPhanRepo;
     }
-
     @EventListener(ApplicationReadyEvent.class)
     public void scheduleRepair() {
         Thread worker = new Thread(this::repairSafely, "mongo-file-repair");
         worker.setDaemon(true);
         worker.start();
     }
-
     private void repairSafely() {
         try {
             int mc = repairMinhChung();
@@ -43,13 +37,12 @@ public class FileDataRepairRunner {
             int bcn = repairBaoCaoNhom();
             int bcp = repairBaoCaoPhan();
             System.out.println("[FileRepair] Mongo file paths repaired: minhChung=" + mc
-                    + ", minhChungChung=" + mcc + ", baoCaoTieuChi=" + bc
-                    + ", baoCaoNhom=" + bcn + ", baoCaoPhan=" + bcp);
+            + ", minhChungChung=" + mcc + ", baoCaoTieuChi=" + bc
+            + ", baoCaoNhom=" + bcn + ", baoCaoPhan=" + bcp);
         } catch (Exception e) {
             System.err.println("[FileRepair] Bỏ qua sửa file nền do Mongo chậm/lỗi: " + e.getMessage());
         }
     }
-
     private int repairMinhChung() {
         int changed = 0;
         for (MinhChung x : minhChungRepo.findAll()) {
@@ -67,7 +60,6 @@ public class FileDataRepairRunner {
         }
         return changed;
     }
-
     private int repairMinhChungChung() {
         int changed = 0;
         for (MinhChungChung x : minhChungChungRepo.findAll()) {
@@ -85,7 +77,6 @@ public class FileDataRepairRunner {
         }
         return changed;
     }
-
     private int repairBaoCaoTieuChi() {
         int changed = 0;
         for (BaoCaoTieuChi x : baoCaoTieuChiRepo.findAll()) {
@@ -104,7 +95,6 @@ public class FileDataRepairRunner {
         }
         return changed;
     }
-
     private int repairBaoCaoNhom() {
         int changed = 0;
         for (BaoCaoNhom x : baoCaoNhomRepo.findAll()) {
@@ -121,13 +111,12 @@ public class FileDataRepairRunner {
         }
         return changed;
     }
-
     private int repairBaoCaoPhan() {
         int changed = 0;
         Map<Integer,String> names = Map.of(
-                1, "BCP001_Phan1_KhaiQuat.pdf",
-                3, "BCP003_Phan3_KetLuan.pdf",
-                4, "BCP004_Phan4_PhuLuc.pdf"
+        1, "BCP001_Phan1_KhaiQuat.pdf",
+        3, "BCP003_Phan3_KetLuan.pdf",
+        4, "BCP004_Phan4_PhuLuc.pdf"
         );
         for (BaoCaoPhan x : baoCaoPhanRepo.findAll()) {
             String name = names.get(x.getSoPhan());
@@ -142,7 +131,6 @@ public class FileDataRepairRunner {
         }
         return changed;
     }
-
     private boolean shouldRepairSeedPath(String current, String prefix, String seedPrefix) {
         if (current == null || current.isBlank()) return true;
         if (!current.startsWith(prefix)) return false;
@@ -150,7 +138,6 @@ public class FileDataRepairRunner {
         if (file.matches(".*_\\d{13}(?:_[^.]*)?\\.[A-Za-z0-9]+$")) return false;
         return file.startsWith(seedPrefix);
     }
-
     private boolean shouldRepairReportPath(String current, String seedPrefix) {
         if (current == null || current.isBlank()) return true;
         if (!current.startsWith("/uploads/bao-cao/")) return false;
@@ -158,7 +145,6 @@ public class FileDataRepairRunner {
         if (file.matches(".*_\\d{13}(?:_[^.]*)?\\.[A-Za-z0-9]+$")) return false;
         return file.startsWith(seedPrefix) || file.equals("PHAN2_BAO_CAO_TDG_DAY_DU.pdf");
     }
-
     private Integer numberOf(String id, String prefix, int min, int max) {
         if (id == null || !id.startsWith(prefix)) return null;
         try {
@@ -168,7 +154,6 @@ public class FileDataRepairRunner {
             return null;
         }
     }
-
     private Integer standardNumber(String code) {
         if (code == null) return null;
         try {
@@ -178,6 +163,7 @@ public class FileDataRepairRunner {
             return null;
         }
     }
-
-    private String pad3(int n) { return String.format("%03d", n); }
+    private String pad3(int n) {
+        return String.format("%03d", n);
+    }
 }

@@ -1,9 +1,172 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tổng quan Trưởng nhóm tiêu chí</title><link rel="stylesheet" href="/css/app.css"></head>
-<body class="role-page role-leader"><div class="top"><span>◉ Hệ thống ĐBCL - Tự đánh giá & Kiểm định</span><span>Không gian làm việc · Trưởng nhóm tiêu chí</span></div><div class="shell"><aside class="sidebar"><div class="user"></div><nav class="nav"><a href="/truong-nhom">▦ Tổng quan</a><a href="/truong-nhom/thanh-vien">♣ Thành viên nhóm</a><a href="/truong-nhom/phan-cong">⇄ Phân công tiêu chí</a><a href="/truong-nhom/minh-chung">▧ Minh chứng</a><a href="/truong-nhom/tien-do">◷ Theo dõi tiến độ</a><a href="/truong-nhom/bao-cao-nhom">▱ <span>Duyệt báo cáo nhóm</span></a></nav></aside><main class="main">
-<section class="role-hero"><div><span class="hero-kicker">● Trưởng nhóm tiêu chí</span><h1 id="leaderIdentity">Điều phối công việc nhóm</h1><p id="leaderGroupText">Phân công tiêu chí cho thành viên, kiểm tra minh chứng và theo dõi tiến độ của các tiêu chuẩn được giao.</p></div><div class="hero-actions"><a class="btn btn-outline" href="/truong-nhom/tien-do">Theo dõi tiến độ</a><a class="btn btn-primary" href="/truong-nhom/phan-cong">+ Phân công tiêu chí</a></div></section>
-<div class="kpi-grid" id="stats"></div>
-<div class="workspace-grid"><section class="panel-card"><div class="panel-head"><div><h2>Tiêu chuẩn đang phụ trách</h2></div></div><div class="panel-body" id="standards"></div></section><aside class="panel-card"><div class="panel-head"><div><h2>Thao tác nhanh</h2></div></div><div class="panel-body"><div class="quick-links"><a class="quick-link" href="/truong-nhom/phan-cong"><span class="qicon">⇄</span><span><b>Giao tiêu chí</b></span></a><a class="quick-link" href="/truong-nhom/minh-chung"><span class="qicon">✓</span><span><b>Duyệt minh chứng</b></span></a><a class="quick-link" href="/truong-nhom/tien-do"><span class="qicon">◷</span><span><b>Kiểm tra tiến độ</b></span></a></div></div></aside></div>
-</main></div><script src="/js/common.js"></script><script>
-const labels={phanCong:'Công việc của tôi',dangThucHien:'Đang thực hiện',minhChung:'Minh chứng đã tạo',baoCao:'Báo cáo liên quan',nhom:'Nhóm phụ trách'};const icons={phanCong:'⇄',dangThucHien:'◷',minhChung:'▧',baoCao:'▤',nhom:'👥'};
-async function load(){const [d,jobs,me,groups]=await Promise.all([api('/truong-nhom/dashboard'),api('/truong-nhom/cong-viec'),api('/auth/me'),api('/truong-nhom/nhom')]);const led=groups.filter(g=>(g.thanhVienChiTiet||[]).some(v=>v.maNguoiDung===me.id&&v.chucVu==='Trưởng nhóm'));const mainLed=led.filter(g=>(g.loaiNhom||'NHOM_CHINH')!=='NHOM_HO_TRO'),shown=mainLed.length?mainLed:led;const leaderLabels=shown.map(g=>{const name=String(g.tenNhom||'').trim(),n=(name.match(/nhóm\s*(\d+)/i)||String(g.id||'').match(/(\d+)/))?.[1];return n?`Trưởng nhóm ${Number(n)}${name?` · ${name}`:''}`:`Trưởng nhóm · ${name||g.id}`});leaderIdentity.textContent=`${me.hoTen||me.id} · ${leaderLabels.length?leaderLabels.join(' / '):'Trưởng nhóm tiêu chí'}`;leaderGroupText.textContent=shown.length?`Bạn đang đăng nhập với vai trò ${leaderLabels.join(' / ')}.`:'Phân công tiêu chí cho thành viên, kiểm tra minh chứng và theo dõi tiến độ của các tiêu chuẩn được giao.';const keys=['phanCong','dangThucHien','minhChung','baoCao','nhom'];stats.innerHTML=keys.map(k=>`<div class="kpi-card"><div class="kpi-icon">${icons[k]}</div><div class="kpi-value">${d[k]??0}</div><div class="kpi-label">${labels[k]}</div></div>`).join('');const mine=jobs.filter(x=>x.maNguoiDung===me.id&&!x.maTieuChi&&x.trangThai!=='Hủy phân công');standards.innerHTML=mine.length?`<div style="display:flex;gap:10px;flex-wrap:wrap">${mine.map(x=>`<div class="quick-link" style="min-width:230px;flex:1"><span class="qicon">${esc(x.maTieuChuan||'H')}</span><span><b>Tiêu chuẩn ${esc(x.maTieuChuan||'')}</b><small>Nhóm ${esc(x.maNhomTieuChi||'-')} · ${esc(x.trangThai||'')}</small></span></div>`).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">⇄</div><b>Chưa có tiêu chuẩn được giao</b></div>`;}load();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Tổng quan Trưởng nhóm tiêu chí
+  </title>
+  <link href="/css/app.css" rel="stylesheet"/>
+ </head>
+ <body class="role-page role-leader">
+  <div class="top">
+   <span>
+    ◉ Hệ thống ĐBCL - Tự đánh giá &amp; Kiểm định
+   </span>
+   <span>
+    Không gian làm việc · Trưởng nhóm tiêu chí
+   </span>
+  </div>
+  <div class="shell">
+   <aside class="sidebar">
+    <div class="user">
+    </div>
+    <nav class="nav">
+     <a href="/truong-nhom">
+      ▦ Tổng quan
+     </a>
+     <a href="/truong-nhom/thanh-vien">
+      ♣ Thành viên nhóm
+     </a>
+     <a href="/truong-nhom/phan-cong">
+      ⇄ Phân công tiêu chí
+     </a>
+     <a href="/truong-nhom/minh-chung">
+      ▧ Minh chứng
+     </a>
+     <a href="/truong-nhom/tien-do">
+      ◷ Theo dõi tiến độ
+     </a>
+     <a href="/truong-nhom/bao-cao-nhom">
+      ▱
+      <span>
+       Duyệt báo cáo nhóm
+      </span>
+     </a>
+    </nav>
+   </aside>
+   <main class="main">
+    <section class="role-hero">
+     <div>
+      <span class="hero-kicker">
+       ● Trưởng nhóm tiêu chí
+      </span>
+      <h1 id="leaderIdentity">
+       Điều phối công việc nhóm
+      </h1>
+      <p id="leaderGroupText">
+       Phân công tiêu chí cho thành viên, kiểm tra minh chứng và theo dõi tiến độ của các tiêu chuẩn được giao.
+      </p>
+     </div>
+     <div class="hero-actions">
+      <a class="btn btn-outline" href="/truong-nhom/tien-do">
+       Theo dõi tiến độ
+      </a>
+      <a class="btn btn-primary" href="/truong-nhom/phan-cong">
+       + Phân công tiêu chí
+      </a>
+     </div>
+    </section>
+    <div class="kpi-grid" id="stats">
+    </div>
+    <div class="workspace-grid">
+     <section class="panel-card">
+      <div class="panel-head">
+       <div>
+        <h2>
+         Tiêu chuẩn đang phụ trách
+        </h2>
+       </div>
+      </div>
+      <div class="panel-body" id="standards">
+      </div>
+     </section>
+     <aside class="panel-card">
+      <div class="panel-head">
+       <div>
+        <h2>
+         Thao tác nhanh
+        </h2>
+       </div>
+      </div>
+      <div class="panel-body">
+       <div class="quick-links">
+        <a class="quick-link" href="/truong-nhom/phan-cong">
+         <span class="qicon">
+          ⇄
+         </span>
+         <span>
+          <b>
+           Giao tiêu chí
+          </b>
+         </span>
+        </a>
+        <a class="quick-link" href="/truong-nhom/minh-chung">
+         <span class="qicon">
+          ✓
+         </span>
+         <span>
+          <b>
+           Duyệt minh chứng
+          </b>
+         </span>
+        </a>
+        <a class="quick-link" href="/truong-nhom/tien-do">
+         <span class="qicon">
+          ◷
+         </span>
+         <span>
+          <b>
+           Kiểm tra tiến độ
+          </b>
+         </span>
+        </a>
+       </div>
+      </div>
+     </aside>
+    </div>
+   </main>
+  </div>
+  <script src="/js/common.js">
+  </script>
+  <script>
+
+     const labels = {
+    phanCong: 'Công việc của tôi', dangThucHien: 'Đang thực hiện', minhChung: 'Minh chứng đã tạo', baoCao: 'Báo cáo liên quan', nhom: 'Nhóm phụ trách'
+  };
+  const icons = {
+    phanCong: '⇄', dangThucHien: '◷', minhChung: '▧', baoCao: '▤', nhom: '👥'
+  };
+  async function load() {
+    const [d, jobs, me, groups] = await Promise.all([api('/truong-nhom/dashboard'), api('/truong-nhom/cong-viec'), api('/auth/me'), api('/truong-nhom/nhom')]);
+    const led = groups.filter(g => (g.thanhVienChiTiet || []).some(v => v.maNguoiDung === me.id && v.chucVu === 'Trưởng nhóm'));
+    const mainLed = led.filter(g => (g.loaiNhom || 'NHOM_CHINH') !== 'NHOM_HO_TRO'), shown = mainLed.length ? mainLed : led;
+    const leaderLabels = shown.map(g => {
+      const name = String(g.tenNhom || '').trim(), n = (name.match(/nhóm\s*(\d+)/i) || String(g.id || '').match(/(\d+)/))?.[1];
+      return n ? `Trưởng nhóm ${Number(n)}${name ? ` · ${name}` : ''}` : `Trưởng nhóm · ${name || g.id}`;
+    });
+    leaderIdentity.textContent = `${me.hoTen || me.id} · ${leaderLabels.length ? leaderLabels.join(' / ') : 'Trưởng nhóm tiêu chí'}`;
+    leaderGroupText.textContent = shown.length ? `Bạn đang đăng nhập với vai trò ${leaderLabels.join(' / ')}.` : 'Phân công tiêu chí cho thành viên, kiểm tra minh chứng và theo dõi tiến độ của các tiêu chuẩn được giao.';
+    const keys = ['phanCong', 'dangThucHien', 'minhChung', 'baoCao', 'nhom'];
+    stats.innerHTML = keys.map(k => `<div class="kpi-card">
+  <div class="kpi-icon">${icons[k]}</div>
+  <div class="kpi-value">${d[k] ?? 0}</div>
+  <div class="kpi-label">${labels[k]}</div>
+  </div>`).join('');
+    const mine = jobs.filter(x => x.maNguoiDung === me.id && !x.maTieuChi && x.trangThai !== 'Hủy phân công');
+    standards.innerHTML = mine.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap">${mine.map(x => `<div class="quick-link" style="min-width:230px;flex:1">
+  <span class="qicon">${esc(x.maTieuChuan || 'H')}</span>
+  <span>
+  <b>Tiêu chuẩn ${esc(x.maTieuChuan || '')}</b>
+  <small>Nhóm ${esc(x.maNhomTieuChi || '-')} · ${esc(x.trangThai || '')}</small>
+  </span>
+  </div>`).join('')}</div>` : `<div class="empty-state">
+  <div class="empty-icon">⇄</div>
+  <b>Chưa có tiêu chuẩn được giao</b>
+  </div>`;
+  }
+  load();
+</script>
+ </body>
+</html>
+

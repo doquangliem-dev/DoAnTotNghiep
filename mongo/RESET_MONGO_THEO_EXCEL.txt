@@ -862,7 +862,7 @@ groups.forEach(g => {
       diemManhTongHop:"Các tiêu chí được phân công theo file Excel và có nội dung tự đánh giá tương ứng.",
       tonTaiTongHop:"Một số dữ liệu và minh chứng cần tiếp tục hoàn thiện.",
       keHoachCaiTien:"Tiếp tục rà soát, cập nhật và hoàn thiện các nội dung theo phản hồi.",
-      maThuKyNhom:g.maThuKyNhom,maTruongNhom:g.maTruongNhom,trangThai:"Đang tổng hợp",
+      maThuKyNhom:g.maThuKyNhom,maTruongNhom:g.maTruongNhom,trangThai:"Đang tổng hợp",mucDoDuyet:25,capDuyetHienTai:"Thư ký nhóm",
       duongDanFile:`/uploads/bao-cao/BCN${String(bcnNo-1).padStart(3,"0")}_${std}.pdf`,
       tenFileBaoCao:`BCN${String(bcnNo-1).padStart(3,"0")}_${std}.pdf`,
       ngayTao:ISODate("2026-10-01T08:00:00.000Z"),

@@ -17,6 +17,8 @@ public class NhomTieuChi {
     private List<String> thanhVien = new ArrayList<>();
     private List<ThanhVienNhom> thanhVienChiTiet = new ArrayList<>();
     private List<String> tieuChi = new ArrayList<>();
+    // Nhiệm vụ bổ sung theo kế hoạch phân công (ví dụ: CSDL kiểm định).
+    private List<String> nhiemVuBoSung = new ArrayList<>();
     private String trangThai;
     public NhomTieuChi() {
     }
@@ -80,6 +82,8 @@ public class NhomTieuChi {
     public void setTieuChi(List<String> v) {
         tieuChi=v;
     }
+    public List<String> getNhiemVuBoSung() { return nhiemVuBoSung; }
+    public void setNhiemVuBoSung(List<String> v) { nhiemVuBoSung=v; }
     public String getTrangThai() {
         return trangThai;
     }

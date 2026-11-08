@@ -515,6 +515,8 @@ public class HeThongService {
             }
             if(p.getMaNhanSuHoTroList()!=null && p.getMaNhanSuHoTroList().stream().anyMatch(id->!memberIds.contains(id)))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không thể xóa nhân sự hỗ trợ đang có phân công hoạt động");
+            if(p.getMaNguoiPhoiHopList()!=null && p.getMaNguoiPhoiHopList().stream().anyMatch(id->!memberIds.contains(id)))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không thể xóa người đồng phụ trách đang có phân công hoạt động");
         }
         if(!"Hoạt động".equalsIgnoreCase(Optional.ofNullable(x.getTrangThai()).orElse("Hoạt động"))&&!activeInGroup.isEmpty())
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không thể ngừng hoạt động nhóm khi vẫn còn phân công đang hoạt động");
@@ -1442,7 +1444,8 @@ public class HeThongService {
                 && !"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(a.getTrangThai()).orElse(""))
                 && (Objects.equals(a.getMaNguoiDung(),tv.getMaNguoiDung())
                 ||Objects.equals(a.getMaNhanSuHoTro(),tv.getMaNguoiDung())
-                ||(a.getMaNhanSuHoTroList()!=null&&a.getMaNhanSuHoTroList().contains(tv.getMaNguoiDung()))))
+                ||(a.getMaNhanSuHoTroList()!=null&&a.getMaNhanSuHoTroList().contains(tv.getMaNguoiDung()))
+                ||(a.getMaNguoiPhoiHopList()!=null&&a.getMaNguoiPhoiHopList().contains(tv.getMaNguoiDung()))))
                 .toList();
                 long done=jobs.stream().filter(a->"Hoàn thành".equalsIgnoreCase(Optional.ofNullable(a.getTrangThai()).orElse(""))).count();
                 long doing=jobs.stream().filter(a->List.of("Đang thực hiện","Chờ duyệt","Chờ Trưởng nhóm duyệt","Chờ Hội đồng cấp khoa duyệt","Chờ TT QLCL duyệt").contains(Optional.ofNullable(a.getTrangThai()).orElse(""))).count();
@@ -1479,7 +1482,8 @@ public class HeThongService {
     public List<PhanCong> congViecCuaNguoiDung(String userId) {
         return phanCong().stream().filter(p -> (Objects.equals(p.getMaNguoiDung(),userId)
         || Objects.equals(p.getMaNhanSuHoTro(),userId)
-        || (p.getMaNhanSuHoTroList()!=null&&p.getMaNhanSuHoTroList().contains(userId)))
+        || (p.getMaNhanSuHoTroList()!=null&&p.getMaNhanSuHoTroList().contains(userId))
+        || (p.getMaNguoiPhoiHopList()!=null&&p.getMaNguoiPhoiHopList().contains(userId)))
         && !"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse(""))).toList();
     }
     public List<PhanCong> phanCongTrongPhamViTruongNhom(String userId) {
@@ -1718,7 +1722,7 @@ public class HeThongService {
                 boolean mine=leaderRole
                 ? Objects.equals(candidate.getMaNguoiDung(),userId)&&Objects.equals(candidate.getMaTieuChuan(),tc.getMaTieuChuan())
                 &&((candidate.getMaTieuChi()==null||candidate.getMaTieuChi().isBlank())||Objects.equals(candidate.getMaTieuChi(),tc.getId()))
-                : (Objects.equals(candidate.getMaNguoiDung(),userId)||Objects.equals(candidate.getMaNhanSuHoTro(),userId)||(candidate.getMaNhanSuHoTroList()!=null&&candidate.getMaNhanSuHoTroList().contains(userId)))&&Objects.equals(candidate.getMaTieuChi(),tc.getId());
+                : (Objects.equals(candidate.getMaNguoiDung(),userId)||Objects.equals(candidate.getMaNhanSuHoTro(),userId)||(candidate.getMaNhanSuHoTroList()!=null&&candidate.getMaNhanSuHoTroList().contains(userId))||(candidate.getMaNguoiPhoiHopList()!=null&&candidate.getMaNguoiPhoiHopList().contains(userId)))&&Objects.equals(candidate.getMaTieuChi(),tc.getId());
                 if(mine) assignment=candidate;
             }
         }
@@ -1801,7 +1805,7 @@ public class HeThongService {
             if("Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse(""))) return false;
             if(leaderRole) return Objects.equals(p.getMaNguoiDung(),userId)&&Objects.equals(p.getMaTieuChuan(),tc.getMaTieuChuan())
             &&((p.getMaTieuChi()==null||p.getMaTieuChi().isBlank())||Objects.equals(p.getMaTieuChi(),tc.getId()));
-            return (Objects.equals(p.getMaNguoiDung(),userId)||Objects.equals(p.getMaNhanSuHoTro(),userId)||(p.getMaNhanSuHoTroList()!=null&&p.getMaNhanSuHoTroList().contains(userId)))&&Objects.equals(p.getMaTieuChi(),tc.getId());
+            return (Objects.equals(p.getMaNguoiDung(),userId)||Objects.equals(p.getMaNhanSuHoTro(),userId)||(p.getMaNhanSuHoTroList()!=null&&p.getMaNhanSuHoTroList().contains(userId))||(p.getMaNguoiPhoiHopList()!=null&&p.getMaNguoiPhoiHopList().contains(userId)))&&Objects.equals(p.getMaTieuChi(),tc.getId());
         }
         ).findFirst().orElse(null);
     }

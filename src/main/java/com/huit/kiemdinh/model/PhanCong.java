@@ -16,6 +16,8 @@ public class PhanCong {
     private String maNhanSuHoTro;
     // dữ liệu cũ: một nhân sự hỗ trợ
     private List<String> maNhanSuHoTroList;
+    // Người đồng phụ trách chính theo bảng phân công Excel (khác nhân sự hỗ trợ).
+    private List<String> maNguoiPhoiHopList;
     // dữ liệu mới: nhiều nhân sự hỗ trợ
     private String maDotPhanCong;
     // gom nhiều tiêu chí phân trong cùng một lần thành một dòng UI
@@ -80,6 +82,8 @@ public class PhanCong {
     public void setMaNhanSuHoTroList(List<String> v) {
         maNhanSuHoTroList=v;
     }
+    public List<String> getMaNguoiPhoiHopList() { return maNguoiPhoiHopList; }
+    public void setMaNguoiPhoiHopList(List<String> v) { maNguoiPhoiHopList=v; }
     public String getMaDotPhanCong() {
         return maDotPhanCong;
     }

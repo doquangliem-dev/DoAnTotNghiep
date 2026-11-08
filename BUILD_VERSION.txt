@@ -1,10 +1,4 @@
-HeThongKiemDinh - CNTT File/Role/Format Fix v2
-Build date: 2026-11-07
-
-Phạm vi:
-- Nội dung minh chứng/báo cáo theo chương trình CNTT, không dùng nội dung ATTT cho dữ liệu mẫu.
-- Mỗi file có nội dung riêng; giữ nguyên CTĐT gốc.
-- Sửa hiển thị báo cáo nhóm/tiêu chí và nhóm phụ trách.
-- Rà chức năng theo các vai trò.
-- Format lại Java/HTML/JS/CSS để dễ đọc trong VS Code.
-- Loại .env khỏi gói để tránh đưa secret lên GitHub.
+HeThongKiemDinh v6.4
+Fix leader evidence review button scope bug.
+Allow team leaders and members to read/download shared School/Faculty evidence files only.
+Write operations on shared evidence remain Admin-only.

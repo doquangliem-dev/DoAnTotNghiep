@@ -42,6 +42,11 @@ public class StoredFileController {
         || auth.hasRole(session,"Trung tâm Quản lý chất lượng") || auth.hasRole(session,"Quản lý chất lượng")
         || auth.hasRole(session,"Bộ phận khảo thí") || auth.hasRole(session,"Khảo thí")) return true;
         String uid=(String)session.getAttribute(AuthService.SESSION_USER_ID);
+        // Trưởng nhóm và Thành viên được QUYỀN XEM/TẢI minh chứng dùng chung cấp Trường/Khoa.
+        // Quyền ghi vẫn bị khóa ở ApiController: chỉ Quản trị được thêm, sửa, upload hoặc xóa.
+        boolean readSharedEvidence = auth.hasRole(session,"Trưởng nhóm") || auth.hasRole(session,"Thành viên");
+        if(readSharedEvidence && service.minhChungChung().stream().anyMatch(x ->
+            path.equals(x.getDuongDanFile()) || path.equals(x.getDuongDanTaiLieuThamChieu()))) return true;
         if(auth.hasRole(session,"Trưởng nhóm")) {
             if(service.minhChungTruongNhom(uid).stream().anyMatch(x->path.equals(x.getDuongDanFile()))) return true;
             if(service.baoCaoTruongNhom(uid).stream().anyMatch(x->path.equals(x.getDuongDanFile()))) return true;

@@ -376,7 +376,7 @@
   <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
   </td>
   <td>
-  <div class="file-tools"><button class="btn-primary btn-sm" onclick="openReview('${x.id}', canReview ? 'Duyệt' : 'Feedback')">Đánh giá / duyệt</button>${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)">
+  <div class="file-tools"><button class="btn-primary btn-sm" onclick="openReview('${x.id}', '${canReview ? 'Duyệt' : 'Feedback'}')">Đánh giá / duyệt</button>${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)">
   </label>${x.duongDanFile ? `<button class="file-btn delete" onclick="deleteOwnFile('${x.id}')">Xóa file</button>
   <button class="file-btn submit" onclick="submitOwn('${x.id}')">${x.trangThai === 'Từ chối' ? 'Nộp lại' : 'Gửi Thư ký'}</button>` : ''}` : ''}${!canReview && !ownEditable ? '<span class="muted">—</span>' : ''}</div>
   </td>

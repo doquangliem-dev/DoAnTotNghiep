@@ -209,7 +209,7 @@
      let jobs = [], criteria = [], reports = [], editing = null, me = null;
   async function load() {
     [jobs, criteria, reports, me] = await Promise.all([api('/thanh-vien/cong-viec'), api('/tieu-chi'), api('/thanh-vien/bao-cao'), api('/auth/me')]);
-    const ids = new Set(jobs.filter(x => x.maTieuChi && x.maNguoiDung === me.id).map(x => x.maTieuChi));
+    const ids = new Set(jobs.filter(x => x.maTieuChi && (x.maNguoiDung === me.id || (x.maNguoiPhoiHopList || []).includes(me.id))).map(x => x.maTieuChi));
     criterion.innerHTML = '<option value="">-- Chọn tiêu chí để soạn báo cáo --</option>' + criteria.filter(c => ids.has(c.id)).map(c => `<option value="${c.id}">${criterionCode(c.id)} - ${esc(c.tenTieuChi)}</option>`).join('');
     render();
   }
@@ -326,7 +326,7 @@
     }
   async function saveReport() {
     const c = criteria.find(x => x.id === criterion.value), requested = status.value;
-    const job = jobs.find(x => x.maTieuChi === criterion.value && x.maNguoiDung === me.id);
+    const job = jobs.find(x => x.maTieuChi === criterion.value && (x.maNguoiDung === me.id || (x.maNguoiPhoiHopList || []).includes(me.id)));
     const payload = {
       id: editing?.id || null, maPhanCong: job?.id || null, maTieuChi: criterion.value, maTieuChuan: c?.maTieuChuan, nhanDeTieuChi: c?.tenTieuChi, moTaHienTrang: hientrang.value, diemManh: manh.value, diemTonTai: tontai.value, keHoachHanhDong: kehoach.value, trangThai: 'Đang soạn'
     };

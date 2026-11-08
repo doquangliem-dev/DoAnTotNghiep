@@ -294,7 +294,7 @@
   async function load() {
     me = await api('/auth/me');
     [all, criteria, jobs, reviews, common] = await Promise.all([api('/thanh-vien/minh-chung'), api('/tieu-chi'), api('/thanh-vien/cong-viec'), api('/thanh-vien/danh-gia-minh-chung'), api('/minh-chung-chung')]);
-    let ids = new Set(jobs.filter(x => (x.maNguoiDung === me.id || x.maNhanSuHoTro === me.id || (Array.isArray(x.maNhanSuHoTroList) && x.maNhanSuHoTroList.includes(me.id))) && x.maTieuChi && x.trangThai !== 'Hủy phân công').map(x => x.maTieuChi));
+    let ids = new Set(jobs.filter(x => (x.maNguoiDung === me.id || x.maNhanSuHoTro === me.id || (Array.isArray(x.maNhanSuHoTroList) && x.maNhanSuHoTroList.includes(me.id)) || (Array.isArray(x.maNguoiPhoiHopList) && x.maNguoiPhoiHopList.includes(me.id))) && x.maTieuChi && x.trangThai !== 'Hủy phân công').map(x => x.maTieuChi));
     allowed = criteria.filter(c => ids.has(c.id));
     criterion.innerHTML = '<option value="">-- Chọn tiêu chí được giao --</option>' + allowed.map(c => `<option value="${c.id}">${c.id} - ${esc(c.tenTieuChi)}</option>`).join('');
     render();
@@ -350,7 +350,7 @@
     try {
       let x = await api('/thanh-vien/minh-chung', {
         method: 'POST', body: JSON.stringify({
-          maTieuChi: criterion.value, maPhanCong: jobs.find(j => j.maTieuChi === criterion.value && (j.maNguoiDung === me.id || j.maNhanSuHoTro === me.id || (Array.isArray(j.maNhanSuHoTroList) && j.maNhanSuHoTroList.includes(me.id))))?.id || null, tenMinhChung: name.value.trim(), moTa: name.value.trim()
+          maTieuChi: criterion.value, maPhanCong: jobs.find(j => j.maTieuChi === criterion.value && (j.maNguoiDung === me.id || j.maNhanSuHoTro === me.id || (Array.isArray(j.maNhanSuHoTroList) && j.maNhanSuHoTroList.includes(me.id)) || (Array.isArray(j.maNguoiPhoiHopList) && j.maNguoiPhoiHopList.includes(me.id))))?.id || null, tenMinhChung: name.value.trim(), moTa: name.value.trim()
         })
       });
       if (file.files[0]) {

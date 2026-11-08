@@ -1925,16 +1925,26 @@ public class HeThongService {
         return dgmcRepo.save(dg);
     }
     public List<BaoCaoTieuChi> baoCaoCuaNguoiDung(String userId) {
-        return baoCao().stream().filter(x->Objects.equals(x.getMaNguoiViet(),userId)).toList();
+        Set<String> assignedCriterionIds=congViecCuaNguoiDung(userId).stream()
+            .filter(p->p.getMaTieuChi()!=null&&!p.getMaTieuChi().isBlank())
+            .map(PhanCong::getMaTieuChi).collect(java.util.stream.Collectors.toSet());
+        return baoCao().stream().filter(x->Objects.equals(x.getMaNguoiViet(),userId)
+            || assignedCriterionIds.contains(x.getMaTieuChi())).toList();
     }
     public BaoCaoTieuChi luuBaoCaoThanhVien(BaoCaoTieuChi x,String userId) {
         if(x.getMaTieuChi()==null||x.getMaTieuChi().isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Vui lòng chọn tiêu chí");
         PhanCong assignment=null;
         if(x.getMaPhanCong()!=null&&!x.getMaPhanCong().isBlank()) {
             PhanCong candidate=pcRepo.findById(x.getMaPhanCong()).orElse(null);
-            if(candidate!=null&&Objects.equals(candidate.getMaNguoiDung(),userId)&&Objects.equals(candidate.getMaTieuChi(),x.getMaTieuChi())&&!"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(candidate.getTrangThai()).orElse(""))) assignment=candidate;
+            if(candidate!=null&&(Objects.equals(candidate.getMaNguoiDung(),userId)
+                ||(candidate.getMaNguoiPhoiHopList()!=null&&candidate.getMaNguoiPhoiHopList().contains(userId)))
+                &&Objects.equals(candidate.getMaTieuChi(),x.getMaTieuChi())
+                &&!"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(candidate.getTrangThai()).orElse(""))) assignment=candidate;
         }
-        if(assignment==null) assignment=pcRepo.findAll().stream().filter(p->Objects.equals(p.getMaNguoiDung(),userId)&&Objects.equals(p.getMaTieuChi(),x.getMaTieuChi())&&!"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse(""))).findFirst().orElse(null);
+        if(assignment==null) assignment=pcRepo.findAll().stream().filter(p->(Objects.equals(p.getMaNguoiDung(),userId)
+            ||(p.getMaNguoiPhoiHopList()!=null&&p.getMaNguoiPhoiHopList().contains(userId)))
+            &&Objects.equals(p.getMaTieuChi(),x.getMaTieuChi())
+            &&!"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse(""))).findFirst().orElse(null);
         if(assignment==null) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chưa được phân công tiêu chí này");
         // Việc chuyển sang "Chờ duyệt" chỉ được thực hiện qua endpoint gui-duyet.
         // Khi lưu nội dung, backend luôn giữ báo cáo ở trạng thái có thể chỉnh sửa để tránh
@@ -1946,7 +1956,8 @@ public class HeThongService {
         BaoCaoTieuChi old=null;
         if(x.getId()!=null&&!x.getId().isBlank()) {
             old=bcRepo.findById(x.getId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy báo cáo"));
-            if(!Objects.equals(old.getMaNguoiViet(),userId)) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được sửa báo cáo do chính mình viết");
+            boolean collaborator=assignment.getMaNguoiPhoiHopList()!=null&&assignment.getMaNguoiPhoiHopList().contains(userId);
+            if(!Objects.equals(old.getMaNguoiViet(),userId)&&!collaborator) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không thuộc nhóm phụ trách báo cáo này");
             if(!Objects.equals(old.getMaTieuChi(),x.getMaTieuChi())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không được đổi tiêu chí của báo cáo");
             String oldState=Optional.ofNullable(old.getTrangThai()).orElse("Đang soạn");
             if("Đã duyệt".equalsIgnoreCase(oldState)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Báo cáo đã duyệt và đã được khóa");
@@ -1954,12 +1965,13 @@ public class HeThongService {
             x.setDuyetBaoCao(old.getDuyetBaoCao());
         } else {
             String planId=assignment.getMaKeHoach();
-            boolean duplicate=bcRepo.findAll().stream().anyMatch(b->Objects.equals(b.getMaNguoiViet(),userId)&&Objects.equals(b.getMaTieuChi(),x.getMaTieuChi())&&Objects.equals(Optional.ofNullable(b.getMaKeHoach()).orElse(""),Optional.ofNullable(planId).orElse("")));
+            boolean duplicate=bcRepo.findAll().stream().anyMatch(b->Objects.equals(b.getMaTieuChi(),x.getMaTieuChi())&&Objects.equals(Optional.ofNullable(b.getMaKeHoach()).orElse(""),Optional.ofNullable(planId).orElse("")));
             if(duplicate) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Bạn đã có báo cáo cho tiêu chí này, hãy cập nhật báo cáo hiện có");
         }
         x.setMaPhanCong(assignment.getId());
         x.setMaKeHoach(assignment.getMaKeHoach());
-        x.setMaNguoiViet(userId);
+        // Người phụ trách chính vẫn là chủ thể báo cáo; người phối hợp được quyền cập nhật nội dung.
+        x.setMaNguoiViet(assignment.getMaNguoiDung());
         BaoCaoTieuChi saved=saveBaoCao(x);
         markAssignmentInProgress(assignment.getId());
         return saved;
@@ -2002,7 +2014,10 @@ public class HeThongService {
     public BaoCaoTieuChi uploadBaoCaoThanhVien(String id,MultipartFile file,String userId) {
         if(file==null||file.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Vui lòng chọn file báo cáo");
         BaoCaoTieuChi bc=bcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy báo cáo"));
-        if(!Objects.equals(bc.getMaNguoiViet(),userId)) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được tải file cho báo cáo của mình");
+        PhanCong uploadAssignment=pcRepo.findById(bc.getMaPhanCong()).orElse(null);
+        boolean uploadAllowed=uploadAssignment!=null&&(Objects.equals(uploadAssignment.getMaNguoiDung(),userId)
+            ||(uploadAssignment.getMaNguoiPhoiHopList()!=null&&uploadAssignment.getMaNguoiPhoiHopList().contains(userId)));
+        if(!uploadAllowed) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không thuộc nhóm phụ trách báo cáo này");
         if(Optional.ofNullable(bc.getTrangThai()).orElse("").startsWith("Chờ ")||"Đã duyệt".equalsIgnoreCase(bc.getTrangThai()))
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Báo cáo đang/đã duyệt nên không thể thay file");
         String original=Optional.ofNullable(file.getOriginalFilename()).orElse("baocao.pdf");
@@ -2020,8 +2035,10 @@ public class HeThongService {
     }
     public BaoCaoTieuChi deleteBaoCaoThanhVienFile(String id,String userId) {
         BaoCaoTieuChi bc=bcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy báo cáo"));
-        if(!Objects.equals(bc.getMaNguoiViet(),userId))
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn chỉ được xóa file báo cáo của mình");
+        PhanCong deleteAssignment=pcRepo.findById(bc.getMaPhanCong()).orElse(null);
+        boolean deleteAllowed=deleteAssignment!=null&&(Objects.equals(deleteAssignment.getMaNguoiDung(),userId)
+            ||(deleteAssignment.getMaNguoiPhoiHopList()!=null&&deleteAssignment.getMaNguoiPhoiHopList().contains(userId)));
+        if(!deleteAllowed) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không thuộc nhóm phụ trách báo cáo này");
         String state=Optional.ofNullable(bc.getTrangThai()).orElse("Đang soạn");
         if(!List.of("Đang soạn","Yêu cầu chỉnh sửa").contains(state))
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Báo cáo đã nộp nên file đã được khóa");

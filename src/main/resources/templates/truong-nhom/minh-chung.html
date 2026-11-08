@@ -334,7 +334,7 @@
     all = evidenceData || [];
     criteria = criteriaData || [];
     jobs = jobsData || [];
-    let ids = new Set(jobs.filter(x => x.maNguoiDung === me.id && x.maTieuChi && x.trangThai !== 'Hủy phân công').map(x => x.maTieuChi));
+    let ids = new Set(jobs.filter(x => (x.maNguoiDung === me.id || (x.maNguoiPhoiHopList || []).includes(me.id) || (x.maNhanSuHoTroList || []).includes(me.id) || x.maNhanSuHoTro === me.id) && x.maTieuChi && x.trangThai !== 'Hủy phân công').map(x => x.maTieuChi));
     let stds = new Set(jobs.filter(x => x.maNguoiDung === me.id && !x.maTieuChi && x.trangThai !== 'Hủy phân công').map(x => x.maTieuChuan));
     let evidenceIds = new Set(all.map(x => x.maTieuChi).filter(Boolean));
     allowed = criteria.filter(c => ids.has(c.id) || stds.has(c.maTieuChuan) || evidenceIds.has(c.id));

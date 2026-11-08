@@ -233,7 +233,7 @@
   const uname = id => users.find(x => x.id === id)?.hoTen || id || '-';
   const viewFile = x => x?.duongDanFile ? `<a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>` : '<span class="muted">Chưa có file</span>';
   async function load() {
-    [parts, criteria, groupReports, users] = await Promise.all([api('/khao-thi/bao-cao-phan'), api('/khao-thi/bao-cao'), api('/khao-thi/bao-cao-nhom'), api('/nguoi-dung')]);
+    [parts, criteria, groupReports, users] = await Promise.all([api('/khao-thi/bao-cao-phan'), api('/khao-thi/bao-cao'), api('/khao-thi/bao-cao-nhom'), api('/danh-sach-nguoi-dung')]);
     partRows.innerHTML = parts.map(x => `<tr>
   <td>${esc(x.id)}</td>
   <td>${esc(x.tenPhan || ('Phần ' + x.soPhan))}</td>
@@ -267,10 +267,11 @@
   </td>
   <td>${x.duongDanFile ? esc(x.tenFileBaoCao || 'Đã có file') : '<span class="muted">Chưa có file</span>'}</td>
   <td>
-  <div class="actions">${viewFile(x)}${x.trangThai === 'Chờ TT QLCL duyệt' ? `<button class="btn-primary" onclick="openReview('criterion','${x.id}')">Xử lý</button>` : ''}</div>
+  <div class="actions">${viewFile(x)}<button class="btn-light" onclick="quickFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickFeedback('${x.id}','Đánh giá')">Đánh giá</button>${x.trangThai === 'Chờ TT QLCL duyệt' ? `<button class="btn-primary" onclick="openReview('criterion','${x.id}')">Đánh giá / duyệt</button>` : ''}</div>
   </td>
   </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có báo cáo tiêu chí</td></tr>';
   }
+  async function quickFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho báo cáo:'); if(!note || !note.trim()) return; try { await api('/khao-thi/bao-cao/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái duyệt không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
   function openReview(m, id) {
     mode = m;
     current = id;

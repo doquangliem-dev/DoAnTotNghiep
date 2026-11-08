@@ -213,7 +213,7 @@
   const userName = id => users.find(x => x.id === id)?.hoTen || id || '';
   const tcName = id => criteria.find(x => x.id === id)?.tenTieuChi || '';
   async function load() {
-    [bc, parts, users, criteria, standards] = await Promise.all([api('/hoi-dong/bao-cao?_=' + Date.now()), api('/hoi-dong/bao-cao-phan?_=' + Date.now()), api('/nguoi-dung'), api('/tieu-chi'), api('/tieu-chuan')]);
+    [bc, parts, users, criteria, standards] = await Promise.all([api('/hoi-dong/bao-cao?_=' + Date.now()), api('/hoi-dong/bao-cao-phan?_=' + Date.now()), api('/danh-sach-nguoi-dung'), api('/tieu-chi'), api('/tieu-chuan')]);
     fTc.innerHTML = '<option value="">Tất cả tiêu chuẩn</option>' + standards.map(x => `<option value="${esc(x.id)}">${esc(standardCode(x.id))} - ${esc(x.tenTieuChuan || '')}</option>`).join('');
     render();
     renderParts();
@@ -236,7 +236,7 @@
   <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
   </td>
   <td>
-  <div class="actions">${x.trangThai === 'Chờ Hội đồng cấp khoa duyệt' ? `<button class="btn-primary" onclick="openDuyet('${x.id}')">Xử lý</button>` : '<span class="muted">—</span>'}</div>
+  <div class="actions"><button class="btn-light" onclick="quickFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickFeedback('${x.id}','Đánh giá')">Đánh giá</button>${x.trangThai === 'Chờ Hội đồng cấp khoa duyệt' ? `<button class="btn-primary" onclick="openDuyet('${x.id}')">Đánh giá / duyệt</button>` : ''}</div>
   </td>
   </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có báo cáo thuộc bước Hội đồng</td></tr>';
   }
@@ -300,6 +300,7 @@
       alert(e.message);
     }
     }
+  async function quickFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho báo cáo:'); if(!note || !note.trim()) return; try { await api('/hoi-dong/bao-cao/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái duyệt không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
   q.oninput = render;
   fTc.onchange = render;
   fStatus.onchange = render;

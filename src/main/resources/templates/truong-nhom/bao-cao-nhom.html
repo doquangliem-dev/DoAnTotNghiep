@@ -289,10 +289,11 @@
     btn.classList.add('active');
   }
   async function load() {
-    [reports, groupReports, groups, users, criteria] = await Promise.all([api('/truong-nhom/bao-cao?_=' + Date.now()), api('/truong-nhom/bao-cao-nhom?_=' + Date.now()), api('/truong-nhom/nhom?_=' + Date.now()), api('/nguoi-dung'), api('/tieu-chi')]);
+    [reports, groupReports, groups, users, criteria] = await Promise.all([api('/truong-nhom/bao-cao?_=' + Date.now()), api('/truong-nhom/bao-cao-nhom?_=' + Date.now()), api('/truong-nhom/nhom?_=' + Date.now()), api('/danh-sach-nguoi-dung'), api('/tieu-chi')]);
     renderCriterion();
     renderGroup();
   }
+  async function quickFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho báo cáo:'); if(!note || !note.trim()) return; try { await api('/truong-nhom/bao-cao/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái duyệt không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
   function renderCriterion() {
     const q = qCriterion.value.toLowerCase(), st = criterionStatus.value;
     criterionRows.innerHTML = reports.filter(x => (!q || JSON.stringify(x).toLowerCase().includes(q) || userName(x.maNguoiViet).toLowerCase().includes(q)) && (!st || x.trangThai === st)).map(x => `<tr>
@@ -311,7 +312,7 @@
   <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
   </td>
   <td>
-  <div class="actions">${x.trangThai === 'Chờ Trưởng nhóm duyệt' ? `<button class="btn-primary" onclick="openCriterionReview('${x.id}')">Duyệt</button>` : '<span class="muted">—</span>'}</div>
+  <div class="actions"><button class="btn-light" onclick="quickFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickFeedback('${x.id}','Đánh giá')">Đánh giá</button>${x.trangThai === 'Chờ Trưởng nhóm duyệt' ? `<button class="btn-primary" onclick="openCriterionReview('${x.id}')">Đánh giá / duyệt</button>` : ''}</div>
   </td>
   </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có báo cáo tiêu chí trong phạm vi nhóm</td></tr>';
   }

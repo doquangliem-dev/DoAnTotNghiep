@@ -15,7 +15,7 @@
 - Bổ sung hiển thị lỗi toàn cục ở giao diện thay vì lỗi API nhưng màn hình im lặng.
 - Trang Quản lý CTĐT có xử lý lỗi tải dữ liệu rõ ràng.
 - Bổ sung bộ khởi tạo dữ liệu MongoDB bằng **đúng Java model** để tránh dữ liệu cũ sai kiểu gây lỗi mapping.
-- Nếu dữ liệu nghiệp vụ đang thiếu/hỏng, hệ thống tự tạo lại bộ demo chuẩn nhưng **không xóa collection người dùng/vai trò**.
+- Seeder chỉ khởi tạo bộ demo khi các collection nghiệp vụ đang trống. Nếu database đã có dữ liệu nhưng thiếu/sai cấu trúc, hệ thống bỏ qua và ghi cảnh báo; không tự xóa collection hoặc ghi đè hồ sơ hiện có.
 - Giữ bảo vệ `/nhan-su-bao-cao` và `/api/admin/mongo-check`.
 - Không dùng Spring Boot DevTools để tránh lỗi Windows khóa file trong `target`.
 
@@ -28,7 +28,7 @@
 - Mỗi nhóm có Trưởng nhóm, Thư ký nhóm và Thành viên.
 - Thư ký nhóm vẫn mang vai trò hệ thống `VT004 - Thành viên nhóm`, chức vụ được lưu trong nhóm.
 - Mỗi Thành viên/Thư ký nhóm tối đa 2 Tiêu chí trong cùng nhóm/kế hoạch.
-- Phiên bản CTĐT chỉ dùng năm chẵn: 2022, 2024, 2026...
+- Phiên bản CTĐT chỉ dùng năm chẵn. Trong source hiện tại chỉ có tài liệu nguồn xác thực cho PB2022 và PB2024; PB2024 là phiên bản mới nhất đang áp dụng. Chỉ bổ sung PB2026 khi có tài liệu CTĐT 2026 thực tế.
 
 ## 7 vai trò hệ thống
 - `VT001` Quản trị
@@ -53,14 +53,15 @@ Workflow minh chứng:
 `Thành viên 30% -> Trưởng nhóm 60% -> Thư ký chương trình 100%`.
 
 ## Tự tạo dữ liệu demo
-Mặc định:
+Mặc định trong `application.properties`, Dockerfile và Render là `false`:
 ```properties
-app.seed-demo-data=true
+app.seed-demo-data=false
 ```
+Chỉ bật seed demo có chủ đích trên database thử nghiệm.
 
-Khi MongoDB đang trống hoặc bộ dữ liệu nghiệp vụ không đủ 8 tiêu chuẩn / 52 tiêu chí / 5 nhóm / 60 phân công, ứng dụng sẽ tạo lại dữ liệu nghiệp vụ chuẩn.
+Khi các collection nghiệp vụ đang trống, ứng dụng khởi tạo bộ dữ liệu demo chuẩn. Nếu phát hiện dữ liệu hiện hữu không đồng bộ (kể cả số lượng thừa/thiếu), ứng dụng không tự reset; seeder ghi cảnh báo và dừng để tránh mất dữ liệu người dùng. Việc sửa dữ liệu hiện hữu phải thực hiện bằng migration có phạm vi, sau khi sao lưu và đối chiếu.
 
-Nếu database đã đầy đủ và đọc được bằng model hiện tại, dữ liệu nghiệp vụ **không bị reset mỗi lần restart**.
+Nếu database đã có dữ liệu, seeder không xóa collection để ép về bộ demo. Dữ liệu hiện hữu được giữ nguyên để rà soát/migration riêng.
 
 Có thể tắt bằng:
 ```powershell
@@ -109,6 +110,10 @@ Sau khi seed thành công, log có dòng dạng:
 - Thư ký chương trình: `/thu-ky`
 - Bộ phận khảo thí / QLCL: `/khao-thi`
 - Nhân sự phụ trách báo cáo: `/nhan-su-bao-cao`
+
+## Cảnh báo script reset MongoDB
+
+`mongo/RESET_MONGO_THEO_EXCEL.js` và `.txt` có lệnh `db.dropDatabase()` và sẽ xóa toàn bộ database đang chọn. Đây là script lưu trữ cho môi trường demo; tuyệt đối không chạy trên MongoDB thật/production. Ưu tiên seeder an toàn và migration có phạm vi.
 
 ## Sửa lỗi seed dữ liệu nhóm
 Bản sửa này phát hiện cả dữ liệu demo bị **thừa**. Ví dụ MongoDB cũ còn 6 nhóm trong khi hệ thống yêu cầu đúng 5 nhóm, Seeder sẽ tự dọn các collection nghiệp vụ demo và tạo lại bộ dữ liệu chuẩn thay vì dừng ứng dụng ở bước `validateSeed()`.

@@ -231,7 +231,8 @@
      let data = [], assignments = [], groups = [], plans = [], standards = [], secretaryInfo = null, sourceReady = false;
   async function load() {
     try {
-      [data, assignments, groups, plans, standards, secretaryInfo] = await Promise.all([api('/thanh-vien/thu-ky-nhom/bao-cao-nhom?_=' + Date.now()), api('/thanh-vien/thu-ky-nhom/phan-cong?_=' + Date.now()), api('/nhom-tieu-chi'), api('/ke-hoach'), api('/tieu-chuan'), api('/thanh-vien/thu-ky-nhom/thong-tin')]);
+      [data, assignments, plans, standards, secretaryInfo] = await Promise.all([api('/thanh-vien/thu-ky-nhom/bao-cao-nhom?_=' + Date.now()), api('/thanh-vien/thu-ky-nhom/phan-cong?_=' + Date.now()), api('/ke-hoach'), api('/tieu-chuan'), api('/thanh-vien/thu-ky-nhom/thong-tin')]);
+      groups = secretaryInfo?.nhom || [];
       if (!secretaryInfo?.laThuKyNhom) {
         document.querySelector('.main').innerHTML = '';
         return;

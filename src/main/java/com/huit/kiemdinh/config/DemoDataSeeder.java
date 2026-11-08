@@ -38,8 +38,18 @@ public class DemoDataSeeder implements ApplicationRunner {
             return;
         }
         try {
-            seedRolesAndUsers();
             boolean repair = needsRepair();
+            if (repair && hasAnyOperationalData()) {
+                System.err.println("[SEED SAFETY] Dữ liệu nghiệp vụ hiện có không khớp bộ demo chuẩn. "
+                    + "Đã bỏ qua seed/repair để bảo toàn dữ liệu người dùng; không xóa collection. "
+                    + "Cần kiểm tra và lập phương án migration có phạm vi trước khi cập nhật.");
+                dataState.markReady();
+                return;
+            }
+
+            // Chỉ tạo mới bộ demo khi các collection nghiệp vụ hoàn toàn trống.
+            // Không tự xóa dữ liệu hiện hữu để ép database về số lượng mẫu.
+            seedRolesAndUsers();
             if (!repair) {
                 repairDemoEvidenceFiles();
                 repairEvidenceApprovalWorkflow();
@@ -49,7 +59,7 @@ public class DemoDataSeeder implements ApplicationRunner {
                 dataState.markReady();
                 return;
             }
-            System.out.println("[SEED] Dữ liệu nghiệp vụ thiếu/không đồng bộ -> tạo lại bộ demo chuẩn trên các collection nghiệp vụ.");
+            System.out.println("[SEED] Database nghiệp vụ đang trống -> khởi tạo bộ dữ liệu demo chuẩn.");
             clearOperationalDemoData();
             seedMoet();
             seedCtdt();
@@ -124,9 +134,16 @@ public class DemoDataSeeder implements ApplicationRunner {
             if (mongo.getCollection("baoCaoPhan").countDocuments() != 3) return true;
             if (mongo.getCollection("phanCongBaoCao").countDocuments() != 3) return true;
             ChuongTrinhDaoTao c = mongo.findById("CTDT001", ChuongTrinhDaoTao.class);
-            if (c == null || c.getPhienBan() == null || c.getPhienBan().size() < 3) return true;
+            if (c == null || c.getPhienBan() == null || c.getPhienBan().size() < 2) return true;
             for (PhienBanCTDT p : c.getPhienBan()) {
-                if (p == null || p.getNamPhienBan() == null || p.getNamPhienBan() % 2 != 0) return true;
+                if (p == null || p.getNamPhienBan() == null || p.getNamPhienBan() % 2 != 0
+                    || "PB2026".equals(p.getMaPhienBan())) return true;
+            }
+            for (String[] group : GROUPS) {
+                NhomTieuChi actual = mongo.findById(group[0], NhomTieuChi.class);
+                List<String> expectedStandards = Arrays.asList(group[5].split(","));
+                if (actual == null || actual.getTieuChuanPhuTrach() == null
+                    || !new HashSet<>(actual.getTieuChuanPhuTrach()).equals(new HashSet<>(expectedStandards))) return true;
             }
             BoTieuChuan b = mongo.findById("MOET", BoTieuChuan.class);
             return b == null || !Objects.equals(b.getTongSoTieuChuan(), 8) || !Objects.equals(b.getTongSoTieuChi(), 52);
@@ -135,6 +152,22 @@ public class DemoDataSeeder implements ApplicationRunner {
             return true;
         }
     }
+    private boolean hasAnyOperationalData() {
+        String[] collections = {
+            "chuongTrinhDaoTao", "boTieuChuan", "tieuChuan", "tieuChi", "nhomTieuChi",
+            "phanCong", "minhChung", "minhChungChung", "danhGiaMinhChung",
+            "baoCaoTieuChi", "baoCaoNhom", "baoCaoTuDanhGia", "baoCaoPhan", "phanCongBaoCao",
+            "danhGiaTieuChi", "tienDo", "thongBao", "lichSuThaoTac", "keHoachTuDanhGia"
+        };
+        for (String collection : collections) {
+            if (mongo.collectionExists(collection)
+                && mongo.getCollection(collection).countDocuments() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void clearOperationalDemoData() {
         String[] collections = {
             "chuongTrinhDaoTao","boTieuChuan","tieuChuan","tieuChi","nhomTieuChi",
@@ -615,13 +648,14 @@ public class DemoDataSeeder implements ApplicationRunner {
         c.setNgayCapNhat(c.getNgayTao());
         List<PhienBanCTDT> versions = new ArrayList<>();
         versions.add(version(2022,1,"Đã ban hành",new ArrayList<>()));
-        versions.add(version(2024,2,"Đã ban hành",new ArrayList<>()));
         List<ChuanDauRaPLO> plos = new ArrayList<>();
         plos.add(plo("PLO1","Kiến thức chuyên môn","Vận dụng kiến thức chuyên môn để giải quyết vấn đề.","Kiến thức",4,1));
         plos.add(plo("PLO2","Kỹ năng nghề nghiệp","Phân tích, thiết kế và triển khai giải pháp công nghệ thông tin.","Kỹ năng",4,2));
         plos.add(plo("PLO3","Giao tiếp và làm việc nhóm","Giao tiếp và phối hợp hiệu quả trong môi trường nghề nghiệp.","Kỹ năng",4,3));
         plos.add(plo("PLO4","Tự chủ và trách nhiệm","Có khả năng tự học, thích ứng và chịu trách nhiệm nghề nghiệp.","Mức tự chủ và trách nhiệm",4,4));
-        versions.add(version(2026,3,"Đang áp dụng",plos));
+        // Chỉ sử dụng phiên bản CTĐT có tài liệu nguồn xác thực trong storage-seed.
+        // Hiện PB2024 là tài liệu mới nhất; không tạo PB2026 bằng cách sao chép PB2024.
+        versions.add(version(2024,2,"Đang áp dụng",plos));
         c.setPhienBan(versions);
         mongo.save(c);
     }
@@ -654,7 +688,7 @@ public class DemoDataSeeder implements ApplicationRunner {
         k.setId(PLAN_ID);
         k.setTenKeHoach("Kế hoạch tự đánh giá CTĐT ngành Công nghệ thông tin năm 2026");
         k.setMaCTDT("CTDT001");
-        k.setMaPhienBanCTDT("PB2026");
+        k.setMaPhienBanCTDT("PB2024");
         k.setMaBoTieuChuan("MOET");
         k.setNgayBatDau(LocalDate.of(2026,9,1));
         k.setNgayKetThuc(LocalDate.of(2026,12,31));
@@ -670,23 +704,23 @@ public class DemoDataSeeder implements ApplicationRunner {
     }
     private static final String[][] GROUPS = {
         {
-            "NT001","Nhóm công tác 1","ND010","ND015","ND020,ND021,ND022,ND023,ND024","TC1,TC6"
+            "NT001","Nhóm công tác 1","ND010","ND015","ND020,ND021,ND022,ND023,ND024,ND047","TC1,TC2"
         }
         ,
         {
-            "NT002","Nhóm công tác 2","ND011","ND016","ND025,ND026,ND027,ND028,ND029","TC2,TC8"
+            "NT002","Nhóm công tác 2","ND011","ND016","ND025,ND026,ND027,ND028,ND029","TC3,TC4"
         }
         ,
         {
-            "NT003","Nhóm công tác 3","ND012","ND017","ND030,ND031,ND032,ND033,ND034","TC3,TC4"
+            "NT003","Nhóm công tác 3","ND012","ND017","ND030,ND031,ND032,ND033,ND034","TC5"
         }
         ,
         {
-            "NT004","Nhóm công tác 4","ND013","ND018","ND035,ND036,ND037,ND038,ND039","TC5"
+            "NT004","Nhóm công tác 4","ND013","ND018","ND035,ND036,ND037,ND038,ND039,ND048","TC6,TC7"
         }
         ,
         {
-            "NT005","Nhóm công tác 5","ND014","ND019","ND040,ND041,ND042,ND043,ND044","TC7"
+            "NT005","Nhóm công tác 5","ND014","ND019","ND040,ND041,ND042,ND043,ND044","TC8"
         }
     }
     ;
@@ -939,7 +973,7 @@ public class DemoDataSeeder implements ApplicationRunner {
         b.setId("BCTDG001");
         b.setMaKeHoach(PLAN_ID);
         b.setMaCTDT("CTDT001");
-        b.setMaPhienBanCTDT("PB2026");
+        b.setMaPhienBanCTDT("PB2024");
         b.setTenBaoCao("Báo cáo tự đánh giá chương trình đào tạo ngành Công nghệ thông tin năm 2026");
         b.setPhienBanBaoCao(1);
         List<Map<String,Object>> structure = new ArrayList<>();

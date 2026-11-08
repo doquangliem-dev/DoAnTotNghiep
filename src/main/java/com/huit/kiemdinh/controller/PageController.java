@@ -1,5 +1,8 @@
 package com.huit.kiemdinh.controller;
 import org.springframework.stereotype.Controller;
+import com.huit.kiemdinh.security.AuthService;
+import com.huit.kiemdinh.service.HeThongService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.MediaType;
@@ -9,6 +12,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 @Controller
 public class PageController {
+    private final HeThongService service;
+    private final AuthService auth;
+    public PageController(HeThongService service, AuthService auth) { this.service=service; this.auth=auth; }
     @GetMapping("/") public String root() {
         return "redirect:/login";
     }
@@ -84,8 +90,9 @@ public class PageController {
     @GetMapping("/thanh-vien/bao-cao") public String tvBc() {
         return "thanh-vien/bao-cao";
     }
-    @GetMapping("/thanh-vien/tong-hop-nhom") public String tvBcn() {
-        return "thanh-vien/tong-hop-nhom";
+    @GetMapping("/thanh-vien/tong-hop-nhom") public String tvBcn(HttpSession session) {
+        String userId=(String)session.getAttribute(AuthService.SESSION_USER_ID);
+        return service.laThuKyCuaNhom(userId) ? "thanh-vien/tong-hop-nhom" : "redirect:/thanh-vien";
     }
     @GetMapping("/thu-ky") public String tk() {
         return "thu-ky/dashboard";

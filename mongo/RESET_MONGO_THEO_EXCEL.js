@@ -1,3 +1,5 @@
+// DANGER: DESTRUCTIVE ARCHIVE SCRIPT. db.dropDatabase() xoa TOAN BO database HeThongKiemDinh.
+// KHONG CHAY tren database that/production. Chi duoc dung tren database demo tam sau khi backup va co chap thuan ro rang.
 use;
 HeThongKiemDinh;
 db.dropDatabase();

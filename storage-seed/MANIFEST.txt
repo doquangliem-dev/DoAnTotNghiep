@@ -63,7 +63,6 @@ bao-cao/BCP003_Phan3_KetLuan.pdf
 bao-cao/BCP004_Phan4_PhuLuc.pdf
 ctdt/CTDT001_PB2022.pdf
 ctdt/CTDT001_PB2024.pdf
-ctdt/CTDT001_PB2026.pdf
 minh-chung-chung/MCC001.pdf
 minh-chung-chung/MCC002.pdf
 minh-chung-chung/MCC003.pdf

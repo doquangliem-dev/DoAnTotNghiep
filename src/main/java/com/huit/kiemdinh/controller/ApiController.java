@@ -73,6 +73,13 @@ public class ApiController {
     @GetMapping("/nguoi-dung") public List<NguoiDung> user() {
         return s.nguoiDung();
     }
+    @GetMapping("/danh-sach-nguoi-dung") public List<Map<String,Object>> userDirectory() {
+        return s.nguoiDung().stream().map(u -> {
+            Map<String,Object> row=new LinkedHashMap<>();
+            row.put("id",u.getId()); row.put("hoTen",u.getHoTen()); row.put("khoa",u.getKhoa());
+            return row;
+        }).toList();
+    }
     @PostMapping("/nguoi-dung") public NguoiDung saveUser(@RequestBody NguoiDung x) {
         return s.saveNguoiDung(x);
     }
@@ -202,6 +209,8 @@ public class ApiController {
     public DanhGiaTieuChi saveDanhGiaTieuChi(@RequestBody DanhGiaTieuChi x,HttpSession session) {
         return s.saveDanhGiaTieuChi(x,currentUser(session));
     }
+    @PostMapping("/hoi-dong/bao-cao/{id}/feedback") public BaoCaoTieuChi hdFeedbackBaoCao(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackBaoCao(id,"Hội đồng",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
+    @PostMapping("/hoi-dong/minh-chung/{id}/feedback") public DanhGiaMinhChung hdFeedbackMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackMinhChung(id,"Hội đồng",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
     @PostMapping("/hoi-dong/bao-cao/{id}/duyet")
     public BaoCaoTieuChi duyetBaoCao(@PathVariable String id,@RequestBody Map<String,String> body,HttpSession session) {
         return s.duyetBaoCao(id,body.get("trangThai"),body.get("nhanXet"),body.get("khuyenNghi"),currentUser(session));
@@ -248,6 +257,8 @@ public class ApiController {
     public List<BaoCaoTieuChi> tnBaoCao(HttpSession session) {
         return s.baoCaoTruongNhom(currentUser(session));
     }
+    @PostMapping("/truong-nhom/bao-cao/{id}/feedback") public BaoCaoTieuChi tnFeedbackBaoCao(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackBaoCao(id,"Trưởng nhóm",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
+    @PostMapping("/truong-nhom/minh-chung/{id}/feedback") public DanhGiaMinhChung tnFeedbackMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackMinhChung(id,"Trưởng nhóm",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
     @PostMapping("/truong-nhom/bao-cao/{id}/duyet")
     public BaoCaoTieuChi tnDuyetBaoCao(@PathVariable String id,@RequestBody Map<String,String> body,HttpSession session) {
         return s.truongNhomDuyetBaoCaoTieuChi(id,body.get("ketQua"),body.get("nhanXet"),currentUser(session));
@@ -398,6 +409,8 @@ public class ApiController {
     @GetMapping("/thu-ky/minh-chung") public List<MinhChung> tkMinhChung() {
         return s.minhChungChoThuKy();
     }
+    @PostMapping("/thu-ky/bao-cao/{id}/feedback") public BaoCaoTieuChi tkFeedbackBaoCao(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackBaoCao(id,"Thư ký chương trình",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
+    @PostMapping("/thu-ky/minh-chung/{id}/feedback") public DanhGiaMinhChung tkFeedbackMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackMinhChung(id,"Thư ký chương trình",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
     @PostMapping("/thu-ky/minh-chung/{id}/duyet")
     public DanhGiaMinhChung tkDuyetMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) {
         return s.thuKyDuyetMinhChung(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));
@@ -470,6 +483,7 @@ public class ApiController {
     @GetMapping("/khao-thi/phan-cong") public List<PhanCong> ktPhanCong() {
         return s.phanCong();
     }
+    @GetMapping("/khao-thi/nhom") public List<NhomTieuChi> ktNhom() { return s.nhomTieuChi(); }
     @GetMapping("/khao-thi/minh-chung") public Map<String,Object> ktMinhChung() {
         Map<String,Object> m=new LinkedHashMap<>();
         m.put("tieuChi",s.minhChung("TIEU_CHI"));
@@ -477,6 +491,8 @@ public class ApiController {
         m.put("dungChung",s.minhChungChung());
         return m;
     }
+    @PostMapping("/khao-thi/bao-cao/{id}/feedback") public BaoCaoTieuChi qlclFeedbackBaoCao(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackBaoCao(id,"TT QLCL",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
+    @PostMapping("/khao-thi/minh-chung/{id}/feedback") public DanhGiaMinhChung qlclFeedbackMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackMinhChung(id,"TT QLCL",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
     @PostMapping("/khao-thi/minh-chung/{id}/duyet")
     public DanhGiaMinhChung ktDuyetMinhChung(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) {
         return s.qlclDuyetMinhChung(id,b.get("ketQua"),b.get("nhanXet"),currentUser(session));

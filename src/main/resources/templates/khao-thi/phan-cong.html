@@ -117,7 +117,7 @@
   </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có phân công</td></tr>';
   }
   async function load() {
-    [a, users, groups] = await Promise.all([api('/khao-thi/phan-cong'), api('/nguoi-dung'), api('/nhom-tieu-chi')]);
+    [a, users, groups] = await Promise.all([api('/khao-thi/phan-cong'), api('/danh-sach-nguoi-dung'), api('/khao-thi/nhom')]);
     render();
   }
   search.oninput = render;

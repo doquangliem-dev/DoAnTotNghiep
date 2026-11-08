@@ -147,7 +147,7 @@
   const uname = id => users.find(u => u.id === id)?.hoTen || id || '';
   async function load() {
     const me = await api('/auth/me');
-    const [jobs, u, e, r, t] = await Promise.all([api('/truong-nhom/phan-cong'), api('/nguoi-dung'), api('/truong-nhom/minh-chung'), api('/truong-nhom/bao-cao'), api('/tieu-chi')]);
+    const [jobs, u, e, r, t] = await Promise.all([api('/truong-nhom/phan-cong'), api('/danh-sach-nguoi-dung'), api('/truong-nhom/minh-chung'), api('/truong-nhom/bao-cao'), api('/tieu-chi')]);
     users = u;
     mc = e;
     bc = r;

@@ -54,9 +54,11 @@ public class AuthInterceptor implements HandlerInterceptor {
         // Các vai trò nghiệp vụ phải dùng API /api/<vai-tro>/... tương ứng để service kiểm tra quyền sở hữu/phân công.
         if(isAdminWriteApi(uri,request.getMethod()) && !hasAny(session,"Quản trị"))
         return deny(request,response,auth.homeFor(session));
-        // API dữ liệu toàn hệ thống chỉ dành cho Admin; các vai trò nghiệp vụ dùng endpoint đã giới hạn phạm vi riêng.
-        if(isAdminOnlyApi(uri) && !hasAny(session,"Quản trị"))
-        return deny(request,response,auth.homeFor(session));
+        // Mặc định khóa toàn bộ API dùng chung. Người dùng nghiệp vụ chỉ được gọi API
+        // theo namespace vai trò đã kiểm tra ở trên; tránh đọc dữ liệu toàn hệ thống qua GET.
+        if(uri.startsWith("/api/") && !isRoleScopedApi(uri) && !uri.startsWith("/api/auth/")
+        && !isSafeSharedReadApi(uri,request.getMethod()) && !hasAny(session,"Quản trị"))
+            return deny(request,response,auth.homeFor(session));
         return true;
     }
     private boolean isAdminWriteApi(String uri,String method) {
@@ -77,11 +79,18 @@ public class AuthInterceptor implements HandlerInterceptor {
         );
         return prefixes.stream().anyMatch(uri::startsWith);
     }
-    private boolean isAdminOnlyApi(String uri) {
-        if("/api/dashboard".equals(uri)) return true;
-        return uri.equals("/api/phan-cong") || uri.startsWith("/api/phan-cong/")
-        || uri.equals("/api/minh-chung") || uri.startsWith("/api/minh-chung/")
-        || uri.equals("/api/bao-cao") || uri.startsWith("/api/bao-cao/");
+    private boolean isSafeSharedReadApi(String uri,String method) {
+        if(!"GET".equalsIgnoreCase(method) && !"HEAD".equalsIgnoreCase(method)) return false;
+        return uri.equals("/api/tieu-chi") || uri.startsWith("/api/tieu-chi/")
+        || uri.equals("/api/tieu-chuan") || uri.startsWith("/api/tieu-chuan/")
+        || uri.equals("/api/bo-tieu-chuan") || uri.equals("/api/ctdt") || uri.startsWith("/api/ctdt/")
+        || uri.equals("/api/ke-hoach") || uri.equals("/api/minh-chung-chung")
+        || uri.equals("/api/danh-sach-nguoi-dung");
+    }
+    private boolean isRoleScopedApi(String uri) {
+        return uri.startsWith("/api/hoi-dong/") || uri.startsWith("/api/truong-nhom/")
+        || uri.startsWith("/api/thanh-vien/") || uri.startsWith("/api/thu-ky/")
+        || uri.startsWith("/api/khao-thi/") || uri.startsWith("/api/nhan-su-bao-cao/");
     }
     private boolean hasAny(HttpSession session,String... roles) {
         for(String role:roles) if(auth.hasRole(session,role)) return true;

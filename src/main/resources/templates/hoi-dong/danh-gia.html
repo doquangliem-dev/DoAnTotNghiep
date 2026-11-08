@@ -214,7 +214,7 @@
 
      let tchi = [], tc = [], dg = [], plans = [], users = [], reports = [];
   async function load() {
-    [tchi, tc, dg, plans, users, reports] = await Promise.all([api('/tieu-chi'), api('/tieu-chuan'), api('/hoi-dong/danh-gia-tieu-chi'), api('/hoi-dong/ke-hoach'), api('/nguoi-dung'), api('/hoi-dong/bao-cao')]);
+    [tchi, tc, dg, plans, users, reports] = await Promise.all([api('/tieu-chi'), api('/tieu-chuan'), api('/hoi-dong/danh-gia-tieu-chi'), api('/hoi-dong/ke-hoach'), api('/danh-sach-nguoi-dung'), api('/hoi-dong/bao-cao')]);
     const approvedPlans = plans.filter(x => x.trangThai === 'Đã phê duyệt');
     const planOpts = '<option value="">-- Chọn kế hoạch đã phê duyệt --</option>' + approvedPlans.map(x => `<option value="${esc(x.id)}">${esc(x.id)} - ${esc(x.tenKeHoach || '')}</option>`).join('');
     $('#fPlan').innerHTML = '<option value="">Tất cả kế hoạch đã phê duyệt</option>' + approvedPlans.map(x => `<option value="${esc(x.id)}">${esc(x.id)} - ${esc(x.tenKeHoach || '')}</option>`).join('');

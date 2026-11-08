@@ -148,7 +148,7 @@
   </td>
   <td>${evidenceFileHtml(x)}</td>
   <td>
-  <span class="badge b-green">Đã duyệt</span>
+  <span class="badge b-green">Đã duyệt</span><br><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Đánh giá')">Đánh giá</button>
   </td>
   </tr>`).join('') || '<tr><td colspan="6" class="empty">Chưa có minh chứng đã duyệt</td></tr>';
   }
@@ -158,6 +158,7 @@
     filterCriteria();
     render();
   });
+  async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:'); if(!note || !note.trim()) return; try { await api('/hoi-dong/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
   load();
 </script>
  </body>

@@ -1206,6 +1206,40 @@ public class HeThongService {
         bc.setNgayCapNhat(LocalDateTime.now());
         return bcRepo.save(bc);
     }
+    /** Lưu feedback độc lập của các cấp rà soát; không tự ý đổi trạng thái quy trình. */
+    public BaoCaoTieuChi reviewerFeedbackBaoCao(String id,String cap,String loai,String nhanXet,String userId) {
+        if(nhanXet==null || nhanXet.isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Nội dung feedback không được để trống");
+        BaoCaoTieuChi bc=getBaoCao(id);
+        if("Trưởng nhóm".equals(cap)) {
+            boolean allowed=baoCaoTruongNhom(userId).stream().anyMatch(x->Objects.equals(x.getId(),id));
+            if(!allowed) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Báo cáo ngoài phạm vi Trưởng nhóm phụ trách");
+        }
+        if(!List.of("Trưởng nhóm","Hội đồng","Thư ký chương trình","TT QLCL").contains(cap))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Vai trò không được phép feedback báo cáo");
+        String requested=Optional.ofNullable(loai).orElse("Góp ý");
+        String action=List.of("Đánh giá","Góp ý").contains(requested)?requested:"Góp ý";
+        addReportReview(bc,cap,userId,action,nhanXet,null,Optional.ofNullable(bc.getMucDoDuyet()).orElse(0));
+        bc.setNgayCapNhat(LocalDateTime.now());
+        return bcRepo.save(bc);
+    }
+    /** Feedback minh chứng không làm thay đổi trạng thái duyệt hiện tại. */
+    public DanhGiaMinhChung reviewerFeedbackMinhChung(String id,String cap,String loai,String nhanXet,String userId) {
+        if(nhanXet==null || nhanXet.isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Nội dung feedback không được để trống");
+        MinhChung mc=mcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy minh chứng"));
+        if("Trưởng nhóm".equals(cap)) {
+            TieuChi tc=tchiRepo.findById(mc.getMaTieuChi()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng không gắn tiêu chí hợp lệ"));
+            if(!truongNhomPhuTrachTieuChuan(userId,mc.getMaKeHoach(),tc.getMaTieuChuan()))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Minh chứng ngoài phạm vi Trưởng nhóm phụ trách");
+        }
+        if(!List.of("Trưởng nhóm","Hội đồng","Thư ký chương trình","TT QLCL").contains(cap))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Vai trò không được phép feedback minh chứng");
+        DanhGiaMinhChung dg=new DanhGiaMinhChung();
+        dg.setId(codes.nextDanhGiaMinhChung()); dg.setMaMinhChung(mc.getMaMinhChung());
+        dg.setMaTieuChi(mc.getMaTieuChi()); dg.setCapDuyet(cap); dg.setMaNguoiDuyet(userId);
+        String requested=Optional.ofNullable(loai).orElse("Góp ý");
+        dg.setTrangThai(List.of("Đánh giá","Góp ý").contains(requested)?requested:"Góp ý"); dg.setNhanXet(nhanXet); dg.setNgayDuyet(LocalDateTime.now());
+        return dgmcRepo.save(dg);
+    }
     public BaoCaoTieuChi qlclDuyetBaoCao(String id,String ketQua,String nhanXet,String userId) {
         BaoCaoTieuChi bc=getBaoCao(id);
         if(!"Chờ TT QLCL duyệt".equalsIgnoreCase(Optional.ofNullable(bc.getTrangThai()).orElse("")))
@@ -2373,6 +2407,9 @@ public class HeThongService {
         return bcpRepo.save(x);
     }
     // ===== HỖ TRỢ THÀNH VIÊN / THƯ KÝ NHÓM =====
+    public boolean laThuKyCuaNhom(String userId) {
+        return nhomTieuChi().stream().anyMatch(g->isSecretaryOfGroup(g,userId));
+    }
     public Map<String,Object> thongTinThuKyNhom(String userId) {
         List<NhomTieuChi> groups=nhomTieuChi().stream().filter(g->isSecretaryOfGroup(g,userId)).toList();
         Map<String,Object> m=new LinkedHashMap<>();

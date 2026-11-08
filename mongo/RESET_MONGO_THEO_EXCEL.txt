@@ -1,3 +1,6 @@
+CANH BAO NGUY HIEM: SCRIPT CO LENH db.dropDatabase(), XOA TOAN BO DATABASE HeThongKiemDinh.
+KHONG CHAY TREN DATABASE THAT/PRODUCTION. Chi dung cho database demo tam sau khi backup va co chap thuan ro rang.
+
 use HeThongKiemDinh
 
 db.dropDatabase()

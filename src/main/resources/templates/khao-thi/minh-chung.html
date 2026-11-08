@@ -176,7 +176,7 @@
   <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || 'Tham khảo')}</span>${tab === 'criterion' ? `<div class="muted" style="margin-top:4px">${evidenceApprovalPercent(x.trangThai)}%</div>` : ''}</td>
   <td>${x.duongDanFile ? esc(x.tenFile || x.tenFileGoc || 'Đã có file') : (x.duongDanTaiLieuThamChieu ? '<span class="muted">Chưa có file gốc</span>' : '<span class="muted">Chưa có file gốc</span>')}</td>
   <td>
-  <div class="actions">${fileLink(x)}${tab === 'criterion' && x.trangThai === 'Chờ TT QLCL duyệt' ? `<button class="btn-green btn-sm" onclick="openReview('${x.id}','Duyệt')">✓ Duyệt</button>
+  <div class="actions">${fileLink(x)}${tab === 'criterion' ? `<button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Đánh giá')">Đánh giá</button>` : ''}${tab === 'criterion' && x.trangThai === 'Chờ TT QLCL duyệt' ? `<button class="btn-green btn-sm" onclick="openReview('${x.id}','Duyệt')">✓ Duyệt</button>
   <button class="btn-danger btn-sm" onclick="openReview('${x.id}','Từ chối')">Từ chối</button>` : ''}</div>
   </td>
   </tr>`).join('') || '<tr><td colspan="6" class="empty">Không có minh chứng</td></tr>';
@@ -187,6 +187,7 @@
     data.dungChung = data.dungChung || [];
     render();
   }
+  async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:'); if(!note || !note.trim()) return; try { await api('/khao-thi/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
   function openReview(id, result) {
     reviewId = id;
     reviewResult = result;

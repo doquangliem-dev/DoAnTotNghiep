@@ -324,7 +324,7 @@
   <b>${evidenceApprovalPercent(x.trangThai)}%</b>
   </td>
   <td>
-  <button class="btn-primary" onclick="openReview('${x.id}')">Duyệt / phản hồi</button>
+  <button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Đánh giá')">Đánh giá</button><button class="btn-primary" onclick="openReview('${x.id}')">Duyệt / phản hồi</button>
   </td>
   </tr>`).join('') || '<tr><td colspan="6" class="empty">Không có minh chứng chờ duyệt</td></tr>';
     schoolRows.innerHTML = commonRows('Cấp Trường', qSchool.value);
@@ -348,6 +348,7 @@
     reviewNote.value = '';
     openModal('mReview');
   }
+  async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:'); if(!note || !note.trim()) return; try { await api('/thu-ky/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
   async function saveReview() {
     try {
       const id = reviewId.value;

@@ -370,7 +370,7 @@ public class HeThongService {
         // Chỉ trả một dòng cho mỗi vai trò để tránh combobox bị lặp do dữ liệu cũ.
         Map<String,VaiTro> unique=new LinkedHashMap<>();
         List<VaiTro> all=roleRepo.findAll();
-        all.sort(Comparator.comparing(VaiTro::getId,Comparator.nullsLast(String::compareTo)));
+        all.sort(Comparator.comparing(VaiTro::getId,Comparator.nullsLast(Comparator.naturalOrder())));
         for(VaiTro v:all) {
             String key=normalizeText(v.getTenVaiTro());
             if(!key.isBlank()) unique.putIfAbsent(key,v);
@@ -746,7 +746,7 @@ public class HeThongService {
     // ===== Minh chứng chung: lưu ở collection riêng minhChungChung =====
     public List<MinhChungChung> minhChungChung() {
         List<MinhChungChung> a=mccRepo.findAll();
-        a.sort(Comparator.comparing(MinhChungChung::getId, Comparator.nullsLast(String::compareTo)));
+        a.sort(Comparator.comparing(MinhChungChung::getId, Comparator.nullsLast(Comparator.naturalOrder())));
         return a;
     }
     public MinhChungChung saveMinhChungChung(MinhChungChung x) {
@@ -903,7 +903,7 @@ public class HeThongService {
     }
     public List<BaoCaoNhom> baoCaoNhom() {
         List<BaoCaoNhom> rows=bcnRepo.findAll();
-        rows.sort(Comparator.comparing(BaoCaoNhom::getId,Comparator.nullsLast(String::compareTo)));
+        rows.sort(Comparator.comparing(BaoCaoNhom::getId,Comparator.nullsLast(Comparator.naturalOrder())));
         return rows;
     }
     public List<BaoCaoNhom> baoCaoNhomCuaThuKy(String userId) {
@@ -1093,8 +1093,9 @@ public class HeThongService {
         .toList();
     }
     public List<MinhChung> minhChungHoiDong() {
+        // Hội đồng cần xem và đánh giá toàn bộ minh chứng tiêu chí, không chỉ minh chứng đã duyệt.
         return minhChung("TIEU_CHI").stream()
-        .filter(x->"Đã duyệt".equalsIgnoreCase(Optional.ofNullable(x.getTrangThai()).orElse("")))
+        .sorted(Comparator.comparing(MinhChung::getMaTieuChi, Comparator.nullsLast(Comparator.naturalOrder())))
         .toList();
     }
     public List<DanhGiaMinhChung> danhGiaMinhChung() {
@@ -2114,7 +2115,7 @@ public class HeThongService {
                 khRepo.save(x);
             }
         }
-        a.sort(Comparator.comparing(KeHoachTuDanhGia::getId,Comparator.nullsLast(String::compareTo)));
+        a.sort(Comparator.comparing(KeHoachTuDanhGia::getId,Comparator.nullsLast(Comparator.naturalOrder())));
         return a;
     }
     public KeHoachTuDanhGia saveKeHoach(KeHoachTuDanhGia x) {
@@ -2460,7 +2461,7 @@ public class HeThongService {
         && Objects.equals(p.getMaTieuChuan(),maTieuChuan)
         && p.getMaTieuChi()!=null && !p.getMaTieuChi().isBlank()
         && !"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse("")))
-        .sorted(Comparator.comparing(PhanCong::getMaTieuChi,Comparator.nullsLast(String::compareTo)))
+        .sorted(Comparator.comparing(PhanCong::getMaTieuChi,Comparator.nullsLast(Comparator.naturalOrder())))
         .toList();
         List<Map<String,Object>> rows=new ArrayList<>();
         int ready=0;

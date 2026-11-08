@@ -107,6 +107,7 @@
           <th>
            Trạng thái
           </th>
+          <th>Thao tác</th>
          </tr>
         </thead>
         <tbody id="rows">
@@ -115,13 +116,23 @@
       </div>
      </div>
     </div>
+    <div class="modal" id="evidenceReviewModal">
+     <div class="modal-box">
+      <div class="modal-head"><span>Hội đồng đánh giá minh chứng</span><button onclick="closeModal('evidenceReviewModal')">×</button></div>
+      <div class="modal-body">
+       <div class="field"><label>Loại đánh giá</label><select id="evidenceReviewType"><option value="Đánh giá">Đánh giá</option><option value="Góp ý">Góp ý</option><option value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option></select></div>
+       <div class="field"><label>Nhận xét / phản hồi</label><textarea id="evidenceReviewNote" rows="5"></textarea></div>
+      </div>
+      <div class="modal-foot"><button class="btn-light" onclick="closeModal('evidenceReviewModal')">Hủy</button><button class="btn-primary" onclick="saveEvidenceReview()">Lưu đánh giá</button></div>
+     </div>
+    </div>
    </main>
   </div>
   <script src="/js/common.js">
   </script>
   <script>
 
-     let mc = [], tc = [], tchi = [];
+     let mc = [], tc = [], tchi = [], evidenceReviewId = null;
   async function load() {
     [mc, tc, tchi] = await Promise.all([api('/hoi-dong/minh-chung'), api('/tieu-chuan'), api('/tieu-chi')]);
     $('#fTc').innerHTML = '<option value="">Tất cả tiêu chuẩn</option>' + tc.map(x => `<option value="${esc(x.id)}">${esc(x.id)} - ${esc(x.tenTieuChuan || '')}</option>`).join('');
@@ -148,9 +159,10 @@
   </td>
   <td>${evidenceFileHtml(x)}</td>
   <td>
-  <span class="badge b-green">Đã duyệt</span><br><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Đánh giá')">Đánh giá</button>
+  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
   </td>
-  </tr>`).join('') || '<tr><td colspan="6" class="empty">Chưa có minh chứng đã duyệt</td></tr>';
+  <td><button class="btn-primary" onclick="openEvidenceReview('${x.id}')">Đánh giá / phản hồi</button></td>
+  </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có minh chứng đã duyệt</td></tr>';
   }
   $('#q').addEventListener('input', render);
   $('#fTchi').addEventListener('change', render);
@@ -158,7 +170,8 @@
     filterCriteria();
     render();
   });
-  async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:'); if(!note || !note.trim()) return; try { await api('/hoi-dong/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
+  function openEvidenceReview(id) { evidenceReviewId=id; $('#evidenceReviewType').value='Đánh giá'; $('#evidenceReviewNote').value=''; openModal('evidenceReviewModal'); }
+  async function saveEvidenceReview() { const note=$('#evidenceReviewNote').value.trim(); if(!note) return alert('Vui lòng nhập nhận xét.'); try { await api('/hoi-dong/minh-chung/'+encodeURIComponent(evidenceReviewId)+'/feedback',{method:'POST',body:JSON.stringify({loai:$('#evidenceReviewType').value,nhanXet:note})}); closeModal('evidenceReviewModal'); await load(); } catch(e){ alert(e.message); } }
   load();
 </script>
  </body>

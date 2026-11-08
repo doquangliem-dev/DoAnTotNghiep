@@ -324,7 +324,7 @@
   <b>${evidenceApprovalPercent(x.trangThai)}%</b>
   </td>
   <td>
-  <button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Đánh giá')">Đánh giá</button><button class="btn-primary" onclick="openReview('${x.id}')">Duyệt / phản hồi</button>
+  <button class="btn-primary" onclick="openReview('${x.id}')">Đánh giá / duyệt</button>
   </td>
   </tr>`).join('') || '<tr><td colspan="6" class="empty">Không có minh chứng chờ duyệt</td></tr>';
     schoolRows.innerHTML = commonRows('Cấp Trường', qSchool.value);

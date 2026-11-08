@@ -289,8 +289,8 @@
        </button>
       </div>
       <div class="modal-body">
-       <div class="review-modal-note" id="reviewInfo">
-       </div>
+       <div class="review-modal-note" id="reviewInfo"></div>
+       <div class="field"><label>Kết quả</label><select id="leaderEvidenceDecision"><option value="Duyệt">Duyệt chuyển Thư ký</option><option value="Từ chối">Yêu cầu chỉnh sửa</option><option value="Chỉ feedback">Chỉ feedback</option></select></div>
        <div class="field">
         <label>
          Nhận xét
@@ -376,8 +376,7 @@
   <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
   </td>
   <td>
-  <div class="file-tools"><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Đánh giá')">Đánh giá</button>${canReview ? `<button class="btn-green btn-sm" onclick="openReview('${x.id}','Duyệt')">✓ Duyệt</button>
-  <button class="btn-danger btn-sm" onclick="openReview('${x.id}','Từ chối')">Từ chối</button>` : ''}${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)">
+  <div class="file-tools"><button class="btn-primary btn-sm" onclick="openReview('${x.id}', canReview ? 'Duyệt' : 'Feedback')">Đánh giá / duyệt</button>${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)">
   </label>${x.duongDanFile ? `<button class="file-btn delete" onclick="deleteOwnFile('${x.id}')">Xóa file</button>
   <button class="file-btn submit" onclick="submitOwn('${x.id}')">${x.trangThai === 'Từ chối' ? 'Nộp lại' : 'Gửi Thư ký'}</button>` : ''}` : ''}${!canReview && !ownEditable ? '<span class="muted">—</span>' : ''}</div>
   </td>
@@ -431,6 +430,7 @@
     reviewTitle.textContent = result === 'Duyệt' ? 'Duyệt minh chứng' : 'Từ chối minh chứng';
     reviewInfo.textContent = `${x?.maMinhChung || id} · ${x?.tenMinhChung || ''}`;
     reviewNote.value = '';
+    document.getElementById('leaderEvidenceDecision').value = result === 'Feedback' ? 'Chỉ feedback' : result;
     reviewSubmit.className = result === 'Duyệt' ? 'btn-green' : 'btn-danger';
     reviewSubmit.textContent = result === 'Duyệt' ? 'Duyệt & chuyển Thư ký' : 'Xác nhận từ chối';
     openModal('reviewModal');
@@ -492,11 +492,12 @@
     }
   reviewSubmit.onclick = async () => {
     try {
-      const r = await api('/truong-nhom/minh-chung/' + reviewId + '/duyet', {
-        method: 'POST', body: JSON.stringify({
-          ketQua: reviewResult, nhanXet: reviewNote.value
-        })
-      });
+      const decision = document.getElementById('leaderEvidenceDecision').value;
+      if (decision === 'Chỉ feedback') {
+        await api('/truong-nhom/minh-chung/' + encodeURIComponent(reviewId) + '/feedback', {method:'POST', body:JSON.stringify({loai:'Feedback', nhanXet:reviewNote.value.trim()})});
+        closeModal('reviewModal'); await load(); return;
+      }
+      const r = await api('/truong-nhom/minh-chung/' + reviewId + '/duyet', {method:'POST', body:JSON.stringify({ketQua:decision, nhanXet:reviewNote.value})});
       const x = all.find(m => m.id === reviewId);
       if (x)
              x.trangThai = r?.trangThai || (reviewResult === 'Duyệt' ? 'Chờ Thư ký duyệt' : 'Từ chối');

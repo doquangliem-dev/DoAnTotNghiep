@@ -236,7 +236,7 @@
   <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
   </td>
   <td>
-  <div class="actions"><button class="btn-light" onclick="quickFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickFeedback('${x.id}','Đánh giá')">Đánh giá</button>${x.trangThai === 'Chờ Hội đồng cấp khoa duyệt' ? `<button class="btn-primary" onclick="openDuyet('${x.id}')">Đánh giá / duyệt</button>` : ''}</div>
+  <div class="actions"><button class="btn-primary" onclick="openDuyet('${x.id}')">Đánh giá / duyệt</button></div>
   </td>
   </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có báo cáo thuộc bước Hội đồng</td></tr>';
   }
@@ -256,7 +256,7 @@
   </td>
   <td>${x.duongDanFile ? `<a class="file-btn view" target="_blank" href="${esc(x.duongDanFile)}">Xem file</a>` : '<span class="muted">Chưa có file</span>'}</td>
   <td>
-  <div class="actions">${x.trangThai === 'Chờ Hội đồng cấp Khoa duyệt' ? `<button class="btn-primary" onclick="openPartDuyet('${x.id}')">Xử lý</button>` : ''}</div>
+  <div class="actions"><button class="btn-primary" onclick="openPartDuyet('${x.id}')">Đánh giá / duyệt</button></div>
   </td>
   </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có phần báo cáo chung thuộc bước Hội đồng</td></tr>';
   }
@@ -271,8 +271,11 @@
   function openDuyet(id) {
     duyetMode = 'criterion';
     const x = bc.find(z => z.id === id);
-    if (!x || x.trangThai !== 'Chờ Hội đồng cấp khoa duyệt')
-         return alert('Báo cáo chưa đến bước Hội đồng cấp khoa');
+    if (!x) return alert('Không tìm thấy báo cáo.');
+    if (x.trangThai !== 'Chờ Hội đồng cấp khoa duyệt') {
+      // Cho phép Hội đồng mở hồ sơ đã xử lý để gửi đánh giá/feedback bổ sung; backend vẫn kiểm soát quyền duyệt.
+      d_tt.value = 'Yêu cầu chỉnh sửa';
+    }
     duyetId = id;
     d_tt.value = 'Duyệt';
     d_nx.value = '';
@@ -300,7 +303,7 @@
       alert(e.message);
     }
     }
-  async function quickFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho báo cáo:'); if(!note || !note.trim()) return; try { await api('/hoi-dong/bao-cao/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái duyệt không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
+  
   q.oninput = render;
   fTc.onchange = render;
   fStatus.onchange = render;

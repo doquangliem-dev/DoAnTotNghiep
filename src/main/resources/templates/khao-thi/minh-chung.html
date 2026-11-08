@@ -131,6 +131,10 @@
        <div class="notice" id="reviewInfo">
        </div>
        <div class="field">
+        <label>Kết quả xử lý</label>
+        <select id="evidenceDecision"><option value="Duyệt">Duyệt cuối</option><option value="Từ chối">Yêu cầu chỉnh sửa</option><option value="Chỉ feedback">Chỉ feedback (không đổi trạng thái)</option></select>
+       </div>
+       <div class="field">
         <label>
          Nhận xét
         </label>
@@ -176,8 +180,7 @@
   <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || 'Tham khảo')}</span>${tab === 'criterion' ? `<div class="muted" style="margin-top:4px">${evidenceApprovalPercent(x.trangThai)}%</div>` : ''}</td>
   <td>${x.duongDanFile ? esc(x.tenFile || x.tenFileGoc || 'Đã có file') : (x.duongDanTaiLieuThamChieu ? '<span class="muted">Chưa có file gốc</span>' : '<span class="muted">Chưa có file gốc</span>')}</td>
   <td>
-  <div class="actions">${fileLink(x)}${tab === 'criterion' ? `<button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickEvidenceFeedback('${x.id}','Đánh giá')">Đánh giá</button>` : ''}${tab === 'criterion' && x.trangThai === 'Chờ TT QLCL duyệt' ? `<button class="btn-green btn-sm" onclick="openReview('${x.id}','Duyệt')">✓ Duyệt</button>
-  <button class="btn-danger btn-sm" onclick="openReview('${x.id}','Từ chối')">Từ chối</button>` : ''}</div>
+  <div class="actions">${fileLink(x)}${tab === 'criterion' ? `<button class="btn-primary" onclick="openReview('${x.id}','Duyệt')">Đánh giá / duyệt</button>` : ''}</div>
   </td>
   </tr>`).join('') || '<tr><td colspan="6" class="empty">Không có minh chứng</td></tr>';
   }
@@ -201,10 +204,13 @@
   }
   reviewSubmit.onclick = async () => {
     try {
+      const decision = document.getElementById('evidenceDecision').value;
+      if (decision === 'Chỉ feedback') {
+        await api('/khao-thi/minh-chung/' + encodeURIComponent(reviewId) + '/feedback', {method:'POST', body:JSON.stringify({loai:'Feedback', nhanXet:reviewNote.value.trim()})});
+        closeModal('reviewModal'); await load(); return;
+      }
       const r = await api('/khao-thi/minh-chung/' + encodeURIComponent(reviewId) + '/duyet', {
-        method: 'POST', body: JSON.stringify({
-          ketQua: reviewResult, nhanXet: reviewNote.value.trim()
-        })
+        method: 'POST', body: JSON.stringify({ketQua: decision, nhanXet: reviewNote.value.trim()})
       });
       const x = data.tieuChi.find(v => v.id === reviewId);
       if (x)

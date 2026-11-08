@@ -204,6 +204,7 @@
          <option>
           Yêu cầu chỉnh sửa
          </option>
+         <option value="Chỉ feedback">Chỉ feedback (không đổi trạng thái)</option>
         </select>
        </div>
        <div class="field">
@@ -267,7 +268,7 @@
   </td>
   <td>${x.duongDanFile ? esc(x.tenFileBaoCao || 'Đã có file') : '<span class="muted">Chưa có file</span>'}</td>
   <td>
-  <div class="actions">${viewFile(x)}<button class="btn-light" onclick="quickFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickFeedback('${x.id}','Đánh giá')">Đánh giá</button>${x.trangThai === 'Chờ TT QLCL duyệt' ? `<button class="btn-primary" onclick="openReview('criterion','${x.id}')">Đánh giá / duyệt</button>` : ''}</div>
+  <div class="actions">${viewFile(x)}<button class="btn-primary" onclick="openReview('criterion','${x.id}')">Đánh giá / duyệt</button></div>
   </td>
   </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có báo cáo tiêu chí</td></tr>';
   }
@@ -287,11 +288,13 @@
           ketQua: result.value, nhanXet: comment.value.trim()
         })
       });
+      else if (result.value === 'Chỉ feedback')
+             await api('/khao-thi/bao-cao/' + encodeURIComponent(current) + '/feedback', {
+        method: 'POST', body: JSON.stringify({loai:'Feedback', nhanXet: comment.value.trim()})
+      });
       else
              await api('/khao-thi/bao-cao/' + encodeURIComponent(current) + '/duyet', {
-        method: 'POST', body: JSON.stringify({
-          ketQua: result.value, nhanXet: comment.value.trim()
-        })
+        method: 'POST', body: JSON.stringify({ketQua: result.value, nhanXet: comment.value.trim()})
       });
       closeModal('review');
       load();

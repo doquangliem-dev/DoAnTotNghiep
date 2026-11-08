@@ -348,7 +348,7 @@
   <td>${fileBtn(x)}</td>
   <td>${esc(x.capDuyetHienTai || '')}</td>
   <td>${fmtDate(x.ngayCapNhat) || '-'}</td>
-  <td><button class="btn-light btn-sm" onclick="quickFeedback('${x.id}','Góp ý')">Feedback</button><button class="btn-light btn-sm" onclick="quickFeedback('${x.id}','Đánh giá')">Đánh giá</button></td>
+  <td><button class="btn-primary btn-sm" onclick="openReview('${x.id}')">Đánh giá / feedback</button></td>
   </tr>`).join('') || '<tr><td colspan="9" class="empty">Chưa có báo cáo tiêu chí</td></tr>';
     groupRows.innerHTML = groups.map(x => `<tr>
   <td>

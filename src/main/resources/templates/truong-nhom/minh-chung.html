@@ -125,7 +125,7 @@
          Minh chứng thuộc phạm vi phụ trách
         </b>
         <span class="head-sub">
-         Duyệt các minh chứng đang ở trạng thái “Chờ Trưởng nhóm duyệt”
+         Xem toàn bộ minh chứng thuộc phạm vi nhóm; chỉ minh chứng đủ điều kiện mới có thao tác duyệt
         </span>
        </div>
        <span class="badge b-gray" id="countBadge">
@@ -195,7 +195,7 @@
       <div class="card-head">
        <div>
         <b>Duyệt minh chứng của thành viên trong nhóm</b>
-        <span class="head-sub">Hiển thị minh chứng của tất cả thành viên thuộc các tiêu chí do nhóm phụ trách.</span>
+        <span class="head-sub">Hiển thị toàn bộ minh chứng của thành viên trong nhóm ở mọi trạng thái: đang soạn, chờ duyệt, đã duyệt hoặc yêu cầu chỉnh sửa.</span>
        </div>
        <span class="badge b-gray" id="reviewCountBadge">0 minh chứng chờ duyệt</span>
       </div>
@@ -441,8 +441,9 @@
   function render() {
     const query = readText(search).toLowerCase();
     const status = statusFilter.value;
+    // Hiển thị toàn bộ minh chứng thuộc tiêu chí được phân công cho Trưởng nhóm,
+    // giống cách Thành viên xem danh sách; chỉ chủ sở hữu mới có nút sửa/tải file.
     const ownEvidence = all
-      .filter(item => item.maNguoiUpload === me.id)
       .filter(item => allowed.some(itemCriterion => itemCriterion.id === item.maTieuChi))
       .filter(item => (!status || item.trangThai === status))
       .filter(item => !query || JSON.stringify(item).toLowerCase().includes(query));
@@ -452,10 +453,10 @@
     countBadge.textContent = `${ownEvidence.length} minh chứng của tôi`;
 
     const reviewQuery = readText(reviewSearch).toLowerCase();
+    // Không lọc theo trạng thái hoặc file: Trưởng nhóm cần xem cả minh chứng
+    // đang soạn, chờ duyệt ở mọi cấp, đã duyệt và yêu cầu chỉnh sửa.
     const reviewEvidence = all
       .filter(item => item.maNguoiUpload !== me.id)
-      .filter(item => item.trangThai === 'Chờ Trưởng nhóm duyệt')
-      .filter(item => Boolean(item.duongDanFile))
       .filter(item => !reviewQuery || JSON.stringify(item).toLowerCase().includes(reviewQuery));
 
     reviewRows.innerHTML = reviewEvidence
@@ -474,7 +475,18 @@
     try {
       let x = await api('/truong-nhom/minh-chung', {
         method: 'POST', body: JSON.stringify({
-          maTieuChi: criterion.value, tenMinhChung: readText(name), moTa: readText(name)
+          maTieuChi: criterion.value,
+          maPhanCong: jobs.find(job =>
+            job.maTieuChi === criterion.value
+            && (
+              job.maNguoiDung === me.id
+              || job.maNhanSuHoTro === me.id
+              || (Array.isArray(job.maNhanSuHoTroList) && job.maNhanSuHoTroList.includes(me.id))
+              || (Array.isArray(job.maNguoiPhoiHopList) && job.maNguoiPhoiHopList.includes(me.id))
+            )
+          )?.id || null,
+          tenMinhChung: readText(name),
+          moTa: readText(name)
         })
       });
       if (file.files[0]) {

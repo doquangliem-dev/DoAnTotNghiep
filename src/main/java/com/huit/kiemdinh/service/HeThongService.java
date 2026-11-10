@@ -1247,7 +1247,7 @@ public class HeThongService {
         MinhChung mc=mcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy minh chứng"));
         if("Trưởng nhóm".equals(cap)) {
             TieuChi tc=tchiRepo.findById(mc.getMaTieuChi()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng không gắn tiêu chí hợp lệ"));
-            if(!truongNhomPhuTrachTieuChuan(userId,mc.getMaKeHoach(),tc.getMaTieuChuan()))
+            if(!truongNhomPhuTrachTieuChi(userId, mc.getMaKeHoach(), mc.getMaTieuChi()))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Minh chứng ngoài phạm vi Trưởng nhóm phụ trách");
         }
         if(!List.of("Trưởng nhóm","Hội đồng","Thư ký chương trình","TT QLCL").contains(cap))
@@ -1255,8 +1255,19 @@ public class HeThongService {
         DanhGiaMinhChung dg=new DanhGiaMinhChung();
         dg.setId(codes.nextDanhGiaMinhChung()); dg.setMaMinhChung(mc.getMaMinhChung());
         dg.setMaTieuChi(mc.getMaTieuChi()); dg.setCapDuyet(cap); dg.setMaNguoiDuyet(userId);
-        String requested=Optional.ofNullable(loai).orElse("Góp ý");
-        dg.setTrangThai(List.of("Đánh giá","Góp ý").contains(requested)?requested:"Góp ý"); dg.setNhanXet(nhanXet); dg.setNgayDuyet(LocalDateTime.now());
+        String requested = Optional.ofNullable(loai).orElse("Góp ý chỉnh sửa");
+
+        if (!List.of("Duyệt", "Góp ý chỉnh sửa").contains(requested)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Kết quả xử lý minh chứng không hợp lệ"
+            );
+        }
+
+        dg.setTrangThai(requested);
+        dg.setNhanXet(nhanXet);
+        dg.setNgayDuyet(LocalDateTime.now());
+
         return dgmcRepo.save(dg);
     }
     public BaoCaoTieuChi qlclDuyetBaoCao(String id,String ketQua,String nhanXet,String userId) {
@@ -1884,7 +1895,7 @@ public class HeThongService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng không ở bước chờ Trưởng nhóm duyệt");
         if(mc.getDuongDanFile()==null||mc.getDuongDanFile().isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng chưa có file đính kèm");
         TieuChi tc=tchiRepo.findById(mc.getMaTieuChi()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Minh chứng không gắn tiêu chí hợp lệ"));
-        boolean allowed=truongNhomPhuTrachTieuChuan(leaderId,mc.getMaKeHoach(),tc.getMaTieuChuan());
+        boolean allowed=truongNhomPhuTrachTieuChi(leaderId, mc.getMaKeHoach(), mc.getMaTieuChi());
         if(!allowed) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Bạn không phụ trách tiêu chuẩn của minh chứng này");
         if(!List.of("Duyệt","Từ chối").contains(Optional.ofNullable(ketQua).orElse(""))) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Kết quả duyệt không hợp lệ");
         String state="Duyệt".equalsIgnoreCase(ketQua)?"Chờ Thư ký duyệt":"Từ chối";
@@ -2105,45 +2116,69 @@ public class HeThongService {
         .collect(java.util.stream.Collectors.toSet());
         return minhChung("TIEU_CHI").stream().filter(x->scopes.contains(Optional.ofNullable(x.getMaKeHoach()).orElse("")+"|"+x.getMaTieuChi())).toList();
     }
-    private boolean truongNhomPhuTrachTieuChuan(String leaderId,String maKeHoach,String maTieuChuan) {
-        if(leaderId==null||maTieuChuan==null||maTieuChuan.isBlank()) return false;
-        List<NhomTieuChi> groups=nhomTieuChi().stream().filter(g->isLeaderOfGroup(g,leaderId)).toList();
-        if(groups.isEmpty()) return false;
-        Set<String> groupIds=groups.stream().map(NhomTieuChi::getId).filter(Objects::nonNull).collect(java.util.stream.Collectors.toSet());
-        boolean byAssignment=pcRepo.findAll().stream().anyMatch(p->
-        groupIds.contains(p.getMaNhomTieuChi())
-        && Objects.equals(p.getMaTieuChuan(),maTieuChuan)
-        && (maKeHoach==null||maKeHoach.isBlank()||Objects.equals(p.getMaKeHoach(),maKeHoach))
-        && !"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse("")));
-        if(byAssignment) return true;
-        return groups.stream().anyMatch(g->
-        Objects.equals(g.getMaTieuChuan(),maTieuChuan)
-        || (g.getTieuChuanPhuTrach()!=null&&g.getTieuChuanPhuTrach().contains(maTieuChuan)));
+    private boolean truongNhomPhuTrachTieuChi(
+            String leaderId,
+            String maKeHoach,
+            String maTieuChi
+    ) {
+        if (leaderId == null || maTieuChi == null || maTieuChi.isBlank()) {
+            return false;
+        }
+
+        Set<String> groupIds = nhomTieuChi().stream()
+                .filter(group -> isLeaderOfGroup(group, leaderId))
+                .map(NhomTieuChi::getId)
+                .filter(Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
+
+        if (groupIds.isEmpty()) {
+            return false;
+        }
+
+        return pcRepo.findAll().stream()
+                .filter(assignment -> groupIds.contains(assignment.getMaNhomTieuChi()))
+                .filter(assignment -> Objects.equals(
+                        assignment.getMaTieuChi(),
+                        maTieuChi
+                ))
+                .filter(assignment -> maKeHoach == null
+                        || maKeHoach.isBlank()
+                        || Objects.equals(assignment.getMaKeHoach(), maKeHoach))
+                .anyMatch(assignment -> !"Hủy phân công".equalsIgnoreCase(
+                        Optional.ofNullable(assignment.getTrangThai()).orElse("")
+                ));
     }
+
     public List<MinhChung> minhChungTruongNhom(String userId) {
-        // Tối ưu: tính phạm vi phụ trách một lần, tránh truy vấn nhóm/phân công lặp lại cho từng minh chứng.
-        List<NhomTieuChi> groups=nhomRepo.findAll().stream().filter(g->isLeaderOfGroup(g,userId)).toList();
-        if(groups.isEmpty()) return List.of();
-        Set<String> groupIds=groups.stream().map(NhomTieuChi::getId).filter(Objects::nonNull).collect(java.util.stream.Collectors.toSet());
-        Set<String> scopes=new HashSet<>();
-        for(PhanCong p:pcRepo.findAll()) {
-            if(groupIds.contains(p.getMaNhomTieuChi()) && p.getMaTieuChuan()!=null
-            && !"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse(""))) {
-                scopes.add(Optional.ofNullable(p.getMaKeHoach()).orElse("")+"|"+p.getMaTieuChuan());
-            }
+        Set<String> groupIds = nhomRepo.findAll().stream()
+                .filter(group -> isLeaderOfGroup(group, userId))
+                .map(NhomTieuChi::getId)
+                .filter(Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
+
+        if (groupIds.isEmpty()) {
+            return List.of();
         }
-        for(NhomTieuChi g:groups) {
-            if(g.getMaTieuChuan()!=null) scopes.add("|"+g.getMaTieuChuan());
-            if(g.getTieuChuanPhuTrach()!=null) for(String tc:g.getTieuChuanPhuTrach()) if(tc!=null) scopes.add("|"+tc);
-        }
-        List<MinhChung> source=minhChung("TIEU_CHI");
-        return source.stream().filter(x-> {
-            String plan=Optional.ofNullable(x.getMaKeHoach()).orElse("");
-            String std=Optional.ofNullable(x.getMaTieuChuan()).orElse("");
-            return scopes.contains(plan+"|"+std)||scopes.contains("|"+std);
-        }
-        ).toList();
+
+        Set<String> assignedScopes = pcRepo.findAll().stream()
+                .filter(assignment -> groupIds.contains(assignment.getMaNhomTieuChi()))
+                .filter(assignment -> assignment.getMaTieuChi() != null
+                        && !assignment.getMaTieuChi().isBlank())
+                .filter(assignment -> !"Hủy phân công".equalsIgnoreCase(
+                        Optional.ofNullable(assignment.getTrangThai()).orElse("")
+                ))
+                .map(assignment -> Optional.ofNullable(assignment.getMaKeHoach()).orElse("")
+                        + "|" + assignment.getMaTieuChi())
+                .collect(java.util.stream.Collectors.toSet());
+
+        return minhChung("TIEU_CHI").stream()
+                .filter(evidence -> assignedScopes.contains(
+                        Optional.ofNullable(evidence.getMaKeHoach()).orElse("")
+                                + "|" + Optional.ofNullable(evidence.getMaTieuChi()).orElse("")
+                ))
+                .toList();
     }
+
     public List<MinhChung> minhChungChoThuKy() {
         return minhChung("TIEU_CHI").stream().filter(x->"Chờ Thư ký duyệt".equalsIgnoreCase(Optional.ofNullable(x.getTrangThai()).orElse(""))).toList();
     }

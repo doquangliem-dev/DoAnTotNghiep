@@ -120,7 +120,10 @@
      <div class="modal-box">
       <div class="modal-head"><span>Hội đồng đánh giá minh chứng</span><button onclick="closeModal('evidenceReviewModal')">×</button></div>
       <div class="modal-body">
-       <div class="field"><label>Loại đánh giá</label><select id="evidenceReviewType"><option value="Đánh giá">Đánh giá</option><option value="Góp ý">Góp ý</option><option value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option></select></div>
+       <div class="field"><label>Loại đánh giá</label><select id="evidenceReviewType">
+            <option value="Duyệt">Duyệt</option>
+            <option value="Góp ý chỉnh sửa">Góp ý chỉnh sửa</option>
+          </select></div>
        <div class="field"><label>Nhận xét / phản hồi</label><textarea id="evidenceReviewNote" rows="5"></textarea></div>
       </div>
       <div class="modal-foot"><button class="btn-light" onclick="closeModal('evidenceReviewModal')">Hủy</button><button class="btn-primary" onclick="saveEvidenceReview()">Lưu đánh giá</button></div>
@@ -170,8 +173,38 @@
     filterCriteria();
     render();
   });
-  function openEvidenceReview(id) { evidenceReviewId=id; $('#evidenceReviewType').value='Đánh giá'; $('#evidenceReviewNote').value=''; openModal('evidenceReviewModal'); }
-  async function saveEvidenceReview() { const note=$('#evidenceReviewNote').value.trim(); if(!note) return alert('Vui lòng nhập nhận xét.'); try { await api('/hoi-dong/minh-chung/'+encodeURIComponent(evidenceReviewId)+'/feedback',{method:'POST',body:JSON.stringify({loai:$('#evidenceReviewType').value,nhanXet:note})}); closeModal('evidenceReviewModal'); await load(); } catch(e){ alert(e.message); } }
+  function openEvidenceReview(id) {
+    evidenceReviewId = id;
+    $('#evidenceReviewType').value = 'Duyệt';
+    $('#evidenceReviewNote').value = '';
+    openModal('evidenceReviewModal');
+  }
+
+  async function saveEvidenceReview() {
+    const note = ($('#evidenceReviewNote').value || '').trim();
+
+    if (!note) {
+      return alert('Vui lòng nhập nhận xét.');
+    }
+
+    try {
+      await api(
+        '/hoi-dong/minh-chung/' + encodeURIComponent(evidenceReviewId) + '/feedback',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            loai: $('#evidenceReviewType').value,
+            nhanXet: note
+          })
+        }
+      );
+
+      closeModal('evidenceReviewModal');
+      await load();
+    } catch (error) {
+      alert(error.message);
+    }
+  }
   load();
 </script>
  </body>

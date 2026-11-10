@@ -1,579 +1,566 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width,initial-scale=1" name="viewport"/>
-    <title>
-      Minh chứng nhóm
-    </title>
-    <link href="/css/app.css" rel="stylesheet"/>
-  </head>
-  <body class="role-page role-leader">
-    <div class="top">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Minh chứng nhóm
+  </title>
+  <link href="/css/app.css" rel="stylesheet"/>
+ </head>
+ <body class="role-page role-leader">
+  <div class="top">
+   <span>
+    ◉ Hệ thống ĐBCL - Tự đánh giá &amp; Kiểm định
+   </span>
+   <span>
+    Trưởng nhóm · Minh chứng
+   </span>
+  </div>
+  <div class="shell">
+   <aside class="sidebar">
+    <div class="user">
+    </div>
+    <nav class="nav">
+     <a href="/truong-nhom">
+      ▦ Tổng quan
+     </a>
+     <a href="/truong-nhom/thanh-vien">
+      ♣ Thành viên nhóm
+     </a>
+     <a href="/truong-nhom/phan-cong">
+      ⇄ Phân công tiêu chí
+     </a>
+     <a href="/truong-nhom/minh-chung">
+      ▧ Minh chứng
+     </a>
+     <a href="/truong-nhom/bao-cao">
+      ▤ Báo cáo của tôi
+     </a>
+     <a href="/truong-nhom/tien-do">
+      ◷ Theo dõi tiến độ
+     </a>
+     <a href="/truong-nhom/bao-cao-nhom">
+      ▱
       <span>
-        ◉ Hệ thống ĐBCL - Tự đánh giá &amp; Kiểm định
+       Duyệt báo cáo nhóm
       </span>
-      <span>
-        Trưởng nhóm · Minh chứng
+     </a>
+    </nav>
+   </aside>
+   <main class="main">
+    <section class="role-hero">
+     <div>
+      <span class="hero-kicker">
+       ▧ Minh chứng nhóm
       </span>
+      <h1>
+       Quản lý &amp; duyệt minh chứng
+      </h1>
+      <p>
+       Trưởng nhóm chỉ bổ sung minh chứng trong phạm vi tiêu chí được phân công; bên dưới là danh sách minh chứng thuộc phạm vi phụ trách để đánh giá, duyệt.
+      </p>
+     </div>
+    </section>
+    <div class="tabs evidence-tabs">
+     <button class="active" data-tab="assigned">
+      Minh chứng phụ trách
+     </button>
+     <button data-tab="school">
+      Cấp Trường
+     </button>
+     <button data-tab="faculty">
+      Cấp Khoa
+     </button>
     </div>
-    <div class="shell">
-      <aside class="sidebar">
-        <div class="user">
+    <section class="tab active evidence-tab-panel" id="assigned">
+     <div class="form-card">
+      <div class="form-card-title">
+       <span>
+        + Bổ sung minh chứng
+       </span>
+       <span class="badge b-blue">
+        Lưu nháp trước, gửi Thư ký khi sẵn sàng
+       </span>
+      </div>
+      <div class="form-row three">
+       <div class="field">
+        <label>
+         Tiêu chí *
+        </label>
+        <select id="criterion">
+        </select>
+       </div>
+       <div class="field">
+        <label>
+         Tên minh chứng *
+        </label>
+        <input id="name" placeholder="Nhập tên minh chứng"/>
+       </div>
+       <div class="field">
+        <label>
+         File đính kèm
+        </label>
+        <div class="file-input-box">
+         <input id="file" type="file"/>
         </div>
-        <nav class="nav">
-          <a href="/truong-nhom">
-            ▦ Tổng quan
-          </a>
-          <a href="/truong-nhom/thanh-vien">
-            ♣ Thành viên nhóm
-          </a>
-          <a href="/truong-nhom/phan-cong">
-            ⇄ Phân công tiêu chí
-          </a>
-          <a href="/truong-nhom/minh-chung">
-            ▧ Minh chứng
-          </a>
-          <a href="/truong-nhom/tien-do">
-            ◷ Theo dõi tiến độ
-          </a>
-          <a href="/truong-nhom/bao-cao-nhom">
-            ▱
-            <span>
-              Duyệt báo cáo nhóm
-            </span>
-          </a>
-        </nav>
-      </aside>
-      <main class="main">
-        <section class="role-hero">
-          <div>
-            <span class="hero-kicker">
-              ▧ Minh chứng nhóm
-            </span>
-            <h1>
-              Quản lý &amp; duyệt minh chứng
-            </h1>
-            <p>
-              Trưởng nhóm chỉ bổ sung minh chứng trong phạm vi tiêu chí được phân công; bên dưới là danh sách minh chứng thuộc phạm vi phụ trách để đánh giá, duyệt.
-            </p>
-          </div>
-        </section>
-        <div class="tabs evidence-tabs">
-          <button class="active" data-tab="assigned">
-            Minh chứng phụ trách
-          </button>
-          <button data-tab="school">
-            Cấp Trường
-          </button>
-          <button data-tab="faculty">
-            Cấp Khoa
-          </button>
-        </div>
-        <section class="tab active evidence-tab-panel" id="assigned">
-          <div class="form-card">
-            <div class="form-card-title">
-              <span>
-                + Bổ sung minh chứng
-              </span>
-              <span class="badge b-blue">
-                Lưu nháp trước, gửi Thư ký khi sẵn sàng
-              </span>
-            </div>
-            <div class="form-row three">
-              <div class="field">
-                <label>
-                  Tiêu chí *
-                </label>
-                <select id="criterion">
-                </select>
-              </div>
-              <div class="field">
-                <label>
-                  Tên minh chứng *
-                </label>
-                <input id="name" placeholder="Nhập tên minh chứng"/>
-              </div>
-              <div class="field">
-                <label>
-                  File đính kèm
-                </label>
-                <div class="file-input-box">
-                  <input id="file" type="file"/>
-                </div>
-              </div>
-            </div>
-            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-              <button class="file-btn upload" onclick="addEvidence(false)">
-                Lưu bản nháp
-              </button>
-              <button class="file-btn submit" onclick="addEvidence(true)">
-                Lưu &amp; gửi Thư ký
-              </button>
-            </div>
-          </div>
-          <section class="role-card">
-            <div class="card-head">
-              <div>
-                <b>
-                  Minh chứng thuộc phạm vi phụ trách
-                </b>
-                <span class="head-sub">
-                  Duyệt các minh chứng đang ở trạng thái “Chờ Trưởng nhóm duyệt”
-                </span>
-              </div>
-              <span class="badge b-gray" id="countBadge">
-                0 minh chứng
-              </span>
-            </div>
-            <div class="card-body">
-              <div class="role-toolbar">
-                <input class="grow" id="search" placeholder="Tìm mã, tiêu chí hoặc tên minh chứng..."/>
-                <select id="statusFilter">
-                  <option value="">
-                    Tất cả trạng thái
-                  </option>
-                  <option>
-                    Đang soạn
-                  </option>
-                  <option>
-                    Chờ Trưởng nhóm duyệt
-                  </option>
-                  <option>
-                    Chờ Thư ký duyệt
-                  </option>
-                  <option>
-                    Chờ TT QLCL duyệt
-                  </option>
-                  <option>
-                    Đã duyệt
-                  </option>
-                  <option>
-                    Từ chối
-                  </option>
-                </select>
-              </div>
-              <div class="role-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>
-                        Mã
-                      </th>
-                      <th>
-                        Tiêu chí
-                      </th>
-                      <th>
-                        Tên minh chứng
-                      </th>
-                      <th>
-                        File
-                      </th>
-                      <th>
-                        Trạng thái
-                      </th>
-                      <th>
-                        Thao tác
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody id="rows">
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-        </section>
-        <section class="tab evidence-tab-panel" id="school">
-          <section class="role-card">
-            <div class="card-head">
-              <div>
-                <b>
-                  Minh chứng cấp Trường
-                </b>
-                <span class="head-sub">
-                  Tài liệu dùng chung để tham khảo
-                </span>
-              </div>
-              <span class="badge b-gray">
-                Chỉ xem
-              </span>
-            </div>
-            <div class="card-body">
-              <div class="role-toolbar">
-                <input class="grow" id="schoolSearch" placeholder="Tìm minh chứng cấp Trường..."/>
-              </div>
-              <div class="role-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>
-                        Mã
-                      </th>
-                      <th>
-                        Tên minh chứng
-                      </th>
-                      <th>
-                        Số hiệu
-                      </th>
-                      <th>
-                        Đơn vị ban hành
-                      </th>
-                      <th>
-                        File
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody id="schoolRows">
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-        </section>
-        <section class="tab evidence-tab-panel" id="faculty">
-          <section class="role-card">
-            <div class="card-head">
-              <div>
-                <b>
-                  Minh chứng cấp Khoa
-                </b>
-                <span class="head-sub">
-                  Tài liệu dùng chung để tham khảo
-                </span>
-              </div>
-              <span class="badge b-gray">
-                Chỉ xem
-              </span>
-            </div>
-            <div class="card-body">
-              <div class="role-toolbar">
-                <input class="grow" id="facultySearch" placeholder="Tìm minh chứng cấp Khoa..."/>
-              </div>
-              <div class="role-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>
-                        Mã
-                      </th>
-                      <th>
-                        Tên minh chứng
-                      </th>
-                      <th>
-                        Số hiệu
-                      </th>
-                      <th>
-                        Đơn vị ban hành
-                      </th>
-                      <th>
-                        File
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody id="facultyRows">
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-        </section>
-        <div class="modal" id="reviewModal">
-          <div class="modal-box" style="max-width:620px">
-            <div class="modal-head">
-              <b id="reviewTitle">
-                Duyệt minh chứng
-              </b>
-              <button onclick="closeModal('reviewModal')">
-                ×
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="review-modal-note" id="reviewInfo">
+       </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+       <button class="file-btn upload" onclick="addEvidence(false)">
+        Lưu bản nháp
+       </button>
+       <button class="file-btn submit" onclick="addEvidence(true)">
+        Lưu &amp; gửi Thư ký
+       </button>
+      </div>
+     </div>
+     <section class="role-card">
+      <div class="card-head">
+       <div>
+        <b>
+         Minh chứng thuộc phạm vi phụ trách
+        </b>
+        <span class="head-sub">
+         Duyệt các minh chứng đang ở trạng thái “Chờ Trưởng nhóm duyệt”
+        </span>
+       </div>
+       <span class="badge b-gray" id="countBadge">
+        0 minh chứng
+       </span>
+      </div>
+      <div class="card-body">
+       <div class="role-toolbar">
+        <input class="grow" id="search" placeholder="Tìm mã, tiêu chí hoặc tên minh chứng..."/>
+        <select id="statusFilter">
+         <option value="">
+          Tất cả trạng thái
+         </option>
+         <option>
+          Đang soạn
+         </option>
+         <option>
+          Chờ Trưởng nhóm duyệt
+         </option>
+         <option>
+          Chờ Thư ký duyệt
+         </option>
+         <option>
+          Chờ TT QLCL duyệt
+         </option>
+         <option>
+          Đã duyệt
+         </option>
+         <option>
+          Từ chối
+         </option>
+        </select>
+       </div>
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Mã
+           </th>
+           <th>
+            Tiêu chí
+           </th>
+           <th>
+            Tên minh chứng
+           </th>
+           <th>
+            File
+           </th>
+           <th>
+            Trạng thái
+           </th>
+           <th>
+            Thao tác
+           </th>
+          </tr>
+         </thead>
+         <tbody id="rows">
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </section>
+    </section>
+    <section class="tab evidence-tab-panel" id="school">
+     <section class="role-card">
+      <div class="card-head">
+       <div>
+        <b>
+         Minh chứng cấp Trường
+        </b>
+        <span class="head-sub">
+         Tài liệu dùng chung để tham khảo
+        </span>
+       </div>
+       <span class="badge b-gray">
+        Chỉ xem
+       </span>
+      </div>
+      <div class="card-body">
+       <div class="role-toolbar">
+        <input class="grow" id="schoolSearch" placeholder="Tìm minh chứng cấp Trường..."/>
+       </div>
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Mã
+           </th>
+           <th>
+            Tên minh chứng
+           </th>
+           <th>
+            Số hiệu
+           </th>
+           <th>
+            Đơn vị ban hành
+           </th>
+           <th>
+            File
+           </th>
+          </tr>
+         </thead>
+         <tbody id="schoolRows">
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </section>
+    </section>
+    <section class="tab evidence-tab-panel" id="faculty">
+     <section class="role-card">
+      <div class="card-head">
+       <div>
+        <b>
+         Minh chứng cấp Khoa
+        </b>
+        <span class="head-sub">
+         Tài liệu dùng chung để tham khảo
+        </span>
+       </div>
+       <span class="badge b-gray">
+        Chỉ xem
+       </span>
+      </div>
+      <div class="card-body">
+       <div class="role-toolbar">
+        <input class="grow" id="facultySearch" placeholder="Tìm minh chứng cấp Khoa..."/>
+       </div>
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Mã
+           </th>
+           <th>
+            Tên minh chứng
+           </th>
+           <th>
+            Số hiệu
+           </th>
+           <th>
+            Đơn vị ban hành
+           </th>
+           <th>
+            File
+           </th>
+          </tr>
+         </thead>
+         <tbody id="facultyRows">
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </section>
+    </section>
+    <div class="modal" id="reviewModal">
+     <div class="modal-box" style="max-width:620px">
+      <div class="modal-head">
+       <b id="reviewTitle">
+        Duyệt minh chứng
+       </b>
+       <button onclick="closeModal('reviewModal')">
+        ×
+       </button>
+      </div>
+      <div class="modal-body">
+       <div class="review-modal-note" id="reviewInfo"></div>
+       <div class="field"><label>Kết quả</label><select id="leaderEvidenceDecision"><option value="Duyệt">Duyệt chuyển Thư ký</option><option value="Từ chối">Yêu cầu chỉnh sửa</option><option value="Chỉ feedback">Chỉ feedback</option></select></div>
+       <div class="field">
+        <label>
+         Nhận xét
+        </label>
+        <textarea id="reviewNote" placeholder="Nhập nhận xét hoặc lý do từ chối..." rows="5"></textarea>
+       </div>
+      </div>
+      <div class="modal-foot">
+       <button class="btn-light" onclick="closeModal('reviewModal')">
+        Hủy
+       </button>
+       <button class="btn-primary" id="reviewSubmit">
+        Xác nhận
+       </button>
+      </div>
+     </div>
     </div>
-              <div class="field">
-    <label>Kết quả</label>
-    <select id="leaderEvidenceDecision">
-    <option value="Duyệt">Duyệt chuyển Thư ký</option>
-    <option value="Từ chối">Yêu cầu chỉnh sửa</option>
-    <option value="Chỉ feedback">Chỉ feedback</option>
-    </select>
-    </div>
-              <div class="field">
-                <label>
-                  Nhận xét
-                </label>
-                <textarea id="reviewNote" placeholder="Nhập nhận xét hoặc lý do từ chối..." rows="5">
-    </textarea>
-              </div>
-            </div>
-            <div class="modal-foot">
-              <button class="btn-light" onclick="closeModal('reviewModal')">
-                Hủy
-              </button>
-              <button class="btn-primary" id="reviewSubmit">
-                Xác nhận
-              </button>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-    <script src="/js/common.js">
-    </script>
-    <script>
+   </main>
+  </div>
+  <script src="/js/common.js">
+  </script>
+  <script>
 
-          $$('.evidence-tabs button').forEach(b => b.onclick = () => {
-        $$('.evidence-tabs button').forEach(x => x.classList.remove('active'));
-        $$('.tab').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        $('#' + b.dataset.tab).classList.add('active');
-        if (b.dataset.tab === 'school' || b.dataset.tab === 'faculty')
-                  ensureCommonLoaded();
-    });
-    let all = [], common = [], criteria = [], jobs = [], allowed = [], reviewId = null, reviewResult = '', me = null;
-    async function load() {
-        const [meData, evidenceData, criteriaData, jobsData] = await Promise.all([
-                          api('/auth/me'),
-                          api('/truong-nhom/minh-chung'),
-                          api('/tieu-chi').catch(() => []),
-                          api('/truong-nhom/cong-viec').catch(() => [])
-                  ]);
-        me = meData;
-        all = evidenceData || [];
-        criteria = criteriaData || [];
-        jobs = jobsData || [];
-        const isAssignedToMe = x =>
-            x.maNguoiDung === me.id ||
-            x.maNhanSuHoTro === me.id ||
-            (Array.isArray(x.maNguoiPhoiHopList) && x.maNguoiPhoiHopList.includes(me.id)) ||
-            (Array.isArray(x.maNhanSuHoTroList) && x.maNhanSuHoTroList.includes(me.id));
+     $$('.evidence-tabs button').forEach(b => b.onclick = () => {
+    $$('.evidence-tabs button').forEach(x => x.classList.remove('active'));
+    $$('.tab').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    $('#' + b.dataset.tab).classList.add('active');
+    if (b.dataset.tab === 'school' || b.dataset.tab === 'faculty')
+         ensureCommonLoaded();
+  });
+  let all = [], common = [], criteria = [], jobs = [], allowed = [], reviewId = null, reviewResult = '', me = null;
+  async function load() {
+    const [meData, evidenceData, criteriaData, jobsData] = await Promise.all([
+             api('/auth/me'),
+             api('/truong-nhom/minh-chung'),
+             api('/tieu-chi').catch(() => []),
+             api('/truong-nhom/cong-viec').catch(() => [])
+         ]);
+    me = meData;
+    all = evidenceData || [];
+    criteria = criteriaData || [];
+    jobs = jobsData || [];
+    const isAssignedToMe = x =>
+      x.maNguoiDung === me.id ||
+      x.maNhanSuHoTro === me.id ||
+      (Array.isArray(x.maNguoiPhoiHopList) && x.maNguoiPhoiHopList.includes(me.id)) ||
+      (Array.isArray(x.maNhanSuHoTroList) && x.maNhanSuHoTroList.includes(me.id));
 
-        const activeJobs = jobs.filter(
-            x => isAssignedToMe(x) && x.trangThai !== 'Hủy phân công'
-        );
+    const activeJobs = jobs.filter(
+      x => isAssignedToMe(x) && x.trangThai !== 'Hủy phân công'
+    );
 
-        const assignedCriterionIds = new Set(
-            activeJobs
-                .filter(x => x.maTieuChi)
-                .map(x => x.maTieuChi)
-        );
+    const assignedCriterionIds = new Set(
+      activeJobs
+        .filter(x => x.maTieuChi)
+        .map(x => x.maTieuChi)
+    );
 
-        const assignedStandardIds = new Set(
-            activeJobs
-                .filter(x => !x.maTieuChi && x.maTieuChuan)
-                .map(x => x.maTieuChuan)
-        );
+    const assignedStandardIds = new Set(
+      activeJobs
+        .filter(x => !x.maTieuChi && x.maTieuChuan)
+        .map(x => x.maTieuChuan)
+    );
 
-        // Chỉ cho phép bổ sung minh chứng trong phạm vi phân công của người đăng nhập.
-        // Không dùng danh sách minh chứng đã tồn tại để mở rộng quyền chọn tiêu chí.
-        allowed = criteria.filter(
-            c => assignedCriterionIds.has(c.id) || assignedStandardIds.has(c.maTieuChuan)
-        );
-        criterion.innerHTML = '<option value="">-- Chọn tiêu chí --</option>' + allowed.map(c => `<option value="${c.id}">${c.id} - ${esc(c.tenTieuChi)}</option>`).join('');
-        render();
+    // Chỉ cho phép bổ sung minh chứng trong phạm vi phân công của người đăng nhập.
+    // Không dùng danh sách minh chứng đã tồn tại để mở rộng quyền chọn tiêu chí.
+    allowed = criteria.filter(
+      c => assignedCriterionIds.has(c.id) || assignedStandardIds.has(c.maTieuChuan)
+    );
+    criterion.innerHTML = '<option value="">-- Chọn tiêu chí --</option>' + allowed.map(c => `<option value="${c.id}">${c.id} - ${esc(c.tenTieuChi)}</option>`).join('');
+    render();
+  }
+  let commonLoaded = false;
+  async function ensureCommonLoaded() {
+    if (commonLoaded)
+             return;
+    commonLoaded = true;
+    try {
+      common = await api('/minh-chung-chung');
+      renderCommon();
     }
-    let commonLoaded = false;
-    async function ensureCommonLoaded() {
-        if (commonLoaded)
-                          return;
-        commonLoaded = true;
-        try {
-            common = await api('/minh-chung-chung');
-            renderCommon();
-        }
-                  catch (e) {
-            commonLoaded = false;
-            console.error('minh-chung-chung', e);
-        }
-        }
-    async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:');
-      if (!note || !note.trim()) return; try { await api('/truong-nhom/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.');
-      await load(); } catch(e){ alert(e.message); } }
-    function render() {
-        const q = search.value.trim().toLowerCase(), s = statusFilter.value;
-        const a = all.filter(x => allowed.some(c => c.id === x.maTieuChi)).filter(x => (!s || x.trangThai === s) && (!q || JSON.stringify(x).toLowerCase().includes(q)));
-        countBadge.textContent = a.length + ' minh chứng';
-        rows.innerHTML = a.map(x => {
-            const ownEditable = x.maNguoiUpload === me.id && ['Đang soạn', 'Từ chối'].includes(x.trangThai);
-            const canReview = x.trangThai === 'Chờ Trưởng nhóm duyệt' && x.duongDanFile;
-            return `<tr>
-    <td>
-    <span class="role-code">${esc(x.maMinhChung || x.id)}</span>
-    </td>
-    <td>
-    <b>${esc(x.maTieuChi || '')}</b>
-    </td>
-    <td>${esc(x.tenMinhChung || '')}</td>
-    <td>${evidenceFileHtml(x)}</td>
-    <td>
-    <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
-    </td>
-    <td>
-    <div class="file-tools">
-    <button class="btn-primary btn-sm" onclick="openReview('${x.id}', '${canReview ? 'Duyệt' : 'Feedback'}')">Đánh giá / duyệt</button>${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)">
-    </label>${x.duongDanFile ? `<button class="file-btn delete" onclick="deleteOwnFile('${x.id}')">Xóa file</button>
-    <button class="file-btn submit" onclick="submitOwn('${x.id}')">${x.trangThai === 'Từ chối' ? 'Nộp lại' : 'Gửi Thư ký'}</button>` : ''}` : ''}${!canReview && !ownEditable ? '<span class="muted">—</span>' : ''}</div>
-    </td>
-    </tr>`;
-        }).join('') || `<tr>
-    <td colspan="6">
-    <div class="empty-state">
-    <div class="empty-icon">▧</div>
-    <b>Chưa có minh chứng</b>
-    </div>
-    </td>
-    </tr>`;
+         catch (e) {
+      commonLoaded = false;
+      console.error('minh-chung-chung', e);
     }
-    async function addEvidence(send) {
-        if (!allowed.some(c => c.id === criterion.value)) {
-            return alert('Bạn chỉ được bổ sung minh chứng cho tiêu chí thuộc phạm vi phân công của mình.');
-        }
-        if (!criterion.value || !name.value.trim())
-                  return alert('Vui lòng chọn tiêu chí và nhập tên minh chứng');
-        if (send && !file.files[0])
-                  return alert('Vui lòng chọn file minh chứng trước khi gửi');
-        try {
-            let x = await api('/truong-nhom/minh-chung', {
-                method: 'POST', body: JSON.stringify({
-                    maTieuChi: criterion.value, tenMinhChung: name.value.trim(), moTa: name.value.trim()
-                })
-            });
-            if (file.files[0]) {
-                const fd = new FormData();
-                fd.append('file', file.files[0]);
-                const r = await fetch('/api/truong-nhom/minh-chung/' + x.id + '/upload', {
-                    method: 'POST', body: fd
-                });
-                if (!r.ok)
-                                  throw new Error(await r.text());
-            }
-            if (send)
-                          await api('/truong-nhom/minh-chung/' + encodeURIComponent(x.id) + '/gui-duyet', {
-                method: 'POST'
-            });
-            name.value = '';
-            file.value = '';
-            await load();
-            alert(send ? 'Đã gửi minh chứng lên Thư ký.' : 'Đã lưu bản nháp. Bạn vẫn có thể thay hoặc xóa file trước khi gửi.');
-        }
-          catch (e) {
-            alert(e.message);
-        }
-        }
-    function openReview(id, result) {
-        reviewId = id;
-        reviewResult = result;
-        const x = all.find(m => m.id === id);
-        reviewTitle.textContent = result === 'Duyệt' ? 'Duyệt minh chứng' : 'Từ chối minh chứng';
-        reviewInfo.textContent = `${x?.maMinhChung || id} · ${x?.tenMinhChung || ''}`;
-        reviewNote.value = '';
-        document.getElementById('leaderEvidenceDecision').value = result === 'Feedback' ? 'Chỉ feedback' : result;
-        reviewSubmit.className = result === 'Duyệt' ? 'btn-green' : 'btn-danger';
-        reviewSubmit.textContent = result === 'Duyệt' ? 'Duyệt & chuyển Thư ký' : 'Xác nhận từ chối';
-        openModal('reviewModal');
     }
-    async function replaceOwnFile(id, input) {
-        const f = input?.files?.[0];
-        if (!f)
-                  return;
-        try {
-            const fd = new FormData();
-            fd.append('file', f);
-            const r = await fetch('/api/truong-nhom/minh-chung/' + encodeURIComponent(id) + '/upload', {
-                method: 'POST', body: fd
-            });
-            if (!r.ok) {
-                let m = await r.text();
-                try {
-                    m = JSON.parse(m).message || m;
-                }
-                          catch (_) {
-                }
-                throw new Error(m || 'Upload thất bại');
-            }
-            await load();
-        }
-          catch (e) {
-            alert(e.message);
-        }
-          finally {
-            if (input)
-                          input.value = '';
-        }
-        }
-    async function deleteOwnFile(id) {
-        if (!confirm('Xóa file đã tải? Minh chứng vẫn được giữ ở bản nháp.'))
-                  return;
-        try {
-            await api('/truong-nhom/minh-chung/' + encodeURIComponent(id) + '/file', {
-                method: 'DELETE'
-            });
-            await load();
-        }
-          catch (e) {
-            alert(e.message);
-        }
-        }
-    async function submitOwn(id) {
-        if (!confirm('Gửi minh chứng này lên Thư ký duyệt? Sau khi gửi file sẽ bị khóa.'))
-                  return;
-        try {
-            await api('/truong-nhom/minh-chung/' + encodeURIComponent(id) + '/gui-duyet', {
-                method: 'POST'
-            });
-            await load();
-        }
-          catch (e) {
-            alert(e.message);
-        }
-        }
-    reviewSubmit.onclick = async () => {
-        try {
-            const decision = document.getElementById('leaderEvidenceDecision').value;
-            if (decision === 'Chỉ feedback') {
-                await api('/truong-nhom/minh-chung/' + encodeURIComponent(reviewId) + '/feedback', {method:'POST', body:JSON.stringify({loai:'Feedback', nhanXet:reviewNote.value.trim()})});
-                closeModal('reviewModal');
+  async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:'); if(!note || !note.trim()) return; try { await api('/truong-nhom/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
+  function render() {
+    const q = search.value.trim().toLowerCase(), s = statusFilter.value;
+    const a = all.filter(x => allowed.some(c => c.id === x.maTieuChi)).filter(x => (!s || x.trangThai === s) && (!q || JSON.stringify(x).toLowerCase().includes(q)));
+    countBadge.textContent = a.length + ' minh chứng';
+    rows.innerHTML = a.map(x => {
+      const ownEditable = x.maNguoiUpload === me.id && ['Đang soạn', 'Từ chối'].includes(x.trangThai);
+      const canReview = x.trangThai === 'Chờ Trưởng nhóm duyệt' && x.duongDanFile;
+      return `<tr>
+  <td>
+  <span class="role-code">${esc(x.maMinhChung || x.id)}</span>
+  </td>
+  <td>
+  <b>${esc(x.maTieuChi || '')}</b>
+  </td>
+  <td>${esc(x.tenMinhChung || '')}</td>
+  <td>${evidenceFileHtml(x)}</td>
+  <td>
+  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
+  </td>
+  <td>
+  <div class="file-tools"><button class="btn-primary btn-sm" onclick="openReview('${x.id}', '${canReview ? 'Duyệt' : 'Feedback'}')">Đánh giá / duyệt</button>${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)">
+  </label>${x.duongDanFile ? `<button class="file-btn delete" onclick="deleteOwnFile('${x.id}')">Xóa file</button>
+  <button class="file-btn submit" onclick="submitOwn('${x.id}')">${x.trangThai === 'Từ chối' ? 'Nộp lại' : 'Gửi Thư ký'}</button>` : ''}` : ''}${!canReview && !ownEditable ? '<span class="muted">—</span>' : ''}</div>
+  </td>
+  </tr>`;
+    }).join('') || `<tr>
+  <td colspan="6">
+  <div class="empty-state">
+  <div class="empty-icon">▧</div>
+  <b>Chưa có minh chứng</b>
+  </div>
+  </td>
+  </tr>`;
+  }
+  async function addEvidence(send) {
+    if (!allowed.some(c => c.id === criterion.value)) {
+      return alert('Bạn chỉ được bổ sung minh chứng cho tiêu chí thuộc phạm vi phân công của mình.');
+    }
+    if (!criterion.value || !name.value.trim())
+         return alert('Vui lòng chọn tiêu chí và nhập tên minh chứng');
+    if (send && !file.files[0])
+         return alert('Vui lòng chọn file minh chứng trước khi gửi');
+    try {
+      let x = await api('/truong-nhom/minh-chung', {
+        method: 'POST', body: JSON.stringify({
+          maTieuChi: criterion.value, tenMinhChung: name.value.trim(), moTa: name.value.trim()
+        })
+      });
+      if (file.files[0]) {
+        const fd = new FormData();
+        fd.append('file', file.files[0]);
+        const r = await fetch('/api/truong-nhom/minh-chung/' + x.id + '/upload', {
+          method: 'POST', body: fd
+        });
+        if (!r.ok)
+                 throw new Error(await r.text());
+      }
+      if (send)
+             await api('/truong-nhom/minh-chung/' + encodeURIComponent(x.id) + '/gui-duyet', {
+        method: 'POST'
+      });
+      name.value = '';
+      file.value = '';
       await load();
-      return;
-            }
-            const r = await api('/truong-nhom/minh-chung/' + reviewId + '/duyet', {method:'POST', body:JSON.stringify({ketQua:decision, nhanXet:reviewNote.value})});
-            const x = all.find(m => m.id === reviewId);
-            if (x)
-                          x.trangThai = r?.trangThai || (reviewResult === 'Duyệt' ? 'Chờ Thư ký duyệt' : 'Từ chối');
-            closeModal('reviewModal');
-            render();
-            alert(reviewResult === 'Duyệt' ? 'Đã duyệt minh chứng và chuyển Thư ký.' : 'Đã từ chối minh chứng.');
-        }
-          catch (e) {
-            alert(e.message || 'Không thể xử lý minh chứng');
-        }
-        };
-    search.oninput = render;
-    statusFilter.onchange = render;
-    function commonRowsHtml(cap, q) {
-        q = (q || '').trim().toLowerCase();
-        const a = common.filter(x => x.capQuanLy === cap && (!q || JSON.stringify(x).toLowerCase().includes(q)));
-        return a.map(x => `<tr>
-    <td>
-    <span class="role-code">${esc(x.maMinhChung || x.id || '')}</span>
-    </td>
-    <td>${esc(x.tenMinhChung || '')}</td>
-    <td>${esc(x.soHieuVanBan || '-')}</td>
-    <td>${esc(x.donViBanHanh || '-')}</td>
-    <td>${evidenceFileHtml(x)}</td>
-    </tr>`).join('') || '<tr>
-    <td colspan="5" class="empty">Chưa có dữ liệu</td>
-    </tr>';
+      alert(send ? 'Đã gửi minh chứng lên Thư ký.' : 'Đã lưu bản nháp. Bạn vẫn có thể thay hoặc xóa file trước khi gửi.');
     }
-    function renderCommon() {
-        schoolRows.innerHTML = commonRowsHtml('Cấp Trường', schoolSearch.value);
-        facultyRows.innerHTML = commonRowsHtml('Cấp Khoa', facultySearch.value);
+     catch (e) {
+      alert(e.message);
     }
-    schoolSearch.oninput = renderCommon;
-    facultySearch.oninput = renderCommon;
-    load();
+    }
+  function openReview(id, result) {
+    reviewId = id;
+    reviewResult = result;
+    const x = all.find(m => m.id === id);
+    reviewTitle.textContent = result === 'Duyệt' ? 'Duyệt minh chứng' : 'Từ chối minh chứng';
+    reviewInfo.textContent = `${x?.maMinhChung || id} · ${x?.tenMinhChung || ''}`;
+    reviewNote.value = '';
+    document.getElementById('leaderEvidenceDecision').value = result === 'Feedback' ? 'Chỉ feedback' : result;
+    reviewSubmit.className = result === 'Duyệt' ? 'btn-green' : 'btn-danger';
+    reviewSubmit.textContent = result === 'Duyệt' ? 'Duyệt & chuyển Thư ký' : 'Xác nhận từ chối';
+    openModal('reviewModal');
+  }
+  async function replaceOwnFile(id, input) {
+    const f = input?.files?.[0];
+    if (!f)
+         return;
+    try {
+      const fd = new FormData();
+      fd.append('file', f);
+      const r = await fetch('/api/truong-nhom/minh-chung/' + encodeURIComponent(id) + '/upload', {
+        method: 'POST', body: fd
+      });
+      if (!r.ok) {
+        let m = await r.text();
+        try {
+          m = JSON.parse(m).message || m;
+        }
+             catch (_) {
+        }
+        throw new Error(m || 'Upload thất bại');
+      }
+      await load();
+    }
+     catch (e) {
+      alert(e.message);
+    }
+     finally {
+      if (input)
+             input.value = '';
+    }
+    }
+  async function deleteOwnFile(id) {
+    if (!confirm('Xóa file đã tải? Minh chứng vẫn được giữ ở bản nháp.'))
+         return;
+    try {
+      await api('/truong-nhom/minh-chung/' + encodeURIComponent(id) + '/file', {
+        method: 'DELETE'
+      });
+      await load();
+    }
+     catch (e) {
+      alert(e.message);
+    }
+    }
+  async function submitOwn(id) {
+    if (!confirm('Gửi minh chứng này lên Thư ký duyệt? Sau khi gửi file sẽ bị khóa.'))
+         return;
+    try {
+      await api('/truong-nhom/minh-chung/' + encodeURIComponent(id) + '/gui-duyet', {
+        method: 'POST'
+      });
+      await load();
+    }
+     catch (e) {
+      alert(e.message);
+    }
+    }
+  reviewSubmit.onclick = async () => {
+    try {
+      const decision = document.getElementById('leaderEvidenceDecision').value;
+      if (decision === 'Chỉ feedback') {
+        await api('/truong-nhom/minh-chung/' + encodeURIComponent(reviewId) + '/feedback', {method:'POST', body:JSON.stringify({loai:'Feedback', nhanXet:reviewNote.value.trim()})});
+        closeModal('reviewModal'); await load(); return;
+      }
+      const r = await api('/truong-nhom/minh-chung/' + reviewId + '/duyet', {method:'POST', body:JSON.stringify({ketQua:decision, nhanXet:reviewNote.value})});
+      const x = all.find(m => m.id === reviewId);
+      if (x)
+             x.trangThai = r?.trangThai || (reviewResult === 'Duyệt' ? 'Chờ Thư ký duyệt' : 'Từ chối');
+      closeModal('reviewModal');
+      render();
+      alert(reviewResult === 'Duyệt' ? 'Đã duyệt minh chứng và chuyển Thư ký.' : 'Đã từ chối minh chứng.');
+    }
+     catch (e) {
+      alert(e.message || 'Không thể xử lý minh chứng');
+    }
+    };
+  search.oninput = render;
+  statusFilter.onchange = render;
+  function commonRowsHtml(cap, q) {
+    q = (q || '').trim().toLowerCase();
+    const a = common.filter(x => x.capQuanLy === cap && (!q || JSON.stringify(x).toLowerCase().includes(q)));
+    return a.map(x => `<tr>
+  <td>
+  <span class="role-code">${esc(x.maMinhChung || x.id || '')}</span>
+  </td>
+  <td>${esc(x.tenMinhChung || '')}</td>
+  <td>${esc(x.soHieuVanBan || '-')}</td>
+  <td>${esc(x.donViBanHanh || '-')}</td>
+  <td>${evidenceFileHtml(x)}</td>
+  </tr>`).join('') || '<tr><td colspan="5" class="empty">Chưa có dữ liệu</td></tr>';
+  }
+  function renderCommon() {
+    schoolRows.innerHTML = commonRowsHtml('Cấp Trường', schoolSearch.value);
+    facultyRows.innerHTML = commonRowsHtml('Cấp Khoa', facultySearch.value);
+  }
+  schoolSearch.oninput = renderCommon;
+  facultySearch.oninput = renderCommon;
+  load();
 </script>
-  </body>
+ </body>
 </html>
 

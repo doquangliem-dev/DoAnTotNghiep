@@ -87,6 +87,9 @@ public class PageController {
     @GetMapping("/truong-nhom/tien-do") public String tnTd() {
         return "truong-nhom/tien-do";
     }
+    @GetMapping("/truong-nhom/bao-cao") public String tnBc() {
+        return "truong-nhom/bao-cao";
+    }
     @GetMapping("/truong-nhom/bao-cao-nhom") public String tnBcn() {
         return "truong-nhom/bao-cao-nhom";
     }

@@ -1812,14 +1812,35 @@ public class HeThongService {
             }
         }
     }
-    private PhanCong findAssignmentForEvidence(String userId,TieuChi tc,boolean leaderRole) {
-        return pcRepo.findAll().stream().filter(p-> {
-            if("Hủy phân công".equalsIgnoreCase(Optional.ofNullable(p.getTrangThai()).orElse(""))) return false;
-            if(leaderRole) return Objects.equals(p.getMaNguoiDung(),userId)&&Objects.equals(p.getMaTieuChuan(),tc.getMaTieuChuan())
-            &&((p.getMaTieuChi()==null||p.getMaTieuChi().isBlank())||Objects.equals(p.getMaTieuChi(),tc.getId()));
-            return (Objects.equals(p.getMaNguoiDung(),userId)||Objects.equals(p.getMaNhanSuHoTro(),userId)||(p.getMaNhanSuHoTroList()!=null&&p.getMaNhanSuHoTroList().contains(userId))||(p.getMaNguoiPhoiHopList()!=null&&p.getMaNguoiPhoiHopList().contains(userId)))&&Objects.equals(p.getMaTieuChi(),tc.getId());
+    private PhanCong findAssignmentForEvidence(String userId, TieuChi tc, boolean leaderRole) {
+        List<PhanCong> activeAssignments = pcRepo.findAll().stream()
+            .filter(p -> !"Hủy phân công".equalsIgnoreCase(
+                Optional.ofNullable(p.getTrangThai()).orElse("")))
+            .toList();
+
+        if (leaderRole) {
+            PhanCong leaderScope = activeAssignments.stream()
+                .filter(p -> Objects.equals(p.getMaNguoiDung(), userId))
+                .filter(p -> Objects.equals(p.getMaTieuChuan(), tc.getMaTieuChuan()))
+                .filter(p -> p.getMaTieuChi() == null || p.getMaTieuChi().isBlank())
+                .findFirst()
+                .orElse(null);
+
+            if (leaderScope != null) {
+                return leaderScope;
+            }
         }
-        ).findFirst().orElse(null);
+
+        return activeAssignments.stream()
+            .filter(p -> Objects.equals(p.getMaTieuChi(), tc.getId()))
+            .filter(p -> Objects.equals(p.getMaNguoiDung(), userId)
+                || Objects.equals(p.getMaNhanSuHoTro(), userId)
+                || (p.getMaNhanSuHoTroList() != null
+                    && p.getMaNhanSuHoTroList().contains(userId))
+                || (p.getMaNguoiPhoiHopList() != null
+                    && p.getMaNguoiPhoiHopList().contains(userId)))
+            .findFirst()
+            .orElse(null);
     }
     public MinhChung uploadMinhChungNguoiDung(String id,MultipartFile file,String userId,boolean leaderRole) {
         MinhChung mc=mcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy minh chứng"));
@@ -1988,6 +2009,32 @@ public class HeThongService {
         markAssignmentInProgress(assignment.getId());
         return saved;
     }
+    public BaoCaoTieuChi guiBaoCaoTruongNhomCaNhan(String id, String userId) {
+        BaoCaoTieuChi report = guiBaoCaoThanhVien(id, userId);
+        if (!"Chờ Trưởng nhóm duyệt".equalsIgnoreCase(report.getTrangThai())) {
+            return report;
+        }
+
+        report.setTrangThai("Chờ Thư ký duyệt");
+        report.setMucDoDuyet(50);
+        report.setCapDuyetHienTai("Trưởng nhóm");
+        if (report.getDuyetBaoCao() == null) {
+            report.setDuyetBaoCao(new ArrayList<>());
+        }
+
+        Map<String, Object> history = new LinkedHashMap<>();
+        history.put("capDuyet", "Trưởng nhóm");
+        history.put("vaiTroDuyet", "Trưởng nhóm");
+        history.put("maNguoiDuyet", userId);
+        history.put("trangThai", "Đã gửi Thư ký");
+        history.put("mucDoDuyet", 50);
+        history.put("ngayDuyet", LocalDateTime.now());
+        report.getDuyetBaoCao().add(history);
+        report.setNgayCapNhat(LocalDateTime.now());
+
+        return bcRepo.save(report);
+    }
+
     public BaoCaoTieuChi guiBaoCaoThanhVien(String id,String userId) {
         BaoCaoTieuChi old=bcRepo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy báo cáo"));
         if(!Objects.equals(old.getMaNguoiViet(),userId))

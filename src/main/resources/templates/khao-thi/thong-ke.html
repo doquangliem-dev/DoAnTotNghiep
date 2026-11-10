@@ -85,9 +85,6 @@
            Đã đánh giá
           </th>
           <th>
-           Điểm TB
-          </th>
-          <th>
            Đạt
           </th>
           <th>
@@ -123,15 +120,11 @@
     const s = await api('/khao-thi/thong-ke' + q), d = s.tongHop || {
     };
     summary.innerHTML = `<div class="summary-mini">
-  <b>${d.mucDanhGiaTrungBinh || 0}/5</b>
-  <span>Điểm đánh giá TB</span>
+  <b>${d.tongDanhGia || 0}</b>
+  <span>Tiêu chí đã đánh giá</span>
   </div>
   <div class="summary-mini">
-  <b>${d.soTieuChiDaChamDiem || 0}</b>
-  <span>Tiêu chí đã chấm</span>
-  </div>
-  <div class="summary-mini">
-  <b>${d.soTieuChiChuaDanhGia || 0}</b>
+  <b>${Math.max(0, (d.tongTieuChi || 0) - (d.tongDanhGia || 0))}</b>
   <span>Chưa đánh giá</span>
   </div>
   <div class="summary-mini">
@@ -145,14 +138,11 @@
   </td>
   <td>${x.tongTieuChi || 0}</td>
   <td>${x.daDanhGia || 0}</td>
-  <td>
-  <b>${x.diemDanhGiaTrungBinh || 0}/5</b>
-  </td>
   <td>${x.dat || 0}</td>
   <td>${x.khongDat || 0}</td>
   <td>${[...(x.nguoiDanhGia || []), ...(x.nguoiDuyetBaoCao || [])].map(v => `<div class="muted">${esc(v)}</div>`).join('') || '-'}</td>
   <td>${x.tyLeHoanThanh || 0}%</td>
-  </tr>`).join('') || '<tr><td colspan="8" class="empty">Chưa có dữ liệu</td></tr>';
+  </tr>`).join('') || '<tr><td colspan="7" class="empty">Chưa có dữ liệu</td></tr>';
   }
   init();
 </script>

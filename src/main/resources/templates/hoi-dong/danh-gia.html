@@ -102,9 +102,6 @@
            Kết quả
           </th>
           <th>
-           Mức đánh giá
-          </th>
-          <th>
            Người đánh giá / đơn vị
           </th>
           <th>
@@ -166,28 +163,6 @@
           </option>
          </select>
         </div>
-        <div class="field">
-         <label>
-          Mức đánh giá tổng quát (1-5)
-         </label>
-         <select id="e_diem">
-          <option value="1">
-           1 - Rất thấp
-          </option>
-          <option value="2">
-           2 - Thấp
-          </option>
-          <option value="3">
-           3 - Trung bình
-          </option>
-          <option selected="" value="4">
-           4 - Tốt
-          </option>
-          <option value="5">
-           5 - Rất tốt
-          </option>
-         </select>
-        </div>
         <div class="field full">
          <label>
           Nhận xét
@@ -242,13 +217,12 @@
   <td>${esc(x.tenTieuChi || '')}</td>
   <td>${d ? d.lanDanhGia : '-'}</td>
   <td>${d ? `<span class="badge ${d.ketQua === 'Đạt' ? 'b-green' : 'b-red'}">${esc(d.ketQua)}</span>` : 'Chưa đánh giá'}</td>
-  <td>${d?.diemDanhGia ? `<b>${d.diemDanhGia}/5</b>` : '-'}</td>
   <td>${d ? `<b>${esc(d.tenNguoiDanhGia || uname(d.maNguoiDanhGia))}</b>
   <div class="muted">${esc(d.vaiTroDanhGia || 'Hội đồng')}${d.donViDanhGia ? ' · ' + esc(d.donViDanhGia) : ''}</div>` : ''}</td>
   <td>${esc(d?.nhanXet || '')}</td>
   <td>${ok ? `<button class="btn-primary" onclick="openEval('${x.id}')">Đánh giá</button>` : '<span class="muted">Chờ báo cáo được duyệt</span>'}</td>
   </tr>`;
-    }).join('') || '<tr><td colspan="8" class="empty">Không có tiêu chí</td></tr>';
+    }).join('') || '<tr><td colspan="7" class="empty">Không có tiêu chí</td></tr>';
   }
   function openEval(id) {
     const plan = $('#fPlan').value;
@@ -257,15 +231,14 @@
     const d = latest(id, plan);
     $('#e_lan').value = (d?.lanDanhGia || 0) + 1;
     $('#e_kq').value = 'Đạt';
-    $('#e_diem').value = '4';
-    $('#e_nx').value = '';
+        $('#e_nx').value = '';
     openModal('modalEval');
   }
   async function saveEval() {
     if (!$('#e_plan').value)
          return alert('Vui lòng chọn kế hoạch đã phê duyệt');
     const body = {
-      maKeHoach: $('#e_plan').value, maTieuChi: $('#e_tchi').value, ketQua: $('#e_kq').value, diemDanhGia: Number($('#e_diem').value), nhanXet: $('#e_nx').value.trim()
+      maKeHoach: $('#e_plan').value, maTieuChi: $('#e_tchi').value, ketQua: $('#e_kq').value, nhanXet: $('#e_nx').value.trim()
     };
     try {
       await api('/hoi-dong/danh-gia-tieu-chi', {

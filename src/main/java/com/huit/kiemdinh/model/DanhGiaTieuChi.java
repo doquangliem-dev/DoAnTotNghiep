@@ -18,8 +18,6 @@ public class DanhGiaTieuChi {
     private String tenNguoiDanhGia;
     private String vaiTroDanhGia;
     private String donViDanhGia;
-    private Integer diemDanhGia;
-    // thang 1-5 để tính mức đánh giá tổng quát
     private LocalDateTime ngayDanhGia;
     public DanhGiaTieuChi() {
     }
@@ -82,12 +80,6 @@ public class DanhGiaTieuChi {
     }
     public void setDonViDanhGia(String v) {
         donViDanhGia=v;
-    }
-    public Integer getDiemDanhGia() {
-        return diemDanhGia;
-    }
-    public void setDiemDanhGia(Integer v) {
-        diemDanhGia=v;
     }
     public LocalDateTime getNgayDanhGia() {
         return ngayDanhGia;

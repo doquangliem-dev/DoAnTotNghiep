@@ -1137,8 +1137,7 @@ public class HeThongService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Vui lòng chọn tiêu chí hợp lệ");
         if(!List.of("Đạt","Không đạt").contains(x.getKetQua()))
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Kết quả chỉ nhận Đạt hoặc Không đạt");
-        if(x.getDiemDanhGia()==null||x.getDiemDanhGia()<1||x.getDiemDanhGia()>5)
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Mức đánh giá tổng quát phải từ 1 đến 5 điểm");
+        // Kết quả đánh giá tiêu chí chỉ gồm Đạt hoặc Không đạt.
         if(x.getMaKeHoach()==null||x.getMaKeHoach().isBlank())
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Vui lòng chọn kế hoạch tự đánh giá trước khi đánh giá tiêu chí");
         KeHoachTuDanhGia evalPlan=khRepo.findById(x.getMaKeHoach())
@@ -1368,7 +1367,6 @@ public class HeThongService {
             }
             long dat=latest.values().stream().filter(x->"Đạt".equalsIgnoreCase(x.getKetQua())).count();
             long khongDat=latest.values().stream().filter(x->"Không đạt".equalsIgnoreCase(x.getKetQua())).count();
-            double diemTb=latest.values().stream().map(DanhGiaTieuChi::getDiemDanhGia).filter(Objects::nonNull).mapToInt(Integer::intValue).average().orElse(0);
             List<String> nguoiDanhGia=latest.values().stream().map(d-> {
                 String ten=Optional.ofNullable(d.getTenNguoiDanhGia()).orElseGet(()->userRepo.findById(d.getMaNguoiDanhGia()).map(NguoiDung::getHoTen).orElse(d.getMaNguoiDanhGia()));
                 String vt=Optional.ofNullable(d.getVaiTroDanhGia()).orElseGet(()->vaiTroNguoiDung(d.getMaNguoiDanhGia()));
@@ -1396,7 +1394,6 @@ public class HeThongService {
             r.put("daDanhGia",latest.size());
             r.put("dat",dat);
             r.put("khongDat",khongDat);
-            r.put("diemDanhGiaTrungBinh",Math.round(diemTb*100.0)/100.0);
             r.put("nguoiDanhGia",nguoiDanhGia);
             r.put("nguoiDuyetBaoCao",nguoiDuyetBaoCao);
             r.put("tyLeCoBaoCao",cs.isEmpty()?0:(int)Math.round(bcCount*100.0/cs.size()));
@@ -1418,12 +1415,9 @@ public class HeThongService {
         out.put("tongMinhChung",evidences.size());
         out.put("tongDanhGia",evals.size());
         Map<String,DanhGiaTieuChi> latestAll=latestEvaluations(evals);
-        double overall=latestAll.values().stream().map(DanhGiaTieuChi::getDiemDanhGia).filter(Objects::nonNull).mapToInt(Integer::intValue).average().orElse(0);
-        out.put("mucDanhGiaTrungBinh",Math.round(overall*100.0)/100.0);
-        out.put("soTieuChiDaChamDiem",latestAll.values().stream().filter(x->x.getDiemDanhGia()!=null).count());
         out.put("soTieuChiChuaDanhGia",Math.max(0,criteria.size()-latestAll.size()));
         List<Map<String,Object>> evaluatorDetails=latestAll.values().stream().sorted(Comparator.comparing(DanhGiaTieuChi::getNgayDanhGia,Comparator.nullsLast(Comparator.reverseOrder()))).map(d-> {
-            Map<String,Object> m=new LinkedHashMap<>(); m.put("maTieuChi",d.getMaTieuChi()); m.put("ketQua",d.getKetQua()); m.put("diem",d.getDiemDanhGia());
+            Map<String,Object> m=new LinkedHashMap<>(); m.put("maTieuChi",d.getMaTieuChi()); m.put("ketQua",d.getKetQua());
             m.put("maNguoiDanhGia",d.getMaNguoiDanhGia()); m.put("tenNguoiDanhGia",Optional.ofNullable(d.getTenNguoiDanhGia()).orElseGet(()->userRepo.findById(d.getMaNguoiDanhGia()).map(NguoiDung::getHoTen).orElse(d.getMaNguoiDanhGia())));
             m.put("vaiTroDanhGia",Optional.ofNullable(d.getVaiTroDanhGia()).orElseGet(()->vaiTroNguoiDung(d.getMaNguoiDanhGia()))); m.put("donViDanhGia",d.getDonViDanhGia()); m.put("ngayDanhGia",d.getNgayDanhGia()); return m;
         }

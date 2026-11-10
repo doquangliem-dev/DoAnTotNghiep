@@ -111,9 +111,6 @@
            Không đạt
           </th>
           <th>
-           Điểm ĐG TB
-          </th>
-          <th>
            Người/cấp đánh giá
           </th>
           <th>
@@ -167,14 +164,11 @@
   <td>${x.daDanhGia || 0}</td>
   <td>${x.dat || 0}</td>
   <td>${x.khongDat || 0}</td>
-  <td>
-  <b>${x.diemDanhGiaTrungBinh || 0}/5</b>
-  </td>
   <td>${[...(x.nguoiDanhGia || []), ...(x.nguoiDuyetBaoCao || [])].map(v => `<div class="muted">${esc(v)}</div>`).join('') || '-'}</td>
   <td>
   <b>${x.tyLeHoanThanh || 0}%</b>
   </td>
-  </tr>`).join('') || '<tr><td colspan="10" class="empty">Chưa có dữ liệu</td></tr>';
+  </tr>`).join('') || '<tr><td colspan="9" class="empty">Chưa có dữ liệu</td></tr>';
   }
   plan.onchange = loadStat;
   init();

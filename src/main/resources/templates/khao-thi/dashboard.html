@@ -171,20 +171,6 @@
       <div class="bar-chart" id="bars">
       </div>
      </section>
-     <section class="qlcl-card">
-      <h3>
-       Điểm đánh giá trung bình
-      </h3>
-      <div class="score-wrap">
-       <div class="score-ring" id="scoreRing" style="--pct:0%">
-        <b id="scoreValue">
-         0/5
-        </b>
-       </div>
-       <div class="muted" id="scoreMeta">
-       </div>
-      </div>
-     </section>
      <section class="qlcl-card" style="grid-column:1/-1">
       <h3>
        Tiến độ theo tiêu chuẩn
@@ -201,7 +187,7 @@
 
      async function load() {
     const d = await api('/khao-thi/dashboard');
-    const x = [['CTĐT', d.ctdt || 0], ['Kế hoạch', d.keHoach || 0], ['Chờ xử lý', d.choDuyet || 0], ['Phân công', d.phanCong || 0], ['Minh chứng', d.minhChung || 0], ['Điểm TB', (d.mucDanhGiaTrungBinh || 0) + '/5']];
+    const x = [['CTĐT', d.ctdt || 0], ['Kế hoạch', d.keHoach || 0], ['Chờ xử lý', d.choDuyet || 0], ['Phân công', d.phanCong || 0], ['Minh chứng', d.minhChung || 0]];
     stats.innerHTML = x.map(v => `<div class="summary-mini">
   <b>${esc(v[1])}</b>
   <span>${esc(v[0])}</span>
@@ -214,10 +200,6 @@
   </div>
   <div class="bar-label">${esc(v[0])}</div>
   </div>`).join('');
-    const score = Math.max(0, Math.min(5, Number(d.mucDanhGiaTrungBinh) || 0));
-    scoreRing.style.setProperty('--pct', (score / 5 * 100) + '%');
-    scoreValue.textContent = score.toFixed(2) + '/5';
-    scoreMeta.textContent = `${d.soTieuChiDaChamDiem || 0} tiêu chí đã chấm · ${d.soTieuChiChuaDanhGia || 0} chưa đánh giá`;
     const standards = d.tieuChuan || [];
     standardProgress.innerHTML = standards.map(r => {
       const pct = Number(r.tyLeHoanThanh) || 0;

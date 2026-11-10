@@ -186,6 +186,36 @@
        </div>
       </div>
      </section>
+     <section class="role-card">
+      <div class="card-head">
+       <div>
+        <b>Duyệt minh chứng của thành viên trong nhóm</b>
+        <span class="head-sub">Hiển thị minh chứng của tất cả thành viên thuộc các tiêu chí do nhóm phụ trách.</span>
+       </div>
+       <span class="badge b-gray" id="reviewCountBadge">0 minh chứng chờ duyệt</span>
+      </div>
+      <div class="card-body">
+       <div class="role-toolbar">
+        <input class="grow" id="reviewSearch" placeholder="Tìm mã, tiêu chí, người gửi hoặc tên minh chứng..." />
+       </div>
+       <div class="role-table">
+        <table>
+         <thead>
+          <tr>
+           <th>Mã</th>
+           <th>Tiêu chí</th>
+           <th>Tên minh chứng</th>
+           <th>Người gửi</th>
+           <th>File</th>
+           <th>Trạng thái</th>
+           <th>Thao tác</th>
+          </tr>
+         </thead>
+         <tbody id="reviewRows"></tbody>
+        </table>
+       </div>
+      </div>
+     </section>
     </section>
     <section class="tab evidence-tab-panel" id="school">
      <section class="role-card">
@@ -293,7 +323,7 @@
       </div>
       <div class="modal-body">
        <div class="review-modal-note" id="reviewInfo"></div>
-       <div class="field"><label>Kết quả</label><select id="leaderEvidenceDecision"><option value="Duyệt">Duyệt chuyển Thư ký</option><option value="Từ chối">Yêu cầu chỉnh sửa</option><option value="Chỉ feedback">Chỉ feedback</option></select></div>
+       <div class="field"><label>Kết quả</label><select id="leaderEvidenceDecision"><option value="Duyệt">Duyệt chuyển Thư ký</option><option value="Từ chối">Góp ý chỉnh sửa</option></select></div>
        <div class="field">
         <label>
          Nhận xét
@@ -376,39 +406,57 @@
     }
     }
   async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:'); if(!note || !note.trim()) return; try { await api('/truong-nhom/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
+  function evidenceRow(x, options = {}) {
+    const canReview = options.canReview === true
+      && x.trangThai === 'Chờ Trưởng nhóm duyệt'
+      && Boolean(x.duongDanFile);
+    const ownEditable = options.own === true
+      && x.maNguoiUpload === me.id
+      && ['Đang soạn', 'Từ chối'].includes(x.trangThai);
+
+    return `<tr>
+      <td><span class="role-code">${esc(x.maMinhChung || x.id)}</span></td>
+      <td><b>${esc(x.maTieuChi || '')}</b></td>
+      <td>${esc(x.tenMinhChung || '')}</td>
+      <td>${options.showUploader ? esc(x.maNguoiUpload || '-') : ''}</td>
+      <td>${evidenceFileHtml(x)}</td>
+      <td><span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span></td>
+      <td>
+        <div class="file-tools">
+          ${canReview ? `<button class="btn-primary btn-sm" onclick="openReview('${x.id}', 'Duyệt')">Duyệt / góp ý chỉnh sửa</button>` : ''}
+          ${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)"></label>
+            ${x.duongDanFile ? `<button class="file-btn delete" onclick="deleteOwnFile('${x.id}')">Xóa file</button>
+            <button class="file-btn submit" onclick="submitOwn('${x.id}')">${x.trangThai === 'Từ chối' ? 'Nộp lại' : 'Gửi Thư ký'}</button>` : ''}` : ''}
+          ${!canReview && !ownEditable ? '<span class="muted">—</span>' : ''}
+        </div>
+      </td>
+    </tr>`;
+  }
+
   function render() {
-    const q = readText(search).toLowerCase(), s = statusFilter.value;
-    const a = all.filter(x => allowed.some(c => c.id === x.maTieuChi)).filter(x => (!s || x.trangThai === s) && (!q || JSON.stringify(x).toLowerCase().includes(q)));
-    countBadge.textContent = a.length + ' minh chứng';
-    rows.innerHTML = a.map(x => {
-      const ownEditable = x.maNguoiUpload === me.id && ['Đang soạn', 'Từ chối'].includes(x.trangThai);
-      const canReview = x.trangThai === 'Chờ Trưởng nhóm duyệt' && x.duongDanFile;
-      return `<tr>
-  <td>
-  <span class="role-code">${esc(x.maMinhChung || x.id)}</span>
-  </td>
-  <td>
-  <b>${esc(x.maTieuChi || '')}</b>
-  </td>
-  <td>${esc(x.tenMinhChung || '')}</td>
-  <td>${evidenceFileHtml(x)}</td>
-  <td>
-  <span class="badge ${statusBadge(x.trangThai)}">${esc(x.trangThai || '')}</span>
-  </td>
-  <td>
-  <div class="file-tools"><button class="btn-primary btn-sm" onclick="openReview('${x.id}', '${canReview ? 'Duyệt' : 'Feedback'}')">Đánh giá / duyệt</button>${ownEditable ? `<label class="file-btn ${x.duongDanFile ? 'replace' : 'upload'}">${x.duongDanFile ? 'Thay file' : 'Tải file'}<input type="file" hidden onchange="replaceOwnFile('${x.id}',this)">
-  </label>${x.duongDanFile ? `<button class="file-btn delete" onclick="deleteOwnFile('${x.id}')">Xóa file</button>
-  <button class="file-btn submit" onclick="submitOwn('${x.id}')">${x.trangThai === 'Từ chối' ? 'Nộp lại' : 'Gửi Thư ký'}</button>` : ''}` : ''}${!canReview && !ownEditable ? '<span class="muted">—</span>' : ''}</div>
-  </td>
-  </tr>`;
-    }).join('') || `<tr>
-  <td colspan="6">
-  <div class="empty-state">
-  <div class="empty-icon">▧</div>
-  <b>Chưa có minh chứng</b>
-  </div>
-  </td>
-  </tr>`;
+    const query = readText(search).toLowerCase();
+    const status = statusFilter.value;
+    const ownEvidence = all
+      .filter(item => item.maNguoiUpload === me.id)
+      .filter(item => allowed.some(itemCriterion => itemCriterion.id === item.maTieuChi))
+      .filter(item => (!status || item.trangThai === status))
+      .filter(item => !query || JSON.stringify(item).toLowerCase().includes(query));
+
+    rows.innerHTML = ownEvidence.map(item => evidenceRow(item, { own: true }))
+      .join('') || `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">▧</div><b>Bạn chưa có minh chứng cho tiêu chí được phân công</b></div></td></tr>`;
+    countBadge.textContent = `${ownEvidence.length} minh chứng của tôi`;
+
+    const reviewQuery = readText(reviewSearch).toLowerCase();
+    const reviewEvidence = all
+      .filter(item => item.maNguoiUpload !== me.id)
+      .filter(item => item.trangThai === 'Chờ Trưởng nhóm duyệt')
+      .filter(item => Boolean(item.duongDanFile))
+      .filter(item => !reviewQuery || JSON.stringify(item).toLowerCase().includes(reviewQuery));
+
+    reviewRows.innerHTML = reviewEvidence
+      .map(item => evidenceRow(item, { canReview: true, showUploader: true }))
+      .join('') || `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">✓</div><b>Không có minh chứng thành viên đang chờ Trưởng nhóm duyệt</b></div></td></tr>`;
+    reviewCountBadge.textContent = `${reviewEvidence.length} minh chứng chờ duyệt`;
   }
   async function addEvidence(send) {
     if (!allowed.some(c => c.id === criterion.value)) {
@@ -516,10 +564,6 @@
   reviewSubmit.onclick = async () => {
     try {
       const decision = document.getElementById('leaderEvidenceDecision').value;
-      if (decision === 'Chỉ feedback') {
-        await api('/truong-nhom/minh-chung/' + encodeURIComponent(reviewId) + '/feedback', {method:'POST', body:JSON.stringify({loai:'Feedback', nhanXet:readText(reviewNote)})});
-        closeModal('reviewModal'); await load(); return;
-      }
       const r = await api('/truong-nhom/minh-chung/' + reviewId + '/duyet', {method:'POST', body:JSON.stringify({ketQua:decision, nhanXet:reviewNote.value})});
       const x = all.find(m => m.id === reviewId);
       if (x)
@@ -534,6 +578,7 @@
     };
   search.oninput = render;
   statusFilter.onchange = render;
+  reviewSearch.oninput = render;
   function commonRowsHtml(cap, q) {
     q = (q || '').trim().toLowerCase();
     const a = common.filter(x => x.capQuanLy === cap && (!q || JSON.stringify(x).toLowerCase().includes(q)));

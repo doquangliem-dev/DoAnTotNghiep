@@ -2160,22 +2160,50 @@ public class HeThongService {
             return List.of();
         }
 
-        Set<String> assignedScopes = pcRepo.findAll().stream()
+        // Giữ cả phân công cũ/đã hoàn tất/đã hủy để lịch sử minh chứng
+        // không biến mất khi Trưởng nhóm phân công lại tiêu chí.
+        List<PhanCong> groupAssignments = pcRepo.findAll().stream()
                 .filter(assignment -> groupIds.contains(assignment.getMaNhomTieuChi()))
+                .toList();
+
+        Set<String> assignmentIds = groupAssignments.stream()
+                .map(PhanCong::getId)
+                .filter(Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
+
+        Set<String> assignedScopes = groupAssignments.stream()
                 .filter(assignment -> assignment.getMaTieuChi() != null
                         && !assignment.getMaTieuChi().isBlank())
-                .filter(assignment -> !"Hủy phân công".equalsIgnoreCase(
-                        Optional.ofNullable(assignment.getTrangThai()).orElse("")
-                ))
                 .map(assignment -> Optional.ofNullable(assignment.getMaKeHoach()).orElse("")
                         + "|" + assignment.getMaTieuChi())
                 .collect(java.util.stream.Collectors.toSet());
 
+        Set<String> assignedCriteria = groupAssignments.stream()
+                .map(PhanCong::getMaTieuChi)
+                .filter(Objects::nonNull)
+                .filter(criteriaId -> !criteriaId.isBlank())
+                .collect(java.util.stream.Collectors.toSet());
+
         return minhChung("TIEU_CHI").stream()
-                .filter(evidence -> assignedScopes.contains(
-                        Optional.ofNullable(evidence.getMaKeHoach()).orElse("")
-                                + "|" + Optional.ofNullable(evidence.getMaTieuChi()).orElse("")
-                ))
+                .filter(evidence -> {
+                    // Ưu tiên mã phân công gốc để giữ đúng lịch sử.
+                    if (evidence.getMaPhanCong() != null
+                            && assignmentIds.contains(evidence.getMaPhanCong())) {
+                        return true;
+                    }
+
+                    String planId = Optional.ofNullable(evidence.getMaKeHoach()).orElse("");
+                    String criteriaId = Optional.ofNullable(evidence.getMaTieuChi()).orElse("");
+
+                    if (criteriaId.isBlank()) {
+                        return false;
+                    }
+
+                    // Khớp chính xác kế hoạch + tiêu chí; dữ liệu cũ thiếu kế hoạch
+                    // được đối chiếu theo mã tiêu chí trong nhóm.
+                    return assignedScopes.contains(planId + "|" + criteriaId)
+                            || (planId.isBlank() && assignedCriteria.contains(criteriaId));
+                })
                 .toList();
     }
 

@@ -1,8 +1,13 @@
 package com.huit.kiemdinh.model;
+
 import org.springframework.data.annotation.Id;
+
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.List;
+
 import java.time.LocalDate;
+
 @Document(collection="phanCong")
 public class PhanCong {
     @Id private String id;

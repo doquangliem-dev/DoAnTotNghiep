@@ -1,4 +1,5 @@
 package com.huit.kiemdinh.model;
+
 public class ChiBao {
     private String maChiBao;
     private String soChiBao;

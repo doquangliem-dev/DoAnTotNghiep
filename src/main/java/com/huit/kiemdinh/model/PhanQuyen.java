@@ -1,4 +1,5 @@
 package com.huit.kiemdinh.model;
+
 public class PhanQuyen {
     private String maVaiTro;
     public PhanQuyen() {

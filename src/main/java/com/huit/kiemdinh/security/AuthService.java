@@ -1,15 +1,27 @@
 package com.huit.kiemdinh.security;
+
 import com.huit.kiemdinh.model.NguoiDung;
+
 import com.huit.kiemdinh.model.PhanQuyen;
+
 import com.huit.kiemdinh.model.VaiTro;
+
 import com.huit.kiemdinh.repository.NguoiDungRepository;
+
 import com.huit.kiemdinh.repository.VaiTroRepository;
+
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpStatus;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
+
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.*;
+
 @Service
 public class AuthService {
     public static final String SESSION_USER_ID = "AUTH_USER_ID";

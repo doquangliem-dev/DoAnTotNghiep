@@ -1,16 +1,29 @@
 package com.huit.kiemdinh.config;
+
 import com.huit.kiemdinh.model.NguoiDung;
+
 import com.huit.kiemdinh.model.PhanQuyen;
+
 import com.huit.kiemdinh.model.VaiTro;
+
 import com.huit.kiemdinh.repository.NguoiDungRepository;
+
 import com.huit.kiemdinh.repository.VaiTroRepository;
+
 import com.huit.kiemdinh.security.AuthService;
+
 import com.huit.kiemdinh.service.CodeGeneratorService;
+
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+
 import org.springframework.context.event.EventListener;
+
 import org.springframework.stereotype.Component;
+
 import org.springframework.beans.factory.annotation.Value;
+
 import java.util.*;
+
 @Component
 public class BootstrapDataConfig {
     private final VaiTroRepository roleRepo;

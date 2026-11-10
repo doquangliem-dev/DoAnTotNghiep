@@ -1,9 +1,15 @@
 package com.huit.kiemdinh.controller;
+
 import com.huit.kiemdinh.security.AuthService;
+
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
+
 import org.springframework.web.bind.annotation.*;
+
 import java.util.*;
+
 @Controller
 public class AuthController {
     private final AuthService auth;

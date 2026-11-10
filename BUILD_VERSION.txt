@@ -1,4 +1,0 @@
-HeThongKiemDinh v6.4
-Fix leader evidence review button scope bug.
-Allow team leaders and members to read/download shared School/Faculty evidence files only.
-Write operations on shared evidence remain Admin-only.

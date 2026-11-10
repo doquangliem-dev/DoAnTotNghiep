@@ -1,5 +1,7 @@
 package com.huit.kiemdinh.config;
+
 import org.springframework.stereotype.Component;
+
 @Component
 public class DemoDataState {
     private volatile boolean ready = false;

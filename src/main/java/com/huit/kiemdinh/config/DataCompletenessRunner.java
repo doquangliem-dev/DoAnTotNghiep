@@ -1,11 +1,19 @@
 package com.huit.kiemdinh.config;
+
 import com.huit.kiemdinh.model.*;
+
 import com.huit.kiemdinh.repository.*;
+
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+
 import org.springframework.context.event.EventListener;
+
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
+
 import java.util.*;
+
 @Component
 public class DataCompletenessRunner {
     private final TieuChiRepository tieuChiRepo;

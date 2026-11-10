@@ -1,6 +1,9 @@
 package com.huit.kiemdinh.model;
+
 import org.springframework.data.annotation.Id;
+
 import org.springframework.data.mongodb.core.mapping.Document;
+
 @Document(collection="vaiTro")
 public class VaiTro {
     @Id private String id;

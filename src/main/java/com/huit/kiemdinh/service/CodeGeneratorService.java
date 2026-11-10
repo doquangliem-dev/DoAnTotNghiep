@@ -1,11 +1,19 @@
 package com.huit.kiemdinh.service;
+
 import org.bson.Document;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
+
 import org.springframework.stereotype.Service;
+
 import java.text.Normalizer;
+
 import java.util.Locale;
+
 import java.util.regex.Matcher;
+
 import java.util.regex.Pattern;
+
 @Service
 public class CodeGeneratorService {
     private final MongoTemplate mongoTemplate;

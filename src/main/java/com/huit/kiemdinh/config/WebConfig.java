@@ -1,8 +1,13 @@
 package com.huit.kiemdinh.config;
+
 import com.huit.kiemdinh.security.AuthInterceptor;
+
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     private final AuthInterceptor authInterceptor;

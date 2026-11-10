@@ -1,4 +1,5 @@
 package com.huit.kiemdinh.model;
+
 public class ThanhVienNhom {
     private String maNguoiDung;
     private String chucVu;

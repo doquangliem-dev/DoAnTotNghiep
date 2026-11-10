@@ -1,11 +1,19 @@
 package com.huit.kiemdinh.security;
+
 import com.huit.kiemdinh.config.DemoDataState;
+
 import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Component;
+
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import java.util.List;
+
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
     private final AuthService auth;

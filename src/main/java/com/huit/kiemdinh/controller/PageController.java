@@ -1,15 +1,27 @@
 package com.huit.kiemdinh.controller;
+
 import org.springframework.stereotype.Controller;
+
 import com.huit.kiemdinh.security.AuthService;
+
 import com.huit.kiemdinh.service.HeThongService;
+
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import org.springframework.http.MediaType;
+
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.core.io.ClassPathResource;
+
 import java.io.IOException;
+
 import java.nio.charset.StandardCharsets;
+
 @Controller
 public class PageController {
     private final HeThongService service;

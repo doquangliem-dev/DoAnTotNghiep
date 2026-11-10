@@ -1,20 +1,37 @@
 package com.huit.kiemdinh.service;
+
 import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.http.MediaType;
+
 import org.springframework.stereotype.Service;
+
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
+
 import java.net.URI;
+
 import java.net.URLEncoder;
+
 import java.net.http.HttpClient;
+
 import java.net.http.HttpRequest;
+
 import java.net.http.HttpResponse;
+
 import java.nio.charset.StandardCharsets;
+
 import java.nio.file.*;
+
 import java.time.Duration;
+
 import java.util.Locale;
+
 import java.util.Optional;
+
 @Service
 public class FileStorageService {
     private final Path root;

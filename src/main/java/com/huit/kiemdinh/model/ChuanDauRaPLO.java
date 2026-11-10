@@ -1,4 +1,5 @@
 package com.huit.kiemdinh.model;
+
 public class ChuanDauRaPLO {
     private String maPLO;
     private String tenPLO;

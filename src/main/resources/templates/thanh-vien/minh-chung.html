@@ -290,6 +290,7 @@
     b.classList.add('active');
     $('#' + b.dataset.tab).classList.add('active');
   });
+  const readText = element => String(element?.value ?? '').trim();
   let all = [], common = [], criteria = [], jobs = [], allowed = [], reviews = [], me = null;
   async function load() {
     me = await api('/auth/me');
@@ -309,7 +310,7 @@
   <b>${esc(r.capDuyet || '')}</b>: ${esc(r.nhanXet || r.trangThai || '')}</small>`;
   }
   function render() {
-    const q = search.value.trim().toLowerCase(), s = statusFilter.value;
+    const q = readText(search).toLowerCase(), s = statusFilter.value;
     const a = all.filter(x => allowed.some(c => c.id === x.maTieuChi)).filter(x => (!s || x.trangThai === s) && (!q || JSON.stringify(x).toLowerCase().includes(q)));
     countBadge.textContent = a.length + ' minh chứng';
     rows.innerHTML = a.map(x => {
@@ -346,14 +347,14 @@
     if (!allowed.some(c => c.id === criterion.value)) {
       return alert('Bạn chỉ được bổ sung minh chứng cho tiêu chí được phân công hoặc phối hợp hỗ trợ.');
     }
-    if (!criterion.value || !name.value.trim())
+    if (!criterion.value || !readText(name))
          return alert('Vui lòng chọn tiêu chí và nhập tên minh chứng');
     if (send && !file.files[0])
          return alert('Vui lòng chọn file minh chứng trước khi gửi duyệt');
     try {
       let x = await api('/thanh-vien/minh-chung', {
         method: 'POST', body: JSON.stringify({
-          maTieuChi: criterion.value, maPhanCong: jobs.find(j => j.maTieuChi === criterion.value && (j.maNguoiDung === me.id || j.maNhanSuHoTro === me.id || (Array.isArray(j.maNhanSuHoTroList) && j.maNhanSuHoTroList.includes(me.id)) || (Array.isArray(j.maNguoiPhoiHopList) && j.maNguoiPhoiHopList.includes(me.id))))?.id || null, tenMinhChung: name.value.trim(), moTa: name.value.trim()
+          maTieuChi: criterion.value, maPhanCong: jobs.find(j => j.maTieuChi === criterion.value && (j.maNguoiDung === me.id || j.maNhanSuHoTro === me.id || (Array.isArray(j.maNhanSuHoTroList) && j.maNhanSuHoTroList.includes(me.id)) || (Array.isArray(j.maNguoiPhoiHopList) && j.maNguoiPhoiHopList.includes(me.id))))?.id || null, tenMinhChung: readText(name), moTa: readText(name)
         })
       });
       if (file.files[0]) {

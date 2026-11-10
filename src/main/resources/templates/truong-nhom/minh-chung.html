@@ -325,6 +325,7 @@
     if (b.dataset.tab === 'school' || b.dataset.tab === 'faculty')
          ensureCommonLoaded();
   });
+  const readText = element => String(element?.value ?? '').trim();
   let all = [], common = [], criteria = [], jobs = [], allowed = [], reviewId = null, reviewResult = '', me = null;
   async function load() {
     const [meData, evidenceData, criteriaData, jobsData] = await Promise.all([
@@ -353,17 +354,10 @@
         .map(x => x.maTieuChi)
     );
 
-    const assignedStandardIds = new Set(
-      activeJobs
-        .filter(x => !x.maTieuChi && x.maTieuChuan)
-        .map(x => x.maTieuChuan)
-    );
-
-    // Chỉ cho phép bổ sung minh chứng trong phạm vi phân công của người đăng nhập.
-    // Không dùng danh sách minh chứng đã tồn tại để mở rộng quyền chọn tiêu chí.
-    allowed = criteria.filter(
-      c => assignedCriterionIds.has(c.id) || assignedStandardIds.has(c.maTieuChuan)
-    );
+    // Chỉ phân công ở cấp tiêu chí mới cấp quyền lập minh chứng.
+    // Phân công cấp tiêu chuẩn cho Trưởng nhóm chỉ phục vụ điều phối, không cấp quyền
+    // tạo minh chứng cho toàn bộ tiêu chí thuộc tiêu chuẩn đó.
+    allowed = criteria.filter(c => assignedCriterionIds.has(c.id));
     criterion.innerHTML = '<option value="">-- Chọn tiêu chí --</option>' + allowed.map(c => `<option value="${c.id}">${c.id} - ${esc(c.tenTieuChi)}</option>`).join('');
     render();
   }
@@ -383,7 +377,7 @@
     }
   async function quickEvidenceFeedback(id,loai) { const note=prompt('Nhập nội dung '+loai.toLowerCase()+' cho minh chứng:'); if(!note || !note.trim()) return; try { await api('/truong-nhom/minh-chung/'+encodeURIComponent(id)+'/feedback',{method:'POST',body:JSON.stringify({loai,nhanXet:note.trim()})}); alert('Đã lưu '+loai.toLowerCase()+'. Trạng thái minh chứng không thay đổi.'); await load(); } catch(e){ alert(e.message); } }
   function render() {
-    const q = search.value.trim().toLowerCase(), s = statusFilter.value;
+    const q = readText(search).toLowerCase(), s = statusFilter.value;
     const a = all.filter(x => allowed.some(c => c.id === x.maTieuChi)).filter(x => (!s || x.trangThai === s) && (!q || JSON.stringify(x).toLowerCase().includes(q)));
     countBadge.textContent = a.length + ' minh chứng';
     rows.innerHTML = a.map(x => {
@@ -420,14 +414,14 @@
     if (!allowed.some(c => c.id === criterion.value)) {
       return alert('Bạn chỉ được bổ sung minh chứng cho tiêu chí thuộc phạm vi phân công của mình.');
     }
-    if (!criterion.value || !name.value.trim())
+    if (!criterion.value || !readText(name))
          return alert('Vui lòng chọn tiêu chí và nhập tên minh chứng');
     if (send && !file.files[0])
          return alert('Vui lòng chọn file minh chứng trước khi gửi');
     try {
       let x = await api('/truong-nhom/minh-chung', {
         method: 'POST', body: JSON.stringify({
-          maTieuChi: criterion.value, tenMinhChung: name.value.trim(), moTa: name.value.trim()
+          maTieuChi: criterion.value, tenMinhChung: readText(name), moTa: readText(name)
         })
       });
       if (file.files[0]) {
@@ -523,7 +517,7 @@
     try {
       const decision = document.getElementById('leaderEvidenceDecision').value;
       if (decision === 'Chỉ feedback') {
-        await api('/truong-nhom/minh-chung/' + encodeURIComponent(reviewId) + '/feedback', {method:'POST', body:JSON.stringify({loai:'Feedback', nhanXet:reviewNote.value.trim()})});
+        await api('/truong-nhom/minh-chung/' + encodeURIComponent(reviewId) + '/feedback', {method:'POST', body:JSON.stringify({loai:'Feedback', nhanXet:readText(reviewNote)})});
         closeModal('reviewModal'); await load(); return;
       }
       const r = await api('/truong-nhom/minh-chung/' + reviewId + '/duyet', {method:'POST', body:JSON.stringify({ketQua:decision, nhanXet:reviewNote.value})});

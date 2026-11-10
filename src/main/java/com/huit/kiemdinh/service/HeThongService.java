@@ -1732,8 +1732,9 @@ public class HeThongService {
             PhanCong candidate=pcRepo.findById(x.getMaPhanCong()).orElse(null);
             if(candidate!=null&&!"Hủy phân công".equalsIgnoreCase(Optional.ofNullable(candidate.getTrangThai()).orElse(""))) {
                 boolean mine=leaderRole
-                ? Objects.equals(candidate.getMaNguoiDung(),userId)&&Objects.equals(candidate.getMaTieuChuan(),tc.getMaTieuChuan())
-                &&((candidate.getMaTieuChi()==null||candidate.getMaTieuChi().isBlank())||Objects.equals(candidate.getMaTieuChi(),tc.getId()))
+                ? Objects.equals(candidate.getMaNguoiDung(),userId)
+                && Objects.equals(candidate.getMaTieuChuan(),tc.getMaTieuChuan())
+                && Objects.equals(candidate.getMaTieuChi(),tc.getId())
                 : (Objects.equals(candidate.getMaNguoiDung(),userId)||Objects.equals(candidate.getMaNhanSuHoTro(),userId)||(candidate.getMaNhanSuHoTroList()!=null&&candidate.getMaNhanSuHoTroList().contains(userId))||(candidate.getMaNguoiPhoiHopList()!=null&&candidate.getMaNguoiPhoiHopList().contains(userId)))&&Objects.equals(candidate.getMaTieuChi(),tc.getId());
                 if(mine) assignment=candidate;
             }
@@ -1818,19 +1819,8 @@ public class HeThongService {
                 Optional.ofNullable(p.getTrangThai()).orElse("")))
             .toList();
 
-        if (leaderRole) {
-            PhanCong leaderScope = activeAssignments.stream()
-                .filter(p -> Objects.equals(p.getMaNguoiDung(), userId))
-                .filter(p -> Objects.equals(p.getMaTieuChuan(), tc.getMaTieuChuan()))
-                .filter(p -> p.getMaTieuChi() == null || p.getMaTieuChi().isBlank())
-                .findFirst()
-                .orElse(null);
-
-            if (leaderScope != null) {
-                return leaderScope;
-            }
-        }
-
+        // Chức danh Trưởng nhóm không tự mở rộng quyền thao tác xuống toàn bộ tiêu chuẩn.
+        // Mọi vai trò chỉ được lập minh chứng khi có phân công ở cấp tiêu chí cụ thể.
         return activeAssignments.stream()
             .filter(p -> Objects.equals(p.getMaTieuChi(), tc.getId()))
             .filter(p -> Objects.equals(p.getMaNguoiDung(), userId)

@@ -221,7 +221,6 @@ public class ApiController {
         return s.saveDanhGiaTieuChi(x,currentUser(session));
     }
     @PostMapping("/hoi-dong/bao-cao/{id}/feedback") public BaoCaoTieuChi hdFeedbackBaoCao(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackBaoCao(id,"Hội đồng",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
-    @PostMapping("/hoi-dong/minh-chung/{id}/feedback") public DanhGiaMinhChung hdFeedbackMc(@PathVariable String id,@RequestBody Map<String,String> b,HttpSession session) { return s.reviewerFeedbackMinhChung(id,"Hội đồng",b.get("loai"),b.get("nhanXet"),currentUser(session)); }
     @PostMapping("/hoi-dong/bao-cao/{id}/duyet")
     public BaoCaoTieuChi duyetBaoCao(@PathVariable String id,@RequestBody Map<String,String> body,HttpSession session) {
         return s.duyetBaoCao(id,body.get("trangThai"),body.get("nhanXet"),body.get("khuyenNghi"),currentUser(session));
@@ -360,19 +359,19 @@ public class ApiController {
     }
     @PostMapping("/thanh-vien/minh-chung")
     public MinhChung tvSaveMc(@RequestBody MinhChung x,HttpSession session) {
-        return s.luuMinhChungNguoiDung(x,currentUser(session),true);
+        return s.luuMinhChungNguoiDung(x,currentUser(session),false);
     }
     @PostMapping(value="/thanh-vien/minh-chung/{id}/upload",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public MinhChung tvUploadMc(@PathVariable String id,@RequestParam("file") MultipartFile file,HttpSession session) {
-        return s.uploadMinhChungNguoiDung(id,file,currentUser(session),true);
+        return s.uploadMinhChungNguoiDung(id,file,currentUser(session),false);
     }
     @DeleteMapping("/thanh-vien/minh-chung/{id}/file")
     public MinhChung tvDeleteMcFile(@PathVariable String id,HttpSession session) {
-        return s.deleteMinhChungFileNguoiDung(id,currentUser(session),true);
+        return s.deleteMinhChungFileNguoiDung(id,currentUser(session),false);
     }
     @PostMapping("/thanh-vien/minh-chung/{id}/gui-duyet")
     public MinhChung tvGuiMc(@PathVariable String id,HttpSession session) {
-        return s.guiMinhChungNguoiDung(id,currentUser(session),true);
+        return s.guiMinhChungNguoiDung(id,currentUser(session),false);
     }
     @PostMapping("/thanh-vien/bao-cao")
     public BaoCaoTieuChi tvSaveBc(@RequestBody BaoCaoTieuChi x,HttpSession session) {

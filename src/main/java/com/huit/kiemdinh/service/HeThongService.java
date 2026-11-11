@@ -1250,7 +1250,10 @@ public class HeThongService {
             if(!truongNhomPhuTrachTieuChi(userId, mc.getMaKeHoach(), mc.getMaTieuChi()))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Minh chứng ngoài phạm vi Trưởng nhóm phụ trách");
         }
-        if(!List.of("Trưởng nhóm","Hội đồng","Thư ký chương trình","TT QLCL").contains(cap))
+        // Hội đồng tự đánh giá chỉ tra cứu/đối chiếu minh chứng; không được ghi nhận
+        // duyệt hoặc góp ý xét duyệt minh chứng. Luồng duyệt thuộc Trưởng nhóm,
+        // Thư ký chương trình và Trung tâm Quản lý chất lượng.
+        if(!List.of("Trưởng nhóm","Thư ký chương trình","TT QLCL").contains(cap))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Vai trò không được phép feedback minh chứng");
         DanhGiaMinhChung dg=new DanhGiaMinhChung();
         dg.setId(codes.nextDanhGiaMinhChung()); dg.setMaMinhChung(mc.getMaMinhChung());
